@@ -27,6 +27,7 @@ async function main() {
   const granted = await vm.runInContext(`grantVideoAccess({ url: ${JSON.stringify(video)}, category: "robotics", reason: "I need this tutorial for my sensor project." })`, context);
   assert.equal(granted.ok, true);
   assert.equal((await vm.runInContext(`policyForUrl(${JSON.stringify(video)})`, context)).mode, "allow");
+  assert.equal((await vm.runInContext("policyForUrl('https://www.youtube.com/watch?v=otherid1234')", context)).mode, "video");
   const shortUrl = "https://www.youtube.com/shorts/abcdefghijk";
   assert.equal((await vm.runInContext(`policyForUrl(${JSON.stringify(shortUrl)})`, context)).mode, "shorts");
   const shortDenied = await vm.runInContext(`grantShortAccess({ url: ${JSON.stringify(shortUrl)}, category: "school", reason: "because" })`, context);

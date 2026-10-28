@@ -3,6 +3,7 @@
   let lastPolicy = "";
   let pending = 0;
   let host = null;
+  let lastSeenUrl = location.href;
 
   // YouTube uses page-wide keyboard shortcuts. Keep typing inside the shadow
   // form from reaching those handlers, without cancelling normal text input.
@@ -68,7 +69,10 @@
     const shadow = makeOverlay();
     const content = shadow.getElementById("content");
     const guardMarkup = `<div class="guard-wrap"><img src="${chrome.runtime.getURL("icons/guard-avatar.svg")}" alt="" aria-hidden="true"></div>`;
-    if (policy.mode === "shorts" && !policy.shortId) {
+    if (policy.mode === "checking") {
+      content.innerHTML = `${guardMarkup}<span class="eyebrow">CHECKING THIS VIDEO</span><h1 id="amythest-title">One moment, <em>please.</em></h1><p>Amythest is checking whether this video needs a reason.</p>`;
+      shadow.querySelector(".guard-wrap")?.classList.add("checking");
+    } else if (policy.mode === "shorts" && !policy.shortId) {
       const escapeLink = policy.shortKind === "TikTok feed" ? '<a class="secondary" href="https://www.tiktok.com/messages">Open TikTok messages →</a>' : policy.shortKind === "Instagram Reels" ? '<a class="secondary" href="https://www.instagram.com/">Back to Instagram →</a>' : '';
       content.innerHTML = `${guardMarkup}<span class="eyebrow">SHORT-FORM FEED PAUSED</span><h1 id="amythest-title">Keep your <em>attention.</em></h1><p>${policy.shortKind || "This feed"} is paused. Open a specific video to ask for access to just that one. Messages and other pages stay available.</p>${escapeLink}`;
     } else if (policy.mode === "video" || policy.mode === "shorts") {
@@ -110,12 +114,29 @@
     } catch { /* Extension may be reloading; the next check will retry. */ }
   }
 
+  function onLocationChange() {
+    if (location.href === lastSeenUrl) return;
+    lastSeenUrl = location.href;
+    if (/^https?:\/\/(?:www\.|m\.)?youtube\.com\/(?:watch(?:\?|$)|shorts\/|live\/)/.test(lastSeenUrl)) {
+      render({ mode: "checking" });
+    }
+    refresh();
+  }
+
+  function watchLocation() {
+    new MutationObserver(onLocationChange).observe(document.documentElement, { childList: true, subtree: true });
+  }
+
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "local" && Object.keys(changes).some(key => key.startsWith("usage:") || ["blockedSites", "siteLimits", "focusUntil", "pausedUntil", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm", "videoAccess", "shortAccess"].includes(key))) refresh();
   });
-  chrome.runtime.onMessage.addListener(message => { if (message.type === "policyChanged") refresh(); });
+  chrome.runtime.onMessage.addListener(message => { if (message.type === "policyChanged") { onLocationChange(); refresh(); } });
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
-  window.addEventListener("popstate", refresh);
-  setInterval(refresh, 10000);
+  window.addEventListener("popstate", onLocationChange);
+  window.addEventListener("yt-navigate-start", onLocationChange);
+  window.addEventListener("yt-navigate-finish", onLocationChange);
+  if (document.documentElement) watchLocation(); else document.addEventListener("DOMContentLoaded", watchLocation, { once: true });
+  setInterval(() => { onLocationChange(); refresh(); }, 1000);
+  if (/^https?:\/\/(?:www\.|m\.)?youtube\.com\/(?:watch(?:\?|$)|shorts\/|live\/)/.test(location.href)) render({ mode: "checking" });
   refresh();
 })();
