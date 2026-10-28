@@ -2,14 +2,17 @@
   "manifest_version": 3,
   "name": "Amythest — mindful screen time",
   "short_name": "Amythest",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "See where your time goes and make space to focus.",
   "permissions": ["storage", "tabs", "alarms", "declarativeNetRequest", "webNavigation"],
   "host_permissions": ["<all_urls>"],
   "background": { "service_worker": "background.js" },
-  "content_scripts": [{ "matches": ["*://youtube.com/*", "*://*.youtube.com/*"], "js": ["youtube-cleanup.js"], "css": ["youtube-cleanup.css"], "run_at": "document_idle" }],
+  "content_scripts": [
+    { "matches": ["<all_urls>"], "js": ["site-overlay.js"], "run_at": "document_start" },
+    { "matches": ["*://youtube.com/*", "*://*.youtube.com/*"], "js": ["youtube-cleanup.js"], "css": ["youtube-cleanup.css"], "run_at": "document_idle" }
+  ],
   "action": { "default_popup": "popup.html", "default_title": "Amythest" },
   "options_page": "dashboard.html",
-  "web_accessible_resources": [{ "resources": ["blocked.html", "shorts-blocked.html"], "matches": ["<all_urls>"] }],
+  "web_accessible_resources": [{ "resources": ["icons/mark.svg"], "matches": ["<all_urls>"] }],
   "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
 }

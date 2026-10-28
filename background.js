@@ -55,6 +55,19 @@ function blockedDomains(settings, usage, now = Date.now()) {
   }
   return [...domains].slice(0, 200);
 }
+function sitePolicy(url, settings, usage, now = Date.now()) {
+  const domain = hostname(url);
+  if (!domain) return { mode: "allow" };
+  if (settings.blockShorts && youtubeShorts(url)) return { mode: "shorts" };
+  if (blockedDomains(settings, usage, now).some(site => matches(domain, site))) {
+    return { mode: "block", focusUntil: settings.focusUntil, workHours: isWorkTime(settings, new Date(now)) };
+  }
+  const video = youtubeVideo(url);
+  if (settings.checkLongForm && video && !(settings.videoAccess?.[video.id]?.until > now)) {
+    return { mode: "video", videoId: video.id };
+  }
+  return { mode: "allow" };
+}
 function recordElapsed() {
   if (!active) return recording;
   const current = active;
@@ -89,52 +102,17 @@ async function applyRules() {
   const settings = await chrome.storage.local.get(DEFAULTS);
   const validAccess = Object.fromEntries(Object.entries(settings.videoAccess).filter(([, entry]) => entry.until > Date.now()));
   if (Object.keys(validAccess).length !== Object.keys(settings.videoAccess).length) await chrome.storage.local.set({ videoAccess: validAccess });
+  const current = await chrome.declarativeNetRequest.getDynamicRules();
+  if (current.length) await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: current.map(rule => rule.id) });
   const data = await chrome.storage.local.get(`usage:${dateKey()}`);
   const domains = blockedDomains(settings, data[`usage:${dateKey()}`] || {});
-  const current = await chrome.declarativeNetRequest.getDynamicRules();
-  const addRules = domains.map((domain, i) => ({
-    id: i + 1, priority: 1,
-    action: { type: "redirect", redirect: { extensionPath: "/blocked.html" } },
-    condition: { urlFilter: `||${domain}^`, resourceTypes: ["main_frame"] }
-  }));
-  if (settings.blockShorts) addRules.push({
-    id: 10000, priority: 2,
-    action: { type: "redirect", redirect: { extensionPath: "/shorts-blocked.html" } },
-    condition: { regexFilter: "^https?://(www\\.|m\\.)?youtube\\.com/shorts(?:/|\\?|$)", resourceTypes: ["main_frame"] }
-  });
-  const currentById = new Map(current.map(rule => [rule.id, rule]));
-  const unchanged = current.length === addRules.length && addRules.every(rule => {
-    const saved = currentById.get(rule.id);
-    return saved?.condition.urlFilter === rule.condition.urlFilter &&
-      saved?.condition.regexFilter === rule.condition.regexFilter &&
-      saved?.action.type === rule.action.type &&
-      saved?.action.redirect?.extensionPath === rule.action.redirect.extensionPath;
-  });
-  if (!unchanged) {
-    if (current.length) await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: current.map(r => r.id) });
-    if (addRules.length) await chrome.declarativeNetRequest.updateDynamicRules({ addRules });
-  }
-  await chrome.action.setBadgeText({ text: domains.length ? "ON" : "" });
+  await chrome.action.setBadgeText({ text: domains.length || settings.blockShorts ? "ON" : "" });
   await chrome.action.setBadgeBackgroundColor({ color: "#7556b8" });
-  const tabs = await chrome.tabs.query({ active: true });
-  for (const tab of tabs) {
-    const domain = hostname(tab.url);
-    if (domain && domains.some(site => matches(domain, site))) {
-      await chrome.tabs.update(tab.id, { url: chrome.runtime.getURL("blocked.html") });
-    }
-  }
 }
-async function gateYouTubeTab(tab) {
-  if (!tab?.id || !tab.url) return;
+async function policyForUrl(url) {
   const settings = await chrome.storage.local.get(DEFAULTS);
-  if (settings.blockShorts && youtubeShorts(tab.url)) {
-    await chrome.tabs.update(tab.id, { url: chrome.runtime.getURL("shorts-blocked.html") });
-    return;
-  }
-  const video = youtubeVideo(tab.url);
-  if (!video) return;
-  if (!settings.checkLongForm || settings.videoAccess[video.id]?.until > Date.now()) return;
-  await chrome.tabs.update(tab.id, { url: chrome.runtime.getURL(`video-gate.html?target=${encodeURIComponent(video.url)}`) });
+  const data = await chrome.storage.local.get(`usage:${dateKey()}`);
+  return sitePolicy(url, settings, data[`usage:${dateKey()}`] || {});
 }
 async function grantVideoAccess(message) {
   const video = youtubeVideo(message.url);
@@ -160,29 +138,23 @@ async function init() {
 }
 chrome.runtime.onInstalled.addListener(init);
 chrome.runtime.onStartup.addListener(init);
-chrome.tabs.onActivated.addListener(async info => {
-  try { await refreshActive(); await gateYouTubeTab(await chrome.tabs.get(info.tabId)); }
-  catch (error) { console.error("Could not check active tab", error); }
-});
+chrome.tabs.onActivated.addListener(refreshActive);
 chrome.tabs.onUpdated.addListener((_id, change, tab) => {
-  if (change.url) {
-    if (tab.active) refreshActive().catch(error => console.error("Could not track active tab", error));
-    gateYouTubeTab(tab).catch(error => console.error("Could not check video", error));
-  }
+  if (change.url && tab.active) refreshActive().catch(error => console.error("Could not track active tab", error));
 });
 chrome.webNavigation.onHistoryStateUpdated.addListener(details => {
-  if (details.frameId === 0) chrome.tabs.get(details.tabId).then(gateYouTubeTab).catch(error => console.error("Could not check video navigation", error));
+  if (details.frameId === 0) chrome.tabs.sendMessage(details.tabId, { type: "policyChanged" }).catch(() => {});
 }, { url: [{ hostSuffix: "youtube.com" }] });
 chrome.tabs.onRemoved.addListener(refreshActive);
 chrome.windows.onFocusChanged.addListener(refreshActive);
 chrome.alarms.onAlarm.addListener(async () => { await recordElapsed(); await syncRules(); });
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && Object.keys(changes).some(key => ["blockedSites", "siteLimits", "focusUntil", "pausedUntil", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm"].includes(key) || key.startsWith("usage:"))) syncRules();
-  if (area === "local" && (changes.blockShorts || changes.checkLongForm)) chrome.tabs.query({ active: true }).then(tabs => Promise.all(tabs.map(gateYouTubeTab))).catch(error => console.error("Could not check open videos", error));
 });
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === "flushUsage") recordElapsed().then(() => sendResponse({ ok: true }));
   else if (message.type === "syncRules") syncRules().then(() => sendResponse({ ok: true }));
+  else if (message.type === "getSitePolicy") policyForUrl(message.url).then(sendResponse).catch(error => sendResponse({ mode: "allow", error: error.message }));
   else if (message.type === "requestVideoAccess") grantVideoAccess(message).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
   return true;
 });

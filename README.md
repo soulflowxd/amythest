@@ -22,14 +22,16 @@ After you change the extension's files, click **Reload** on its card at `chrome:
 - **Distraction list:** Add websites such as `youtube.com`. Subdomains such as `music.youtube.com` are included.
 - **Work hours:** Turn this on in the dashboard and choose a start and end time. Your distraction list is blocked during those hours Monday through Friday. It uses your computer's local time. Work hours are off by default.
 - **Daily site limits:** Enter a website and a number of minutes. Amythest adds up time on that site and its subdomains. Once the limit is reached, the site is blocked for the rest of the day. Limits reset at local midnight.
-- **Take a break:** The block page has a five-minute break button. It temporarily pauses all blocks, including work-hour and daily-limit blocks.
+- **Take a break:** The reminder shown over a blocked website has a five-minute break button. It temporarily pauses focus, work-hour, and daily-limit blocks while keeping you on that website.
 - **Distraction goal:** Set a daily goal for time on sites in your distraction list. Productive sites stay in the activity chart but do not move the goal bar unless you add them to that list. This goal is a progress guide; it does not block all websites.
-- **Block YouTube Shorts:** Turn this on to send Shorts pages to a pause page with no break button. A separate switch hides Shorts shelves and sidebar links on YouTube. This applies even outside focus sessions.
-- **Check long-form videos:** Turn this on to ask why you want to watch a YouTube video. Choose a purpose such as school or robotics and write what you need to do. A valid response opens that one video for 15 minutes. Amythest cannot verify whether the reason is true, so this is an intentional pause rather than an automatic judgment.
+- **Block YouTube Shorts:** Turn this on to cover Shorts with an on-page reminder that has no break button. A separate switch hides Shorts shelves and sidebar links on YouTube. This applies even outside focus sessions.
+- **Check long-form videos:** Turn this on to ask why you want to watch a YouTube video. The question appears over the video, so the tab keeps its YouTube address. Choose a purpose such as school or robotics and write what you need to do. A valid response unlocks that one video for 15 minutes. Amythest cannot verify whether the reason is true, so this is an intentional pause rather than an automatic judgment.
 
 The written reason is checked locally and is not saved. Only the chosen purpose and the temporary access time stay in Chrome storage until that access expires.
 
-When the long-form check is on, it replaces whole-site focus blocking for `youtube.com` so the video reason page can appear. The Shorts switch still blocks Shorts. Turn the long-form check off if you want your distraction list to block all of YouTube during focus sessions and work hours.
+When the long-form check is on, it replaces whole-site focus blocking for `youtube.com` so the video question can appear. The Shorts switch still blocks Shorts. Turn the long-form check off if you want your distraction list to block all of YouTube during focus sessions and work hours.
+
+Reminders now appear over the original website, so the tab does not change addresses. Amythest pauses ordinary page audio and video while a reminder is visible. The site still loads behind it; this is a self-control screen, not a network block.
 
 Your browsing totals and settings stay in Chrome on your device. Amythest has no account or server. It counts active website time while Chrome is focused, so the totals are approximate. It cannot track other browsers or apps. The animated companion is original to this project; click it for a wave.
 

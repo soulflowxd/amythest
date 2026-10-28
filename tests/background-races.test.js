@@ -40,11 +40,9 @@ async function main() {
   saved.focusUntil = Date.now() + 60000;
   saved.checkLongForm = false;
   await vm.runInContext("applyRules()", context);
-  assert.equal(updates.length, 2);
+  assert.equal(updates.length, 1);
   assert.deepEqual([...updates[0].removeRuleIds], [1]);
   assert.equal(updates[0].addRules, undefined);
-  assert.equal(updates[1].addRules[0].id, 1);
-  assert.equal(updates[1].removeRuleIds, undefined);
   console.log("Background race checks passed");
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });
