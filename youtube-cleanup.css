@@ -1,0 +1,6 @@
+html.amythest-hide-shorts ytd-reel-shelf-renderer,
+html.amythest-hide-shorts ytd-rich-shelf-renderer:has(a[href^="/shorts/"]),
+html.amythest-hide-shorts ytd-guide-entry-renderer:has(a[href^="/shorts"]),
+html.amythest-hide-shorts ytd-mini-guide-entry-renderer:has(a[href^="/shorts"]),
+html.amythest-hide-shorts ytd-rich-grid-slim-media:has(a[href^="/shorts/"]),
+html.amythest-hide-shorts ytd-video-renderer:has(a[href^="/shorts/"]) { display: none !important; }

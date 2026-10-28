@@ -15,7 +15,7 @@ async function render() {
   await chrome.runtime.sendMessage({ type: "flushUsage" });
   const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate() - (6-i)); return d; });
   const keys = days.flatMap(d => [`usage:${keyFor(d)}`, `hours:${keyFor(d)}`, `hoursBySite:${keyFor(d)}`]);
-  state = await chrome.storage.local.get(["blockedSites", "siteLimits", "focusUntil", "sessionMinutes", "dailyGoalMinutes", "workHoursEnabled", "workStart", "workEnd", ...keys]);
+  state = await chrome.storage.local.get(["blockedSites", "siteLimits", "focusUntil", "sessionMinutes", "dailyGoalMinutes", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "hideShortsFeed", "checkLongForm", ...keys]);
   const usage = chartView === "day" ? (state[`usage:${dateKey()}`] || {}) : days.reduce((sum, d) => { for (const [site, ms] of Object.entries(state[`usage:${keyFor(d)}`] || {})) sum[site] = (sum[site] || 0) + ms; return sum; }, {});
   const rows = Object.entries(usage).sort((a,b) => b[1]-a[1]);
   const total = rows.reduce((sum, row) => sum+row[1], 0);
@@ -54,6 +54,9 @@ async function render() {
   $("work-start").value = state.workStart || "09:00";
   $("work-end").value = state.workEnd || "17:00";
   $("work-status").textContent = state.workHoursEnabled ? "Your distraction list is blocked Monday through Friday during these hours." : "Work hours are off.";
+  $("block-shorts").checked = state.blockShorts !== false;
+  $("hide-shorts-feed").checked = state.hideShortsFeed !== false;
+  $("check-long-form").checked = state.checkLongForm !== false;
   $("site-usage").replaceChildren();
   rows.slice(0,8).forEach(([domain, ms]) => {
     const row = document.createElement("div"); row.className="usage-row";
@@ -109,6 +112,9 @@ $("add-limit").addEventListener("submit", async e => {
 $("work-enabled").addEventListener("change", e => chrome.storage.local.set({ workHoursEnabled: e.target.checked }));
 $("work-start").addEventListener("change", e => chrome.storage.local.set({ workStart: e.target.value }));
 $("work-end").addEventListener("change", e => chrome.storage.local.set({ workEnd: e.target.value }));
+$("block-shorts").addEventListener("change", e => chrome.storage.local.set({ blockShorts: e.target.checked }));
+$("hide-shorts-feed").addEventListener("change", e => chrome.storage.local.set({ hideShortsFeed: e.target.checked }));
+$("check-long-form").addEventListener("change", e => chrome.storage.local.set({ checkLongForm: e.target.checked }));
 $("duration").addEventListener("change", e => chrome.storage.local.set({ sessionMinutes:Number(e.target.value) }));
 $("goal").addEventListener("change", e => chrome.storage.local.set({ dailyGoalMinutes:Number(e.target.value) }));
 $("start-focus").addEventListener("click", async () => {

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Before you watch — amythest</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="video-gate.css"></head>
+<body class="video-gate-page">
+  <main class="video-gate-card">
+    <div class="brand"><img class="gem" src="icons/mark.svg" alt=""><span>amythest</span></div>
+    <div class="gate-icon" aria-hidden="true">▶</div>
+    <span class="eyebrow">WATCH WITH INTENTION</span>
+    <h1>What are you here to <em>learn?</em></h1>
+    <p>Long-form videos open after a quick check-in. Pick a purpose and describe what you need from this video. Your access lasts 15 minutes.</p>
+    <form id="reason-form">
+      <label for="purpose">Purpose</label>
+      <select id="purpose" required><option value="">Choose a purpose</option><option value="school">School</option><option value="robotics">Robotics</option><option value="work">Work</option><option value="research">Research</option><option value="other">Another purposeful task</option></select>
+      <label for="reason">What will you use this video for?</label>
+      <textarea id="reason" rows="3" maxlength="280" minlength="15" placeholder="I need to follow this robotics tutorial to wire my sensor." required></textarea>
+      <p class="gate-hint">Write at least three meaningful words. Amythest uses this pause to help you decide; it cannot verify your reason.</p>
+      <p id="gate-error" class="form-error" role="alert"></p>
+      <button class="primary-button" type="submit">Watch for 15 minutes <span>→</span></button>
+    </form>
+    <button id="close-tab" class="text-button">Close this tab</button>
+  </main>
+  <script src="video-gate.js"></script>
+</body>
+</html>

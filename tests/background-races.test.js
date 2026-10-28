@@ -38,6 +38,7 @@ async function main() {
   delayRead = false;
   saved.blockedSites = ["youtube.com"];
   saved.focusUntil = Date.now() + 60000;
+  saved.checkLongForm = false;
   await vm.runInContext("applyRules()", context);
   assert.equal(updates.length, 2);
   assert.deepEqual([...updates[0].removeRuleIds], [1]);
