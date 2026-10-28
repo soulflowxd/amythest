@@ -91,6 +91,7 @@ async function render() {
   const remaining = Math.max(0,(state.focusUntil || 0)-Date.now());
   $("start-focus").innerHTML = remaining ? 'End focus session <span>×</span>' : 'Start a focus session <span>→</span>';
   $("focus-status").textContent = remaining ? `${Math.ceil(remaining/60000)} minutes remaining. You have this.` : "No session running. Start whenever you're ready.";
+  document.body.removeAttribute("data-loading");
 }
 
 $("add-site").addEventListener("submit", async e => {

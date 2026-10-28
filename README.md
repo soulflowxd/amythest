@@ -32,8 +32,12 @@ Written reasons for short-form and long-form videos are checked locally and are 
 
 When the long-form check is on, it replaces whole-site focus blocking for `youtube.com` so the video question can appear. The short-form switch prevents default whole-site focus blocking for `instagram.com` and `tiktok.com`, allowing normal Instagram pages and TikTok messages to work. You can still set a separate daily site limit for either domain. Turn the long-form check off if you want your distraction list to block all of YouTube during focus sessions and work hours.
 
-Reminders now appear over the original website, so the tab does not change addresses. Amythest pauses ordinary page audio and video while a reminder is visible. The site still loads behind it; this is a self-control screen, not a network block.
+Reminders appear over the original website, so the tab does not change addresses. The Aero-style robot crosses its arms when a distraction is paused and animates while a written reason is being checked. Text fields keep keyboard shortcuts, including YouTube's spacebar shortcut, from interrupting typing. Amythest pauses ordinary page audio and video while a reminder is visible. The site still loads behind it; this is a self-control screen, not a network block.
 
 Your browsing totals and settings stay in Chrome on your device. Amythest has no account or server. It counts active website time while Chrome is focused, so the totals are approximate. It cannot track other browsers or apps.
 
-The glass square with the white four-point star is the same mark in the toolbar and on the extension pages. The animated robot companion uses [Agent Robot Avatar](https://github.com/CX-ArtLab/agent-robot-avatar) by CX ART Lab under the MIT license, included in `vendor/agent-robot-avatar/`. It is separate from the amythest logo and is not presented as an original amythest character.
+The simple purple geode mark is the same in the toolbar and on extension pages. The interface bundles [Inter](https://github.com/rsms/inter) under the SIL Open Font License, so it works offline. The animated robot companion uses [Agent Robot Avatar](https://github.com/CX-ArtLab/agent-robot-avatar) by CX ART Lab under its MIT license. Its source and license are included in `vendor/agent-robot-avatar/`.
+
+## License
+
+Amythest's original code and artwork are available under the [MIT License](LICENSE). The bundled avatar and font retain their own licenses in `vendor/agent-robot-avatar/LICENSE` and `assets/fonts/OFL.txt`.

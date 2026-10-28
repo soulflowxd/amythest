@@ -1,0 +1,66 @@
+@font-face{font-family:"Amythest Inter";src:url("assets/fonts/Inter-Variable.ttf") format("truetype");font-style:normal;font-weight:100 900;font-display:swap}
+:root{--aero-font:"Amythest Inter",Inter,"Segoe UI",sans-serif;--aero-ink:#f4fbff;--aero-muted:#b8d5e7;--aero-line:rgba(199,241,255,.27);--aero-card:22px;--aero-control:10px}
+.popup,.dashboard,.popup button,.dashboard button,.dashboard input,.dashboard select,.dashboard textarea{font-family:var(--aero-font)!important}
+.popup h1,.popup h2,.dashboard h1,.dashboard h2,.popup .timer,.dashboard .screen-total,.popup .metrics strong{font-family:var(--aero-font)!important}
+.popup,.dashboard{color:var(--aero-ink);background:radial-gradient(ellipse at 77% -8%,rgba(151,244,255,.46),transparent 37%),radial-gradient(ellipse at 5% 30%,rgba(32,141,224,.4),transparent 43%),radial-gradient(ellipse at 90% 78%,rgba(87,199,189,.22),transparent 45%),linear-gradient(145deg,#04132e 5%,#07345f 53%,#07223f 100%)}
+.dashboard{background-attachment:fixed}
+.brand{color:#fff;font-weight:700;letter-spacing:-.045em}.brand img.gem{filter:drop-shadow(0 0 9px rgba(99,219,255,.48));box-shadow:none!important}
+.eyebrow,.screen-kicker,.dashboard .panel .eyebrow{color:#b4edff!important;letter-spacing:.13em;font-weight:650}
+.muted,.header-note,.page-intro p,.hero p,.popup .card-heading small,.dashboard .panel .muted,.dashboard .status,.dashboard .video-note,.dashboard .video-toggle small{color:var(--aero-muted)!important}
+.popup .hero h1,.dashboard .page-intro h1{font-weight:520;letter-spacing:-.055em;color:#fff}
+.popup .hero h1 em,.dashboard .page-intro h1 em{background:linear-gradient(100deg,#fff 0%,#b8f3ff 42%,#76d7ed 100%);background-clip:text;color:transparent}
+.popup .focus-card,.dashboard .panel,.dashboard .screen-card{position:relative;overflow:hidden;border:1px solid var(--aero-line);border-radius:var(--aero-card);background:linear-gradient(160deg,rgba(173,235,255,.22),rgba(50,130,184,.13) 34%,rgba(8,42,82,.48) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 15px 32px rgba(255,255,255,.045),0 18px 45px rgba(0,12,36,.28);backdrop-filter:blur(26px) saturate(155%);-webkit-backdrop-filter:blur(26px) saturate(155%)}
+.popup .focus-card:before,.dashboard .panel:before,.dashboard .screen-card:before{content:"";position:absolute;inset:0 0 auto;height:29px;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.13),transparent);border-radius:inherit}
+.popup .card-heading strong,.dashboard .panel h2,.dashboard .screen-top h2,.dashboard .screen-list-heading{color:#fff;font-weight:650}
+.popup .focus-card{padding:20px}.popup .timer{font-weight:430;color:#fff;letter-spacing:-.075em}.popup .timer-caption{color:#b7d8ec}
+.primary-button,.popup .primary-button,.dashboard .primary-button{border:1px solid rgba(193,245,255,.6);border-radius:var(--aero-control);background:linear-gradient(180deg,#8feaff 0%,#44c8f4 44%,#1786ce 47%,#1671b1 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.72),inset 0 -1px 0 rgba(0,40,100,.35),0 8px 23px rgba(3,73,153,.35);color:#fff;text-shadow:0 1px 2px rgba(0,45,86,.5);font-weight:650}
+.primary-button:hover,.popup .primary-button:hover,.dashboard .primary-button:hover{background:linear-gradient(180deg,#b3f4ff,#62d5f7 45%,#259bd9 47%,#207eb8);box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 11px 26px rgba(3,73,153,.44)}
+.popup .dashboard-link{border:1px solid rgba(197,241,255,.42);background:linear-gradient(180deg,rgba(221,251,255,.23),rgba(43,126,175,.18));box-shadow:inset 0 1px 0 rgba(255,255,255,.38);color:#effcff;border-radius:var(--aero-control)}
+.popup .dashboard-link:hover{background:rgba(135,220,250,.28)}
+.avatar-stage{position:relative;display:grid;place-items:center;flex:none;width:91px;height:91px;border-radius:50%;background:radial-gradient(circle at 35% 23%,rgba(255,255,255,.65),transparent 28%),radial-gradient(circle at 52% 58%,rgba(130,234,235,.36),rgba(18,101,153,.16) 56%,transparent 70%);filter:drop-shadow(0 12px 18px rgba(0,116,181,.2))}
+.avatar-stage:after{content:"";position:absolute;inset:5px;border-radius:50%;border:1px solid rgba(197,255,255,.24);pointer-events:none}
+.avatar-stage agent-robot-avatar{filter:drop-shadow(0 4px 6px rgba(1,51,100,.28))!important}
+.intro-stage{float:right;width:145px;height:145px;margin:0 6% 0 20px}
+.dashboard .intro-avatar{float:none;margin:0;filter:drop-shadow(0 6px 12px rgba(0,79,130,.3))!important}
+.popup .distraction-caption{background:rgba(163,245,229,.13);border-color:rgba(166,242,235,.23);color:#dcfff5}
+.popup .usage-row,.dashboard .usage-row,.dashboard .setting-row,.dashboard .blocked-row,.dashboard .video-toggle,.dashboard .screen-summary{border-color:rgba(187,230,255,.2)}
+.popup .usage-row strong,.dashboard .screen-card .usage-row strong,.dashboard .blocked-row button,.popup footer button{color:#b8f0ff}
+.dashboard .segmented{background:rgba(1,36,77,.38);border:1px solid rgba(194,241,255,.25);border-radius:12px}.dashboard .segmented button{color:#d1eaf6}.dashboard .segmented button.selected{background:linear-gradient(180deg,rgba(188,242,255,.37),rgba(57,155,202,.28));color:white;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+.dashboard .setting-row select,.dashboard .time-fields input,.dashboard .distractions input,.dashboard .limits input,.dashboard .video-controls select,.dashboard .video-controls textarea{background:linear-gradient(180deg,rgba(215,247,255,.13),rgba(6,40,81,.27));border:1px solid rgba(191,234,255,.31);color:#fff;border-radius:8px;box-shadow:inset 0 1px 3px rgba(0,14,37,.18)}
+.dashboard select option{background:#16416a;color:#fff}.dashboard input::placeholder{color:#b4cadb}
+.dashboard .distractions form button,.dashboard .limits form button{background:linear-gradient(180deg,rgba(198,247,255,.33),rgba(49,156,203,.24));border:1px solid rgba(202,246,255,.37);color:#fff;border-radius:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.33)}
+.dashboard .chart-bar,.dashboard .progress-track>div{background:linear-gradient(180deg,#b4ffe4,#48d7dd 46%,#298bc9);box-shadow:0 0 13px rgba(86,235,244,.28)}
+.dashboard .progress-track{background:rgba(200,240,255,.13)}.dashboard .chart-bars{border-color:rgba(192,230,255,.22);background:linear-gradient(to bottom,rgba(225,246,255,.14) 1px,transparent 1px) 0 0/100% 50%}
+.dashboard .video-toggle input:checked{background:#38a9d9}
+.popup button:focus-visible,.dashboard button:focus-visible,.dashboard input:focus-visible,.dashboard select:focus-visible{outline:2px solid #adf5ff;outline-offset:3px}
+body[data-loading="true"] .avatar-stage{animation:aero-loading 1.15s ease-in-out infinite alternate}
+body[data-loading="true"] .avatar-stage:after{animation:aero-ring 1.15s ease-out infinite}
+@keyframes aero-loading{from{transform:translateY(2px) scale(.97)}to{transform:translateY(-4px) scale(1.03)}}
+@keyframes aero-ring{from{opacity:.8;transform:scale(.85)}to{opacity:0;transform:scale(1.27)}}
+@media(max-width:730px){.intro-stage{width:108px;height:108px;margin-right:0}.dashboard .intro-avatar{width:96px;height:96px}}
+@media(max-width:420px){.intro-stage{width:80px;height:80px}.dashboard .intro-avatar{width:72px;height:72px}}
+@media(prefers-reduced-motion:reduce){body[data-loading="true"] .avatar-stage,body[data-loading="true"] .avatar-stage:after{animation:none}}
+/* Amethyst is the primary hue; icy blue is only a glass reflection. */
+.popup,.dashboard{background:radial-gradient(ellipse at 77% -8%,rgba(213,170,255,.39),transparent 37%),radial-gradient(ellipse at 5% 33%,rgba(126,80,211,.42),transparent 43%),radial-gradient(ellipse at 90% 78%,rgba(110,93,214,.2),transparent 45%),linear-gradient(145deg,#100b2c 5%,#312264 53%,#171344 100%)}
+.eyebrow,.screen-kicker,.dashboard .panel .eyebrow{color:#dfc9ff!important}
+.popup .hero h1 em,.dashboard .page-intro h1 em{background:linear-gradient(100deg,#fff 0%,#e2c9ff 42%,#ad9df5 100%);background-clip:text;color:transparent}
+.popup .focus-card,.dashboard .panel,.dashboard .screen-card{border-color:rgba(229,199,255,.3);background:linear-gradient(160deg,rgba(222,184,255,.23),rgba(114,78,181,.15) 34%,rgba(30,23,80,.56) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.51),inset 0 15px 32px rgba(255,255,255,.045),0 18px 45px rgba(14,5,46,.32)}
+.primary-button,.popup .primary-button,.dashboard .primary-button{border-color:rgba(235,206,255,.65);background:linear-gradient(180deg,#e0bfff 0%,#b47ce8 44%,#8650cf 47%,#7040b5 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(53,23,107,.35),0 8px 23px rgba(74,31,144,.39);text-shadow:0 1px 2px rgba(48,16,94,.48)}
+.primary-button:hover,.popup .primary-button:hover,.dashboard .primary-button:hover{background:linear-gradient(180deg,#efd8ff,#c695f2 45%,#9c68dd 47%,#8050c4)}
+.popup .dashboard-link{border-color:rgba(235,213,255,.4);background:linear-gradient(180deg,rgba(248,227,255,.25),rgba(126,85,188,.2));color:#fff}
+.avatar-stage{background:radial-gradient(circle at 35% 23%,rgba(255,255,255,.64),transparent 28%),radial-gradient(circle at 52% 58%,rgba(213,163,255,.39),rgba(97,62,164,.17) 56%,transparent 70%);filter:drop-shadow(0 12px 18px rgba(79,38,153,.27))}
+.avatar-stage:after{border-color:rgba(236,209,255,.28)}
+.popup .distraction-caption{background:rgba(204,160,255,.14);border-color:rgba(223,187,255,.24);color:#f2dcff}
+.popup .usage-row,.dashboard .usage-row,.dashboard .setting-row,.dashboard .blocked-row,.dashboard .video-toggle,.dashboard .screen-summary{border-color:rgba(226,194,255,.2)}
+.popup .usage-row strong,.dashboard .screen-card .usage-row strong,.dashboard .blocked-row button,.popup footer button{color:#e6caff}
+.dashboard .segmented{background:rgba(32,16,74,.38);border-color:rgba(221,190,255,.27)}.dashboard .segmented button.selected{background:linear-gradient(180deg,rgba(226,191,255,.4),rgba(131,84,195,.33))}
+.dashboard .setting-row select,.dashboard .time-fields input,.dashboard .distractions input,.dashboard .limits input,.dashboard .video-controls select,.dashboard .video-controls textarea{background:linear-gradient(180deg,rgba(227,202,255,.16),rgba(44,24,100,.32));border-color:rgba(225,194,255,.35)}
+.dashboard select option{background:#3b296d}.dashboard .distractions form button,.dashboard .limits form button{background:linear-gradient(180deg,rgba(235,205,255,.37),rgba(137,87,199,.31));border-color:rgba(231,199,255,.38)}
+.dashboard .chart-bar,.dashboard .progress-track>div{background:linear-gradient(180deg,#f1d8ff,#b484ee 46%,#7755ce);box-shadow:0 0 13px rgba(194,136,255,.3)}
+.dashboard .video-toggle input:checked{background:#9d69d9}
+/* Bright Aero buttons from the supplied control reference. */
+.primary-button,.popup .primary-button,.dashboard .primary-button{min-height:48px;border:1px solid #9ab9f6;border-radius:16px;background:linear-gradient(180deg,#fff 0%,#f3f5ff 48%,#d7def9 49%,#d6d9ef 100%);box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 rgba(92,89,154,.18),0 4px 0 rgba(72,83,136,.62),0 9px 20px rgba(9,16,58,.23);color:#252047;text-shadow:0 1px 0 rgba(255,255,255,.8);font-weight:650}
+.primary-button:hover,.popup .primary-button:hover,.dashboard .primary-button:hover{background:linear-gradient(180deg,#fff,#faf8ff 48%,#e7ddfa 49%,#dfd8f2);box-shadow:inset 0 1px 0 #fff,0 4px 0 rgba(72,83,136,.64),0 11px 23px rgba(9,16,58,.26)}
+.primary-button:active,.popup .primary-button:active,.dashboard .primary-button:active{transform:translateY(3px);box-shadow:inset 0 1px 0 #fff,0 1px 0 rgba(72,83,136,.63),0 3px 9px rgba(9,16,58,.18)}
+.popup .dashboard-link,.dashboard .distractions form button,.dashboard .limits form button{border:1px solid #98b8ef;border-radius:13px;background:linear-gradient(180deg,#fff,#e4e8fa 55%,#d0d8ef);box-shadow:inset 0 1px 0 #fff,0 3px 0 rgba(72,83,136,.55);color:#252047;text-shadow:0 1px 0 #fff}
+.popup .dashboard-link:hover,.dashboard .distractions form button:hover,.dashboard .limits form button:hover{background:linear-gradient(180deg,#fff,#eee8ff 55%,#ddd7f4)}

@@ -32,6 +32,7 @@ async function render() {
     row.append(name,time); $("usage-list").append(row);
   });
   if (!rows.length) $("usage-list").innerHTML = '<div class="empty">Your day is a blank canvas.</div>';
+  document.body.removeAttribute("data-loading");
 }
 
 $("focus-button").addEventListener("click", async () => {
