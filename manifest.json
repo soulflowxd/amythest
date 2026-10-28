@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Amythest — mindful screen time",
   "short_name": "Amythest",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "See where your time goes and make space to focus.",
   "permissions": ["storage", "tabs", "alarms", "declarativeNetRequest", "webNavigation"],
   "host_permissions": ["<all_urls>"],

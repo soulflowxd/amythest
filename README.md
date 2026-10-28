@@ -36,7 +36,7 @@ Reminders appear over the original website, so the tab does not change addresses
 
 Your browsing totals and settings stay in Chrome on your device. Amythest has no account or server. It counts active website time while Chrome is focused, so the totals are approximate. It cannot track other browsers or apps.
 
-The simple purple geode mark is the same in the toolbar and on extension pages. The interface bundles [Inter](https://github.com/rsms/inter) under the SIL Open Font License, so it works offline. The animated robot companion uses [Agent Robot Avatar](https://github.com/CX-ArtLab/agent-robot-avatar) by CX ART Lab under its MIT license. Its source and license are included in `vendor/agent-robot-avatar/`.
+The soft opal-shaped ring with an amethyst gradient center is the same mark in the toolbar and on extension pages. The interface bundles [Inter](https://github.com/rsms/inter) under the SIL Open Font License, so it works offline. The animated robot companion uses [Agent Robot Avatar](https://github.com/CX-ArtLab/agent-robot-avatar) by CX ART Lab under its MIT license. Its source and license are included in `vendor/agent-robot-avatar/`.
 
 ## License
 
