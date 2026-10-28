@@ -27,7 +27,17 @@ async function main() {
   const granted = await vm.runInContext(`grantVideoAccess({ url: ${JSON.stringify(video)}, category: "robotics", reason: "I need this tutorial for my sensor project." })`, context);
   assert.equal(granted.ok, true);
   assert.equal((await vm.runInContext(`policyForUrl(${JSON.stringify(video)})`, context)).mode, "allow");
-  assert.equal((await vm.runInContext("policyForUrl('https://www.youtube.com/shorts/abcdefghijk')", context)).mode, "shorts");
+  const shortUrl = "https://www.youtube.com/shorts/abcdefghijk";
+  assert.equal((await vm.runInContext(`policyForUrl(${JSON.stringify(shortUrl)})`, context)).mode, "shorts");
+  const shortDenied = await vm.runInContext(`grantShortAccess({ url: ${JSON.stringify(shortUrl)}, category: "school", reason: "because" })`, context);
+  assert.equal(shortDenied.ok, false);
+  const shortGranted = await vm.runInContext(`grantShortAccess({ url: ${JSON.stringify(shortUrl)}, category: "robotics", reason: "I need to check this sensor wiring tip." })`, context);
+  assert.equal(shortGranted.ok, true);
+  assert.equal((await vm.runInContext(`policyForUrl(${JSON.stringify(shortUrl)})`, context)).mode, "allow");
+  assert.equal((await vm.runInContext("policyForUrl('https://www.youtube.com/shorts/otherid1234')", context)).mode, "shorts");
+  assert.equal(saved.shortAccess.abcdefghijk.reason, undefined);
+  saved.shortAccess.abcdefghijk.until = Date.now() - 1;
+  assert.equal((await vm.runInContext(`policyForUrl(${JSON.stringify(shortUrl)})`, context)).mode, "shorts");
   saved.focusUntil = Date.now() + 60000;
   assert.equal((await vm.runInContext("policyForUrl('https://instagram.com/')", context)).mode, "block");
   await vm.runInContext("applyRules()", context);

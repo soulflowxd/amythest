@@ -2,7 +2,7 @@ const DEFAULTS = {
   blockedSites: ["instagram.com", "tiktok.com", "x.com", "youtube.com"],
   siteLimits: {}, focusUntil: 0, pausedUntil: 0, sessionMinutes: 25,
   dailyGoalMinutes: 120, workHoursEnabled: false, workStart: "09:00", workEnd: "17:00",
-  blockShorts: true, hideShortsFeed: true, checkLongForm: true, videoAccess: {}
+  blockShorts: true, hideShortsFeed: true, checkLongForm: true, videoAccess: {}, shortAccess: {}
 };
 let active = null;
 let recording = Promise.resolve();
@@ -31,6 +31,13 @@ function youtubeShorts(url) {
     return ["youtube.com", "www.youtube.com", "m.youtube.com"].includes(parsed.hostname) && /^\/shorts(?:\/|$)/.test(parsed.pathname);
   } catch { return false; }
 }
+function youtubeShortId(url) {
+  try {
+    const parsed = new URL(url);
+    if (!["youtube.com", "www.youtube.com", "m.youtube.com"].includes(parsed.hostname)) return null;
+    return parsed.pathname.match(/^\/shorts\/([\w-]{11})\/?$/)?.[1] || null;
+  } catch { return null; }
+}
 function validVideoReason(category, reason) {
   const words = reason.trim().match(/[a-zA-Z]{3,}/g) || [];
   return ["school", "robotics", "work", "research", "other"].includes(category) && reason.trim().length >= 15 && words.length >= 3 && new Set(reason.toLowerCase().replace(/[^a-z]/g, "")).size >= 5;
@@ -58,7 +65,11 @@ function blockedDomains(settings, usage, now = Date.now()) {
 function sitePolicy(url, settings, usage, now = Date.now()) {
   const domain = hostname(url);
   if (!domain) return { mode: "allow" };
-  if (settings.blockShorts && youtubeShorts(url)) return { mode: "shorts" };
+  if (settings.blockShorts && youtubeShorts(url)) {
+    const shortId = youtubeShortId(url);
+    if (!shortId || !(settings.shortAccess?.[shortId]?.until > now)) return { mode: "shorts", shortId };
+    return { mode: "allow" };
+  }
   if (blockedDomains(settings, usage, now).some(site => matches(domain, site))) {
     return { mode: "block", focusUntil: settings.focusUntil, workHours: isWorkTime(settings, new Date(now)) };
   }
@@ -102,6 +113,8 @@ async function applyRules() {
   const settings = await chrome.storage.local.get(DEFAULTS);
   const validAccess = Object.fromEntries(Object.entries(settings.videoAccess).filter(([, entry]) => entry.until > Date.now()));
   if (Object.keys(validAccess).length !== Object.keys(settings.videoAccess).length) await chrome.storage.local.set({ videoAccess: validAccess });
+  const validShorts = Object.fromEntries(Object.entries(settings.shortAccess).filter(([, entry]) => entry.until > Date.now()));
+  if (Object.keys(validShorts).length !== Object.keys(settings.shortAccess).length) await chrome.storage.local.set({ shortAccess: validShorts });
   const current = await chrome.declarativeNetRequest.getDynamicRules();
   if (current.length) await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: current.map(rule => rule.id) });
   const data = await chrome.storage.local.get(`usage:${dateKey()}`);
@@ -123,6 +136,16 @@ async function grantVideoAccess(message) {
   current[video.id] = { until: now + 15 * 60000, category: message.category };
   await chrome.storage.local.set({ videoAccess: current });
   return { ok: true, url: video.url };
+}
+async function grantShortAccess(message) {
+  const shortId = youtubeShortId(message.url);
+  if (!shortId || !validVideoReason(message.category, message.reason || "")) return { ok: false, error: "Choose a purpose and write at least three meaningful words about why you need this Short." };
+  const { shortAccess } = await chrome.storage.local.get(DEFAULTS);
+  const now = Date.now();
+  const current = Object.fromEntries(Object.entries(shortAccess).filter(([, entry]) => entry.until > now));
+  current[shortId] = { until: now + 5 * 60000, category: message.category };
+  await chrome.storage.local.set({ shortAccess: current });
+  return { ok: true };
 }
 function syncRules() {
   syncing = syncing.catch(() => {}).then(applyRules);
@@ -156,6 +179,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   else if (message.type === "syncRules") syncRules().then(() => sendResponse({ ok: true }));
   else if (message.type === "getSitePolicy") policyForUrl(message.url).then(sendResponse).catch(error => sendResponse({ mode: "allow", error: error.message }));
   else if (message.type === "requestVideoAccess") grantVideoAccess(message).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
+  else if (message.type === "requestShortAccess") grantShortAccess(message).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
   return true;
 });
 init();

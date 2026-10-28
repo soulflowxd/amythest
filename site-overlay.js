@@ -38,16 +38,17 @@
     if (policy.mode === "allow") { host?.remove(); host = null; return; }
     const shadow = makeOverlay();
     const content = shadow.getElementById("content");
-    if (policy.mode === "shorts") {
-      content.innerHTML = `<div class="symbol" aria-hidden="true">✦</div><span class="eyebrow">SHORTS ARE PAUSED</span><h1 id="amythest-title">Keep your <em>attention.</em></h1><p>You turned on Shorts blocking. This page stays here, but Shorts cannot play while the setting is on.</p><p class="note">You can change this in the amythest dashboard.</p>`;
-    } else if (policy.mode === "video") {
-      content.innerHTML = `<div class="symbol" aria-hidden="true">▶</div><span class="eyebrow">WATCH WITH INTENTION</span><h1 id="amythest-title">What are you here to <em>learn?</em></h1><p>Pick a purpose and describe what you need from this video. Access lasts 15 minutes.</p><form id="reason-form"><label for="purpose">Purpose</label><select id="purpose" required><option value="">Choose a purpose</option><option value="school">School</option><option value="robotics">Robotics</option><option value="work">Work</option><option value="research">Research</option><option value="other">Another purposeful task</option></select><label for="reason">What will you use this video for?</label><textarea id="reason" rows="3" minlength="15" maxlength="280" placeholder="I need this robotics tutorial to wire my sensor." required></textarea><p class="hint">Write at least three meaningful words. Amythest cannot verify your reason.</p><div id="error" class="error" role="alert"></div><button class="primary" type="submit">Watch for 15 minutes <span>→</span></button></form>`;
+    if (policy.mode === "shorts" && !policy.shortId) {
+      content.innerHTML = `<div class="symbol" aria-hidden="true">✦</div><span class="eyebrow">SHORTS ARE PAUSED</span><h1 id="amythest-title">Keep your <em>attention.</em></h1><p>You turned on Shorts blocking. Open a specific Short to ask for access to just that one.</p>`;
+    } else if (policy.mode === "video" || policy.mode === "shorts") {
+      const isShort = policy.mode === "shorts";
+      content.innerHTML = `<div class="symbol" aria-hidden="true">${isShort ? "✦" : "▶"}</div><span class="eyebrow">${isShort ? "ONE SHORT, WITH INTENTION" : "WATCH WITH INTENTION"}</span><h1 id="amythest-title">${isShort ? "Why this <em>Short?</em>" : "What are you here to <em>learn?</em>"}</h1><p>${isShort ? "Tell yourself why this Short is worth watching. A reason unlocks only this Short for 5 minutes." : "Pick a purpose and describe what you need from this video. Access lasts 15 minutes."}</p><form id="reason-form"><label for="purpose">Purpose</label><select id="purpose" required><option value="">Choose a purpose</option><option value="school">School</option><option value="robotics">Robotics</option><option value="work">Work</option><option value="research">Research</option><option value="other">Another purposeful task</option></select><label for="reason">What will you use ${isShort ? "this Short" : "this video"} for?</label><textarea id="reason" rows="3" minlength="15" maxlength="280" placeholder="I need this robotics tutorial to wire my sensor." required></textarea><p class="hint">Write at least three meaningful words. Amythest cannot verify your reason.</p><div id="error" class="error" role="alert"></div><button class="primary" type="submit">${isShort ? "Watch this Short for 5 minutes" : "Watch for 15 minutes"} <span>→</span></button></form>`;
       shadow.getElementById("reason-form").addEventListener("submit", async event => {
         event.preventDefault();
         const button = event.currentTarget.querySelector("button");
         button.disabled = true;
         try {
-          const result = await chrome.runtime.sendMessage({ type: "requestVideoAccess", url: location.href, category: shadow.getElementById("purpose").value, reason: shadow.getElementById("reason").value });
+          const result = await chrome.runtime.sendMessage({ type: isShort ? "requestShortAccess" : "requestVideoAccess", url: location.href, category: shadow.getElementById("purpose").value, reason: shadow.getElementById("reason").value });
           if (!result?.ok) { shadow.getElementById("error").textContent = result?.error || "Please try again."; return; }
           await refresh();
         } catch { shadow.getElementById("error").textContent = "Please try again."; }
@@ -78,7 +79,7 @@
   }
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && Object.keys(changes).some(key => key.startsWith("usage:") || ["blockedSites", "siteLimits", "focusUntil", "pausedUntil", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm", "videoAccess"].includes(key))) refresh();
+    if (area === "local" && Object.keys(changes).some(key => key.startsWith("usage:") || ["blockedSites", "siteLimits", "focusUntil", "pausedUntil", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm", "videoAccess", "shortAccess"].includes(key))) refresh();
   });
   chrome.runtime.onMessage.addListener(message => { if (message.type === "policyChanged") refresh(); });
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
