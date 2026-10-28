@@ -10,7 +10,6 @@ async function render() {
   const remaining = Math.max(0, (data.focusUntil || 0) - Date.now());
   const focused = remaining > 0;
   const paused = focused && (data.pausedUntil || 0) > Date.now();
-  $("avatar").setAttribute("mood", paused ? "pause" : focused ? "focus" : "happy");
   $("focus-title").textContent = paused ? "Taking a breath" : focused ? "You're in focus mode" : "Ready to focus?";
   $("focus-subtitle").textContent = paused ? "Your break ends soon." : focused ? "Your distractions can wait." : "A little intention goes a long way.";
   const seconds = Math.ceil(remaining / 1000);
