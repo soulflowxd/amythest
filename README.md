@@ -15,7 +15,7 @@ After you change the extension's files, click **Reload** on its card at `chrome:
 
 ## Use it
 
-- **See your time:** Click the amythest icon to see today's time in Chrome. Open the dashboard for your most visited sites.
+- **See your time:** Click the amythest icon to see today's time in Chrome. Open the dashboard for an iOS-style Screen Time view. **Day** shows time by hour; **Week** shows the last seven days and your daily average. The hourly chart starts collecting data after this update.
 - **Focus session:** Pick 15, 25, 45, or 60 minutes in the dashboard, then start a session. Websites on your distraction list will be blocked until it ends.
 - **Distraction list:** Add websites such as `youtube.com`. Subdomains such as `music.youtube.com` are included.
 - **Work hours:** Turn this on in the dashboard and choose a start and end time. Your distraction list is blocked during those hours Monday through Friday. It uses your computer's local time. Work hours are off by default.
