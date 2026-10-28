@@ -36,4 +36,4 @@ Reminders now appear over the original website, so the tab does not change addre
 
 Your browsing totals and settings stay in Chrome on your device. Amythest has no account or server. It counts active website time while Chrome is focused, so the totals are approximate. It cannot track other browsers or apps.
 
-The purple square with the white four-point star is the same mark in the toolbar and on the extension pages. The animated robot companion uses [Agent Robot Avatar](https://github.com/CX-ArtLab/agent-robot-avatar) by CX ART Lab under the MIT license, included in `vendor/agent-robot-avatar/`. It is separate from the amythest logo and is not presented as an original amythest character.
+The glass square with the white four-point star is the same mark in the toolbar and on the extension pages. The animated robot companion uses [Agent Robot Avatar](https://github.com/CX-ArtLab/agent-robot-avatar) by CX ART Lab under the MIT license, included in `vendor/agent-robot-avatar/`. It is separate from the amythest logo and is not presented as an original amythest character.

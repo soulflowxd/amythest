@@ -15,3 +15,22 @@ body{color:#f6f4ff;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI"
 @media(max-width:730px){.dashboard .page-intro{padding:52px 4px 27px}.dashboard .page-intro h1{font-size:38px}.dashboard .intro-avatar{width:96px;height:96px}.dashboard .screen-card{padding:23px 19px}.dashboard .panel{padding:22px}}
 @media(max-width:420px){.dashboard .page-intro h1{font-size:32px}.dashboard .intro-avatar{width:72px;height:72px}.dashboard .screen-card{padding:19px 16px}}
 @media(prefers-reduced-motion:reduce){.primary-button{transition:none}.primary-button:hover{transform:none}}
+
+/* Shared type and geometry: quiet editorial text over frosted surfaces. */
+:root{--amythest-font:"Segoe UI Variable","Segoe UI",Arial,sans-serif;--radius-card:22px;--radius-control:11px;--radius-small:8px}
+.popup,.dashboard,.popup button,.dashboard button,.dashboard input,.dashboard select,.dashboard textarea{font-family:var(--amythest-font)}
+.popup h1,.popup h2,.dashboard h1,.dashboard h2{font-family:var(--amythest-font)}
+.popup .hero h1,.dashboard .page-intro h1{font-weight:520;letter-spacing:-.045em}
+.dashboard .panel h2,.dashboard .screen-top h2,.popup .section-title h2{font-weight:600;letter-spacing:-.025em}
+.popup .eyebrow,.dashboard .eyebrow,.dashboard .screen-kicker{font-weight:700;letter-spacing:.13em}
+.popup .primary-button,.dashboard .primary-button{border-radius:var(--radius-control);font-weight:650}
+.popup .focus-card,.dashboard .panel,.dashboard .screen-card{border-radius:var(--radius-card)}
+.popup .focus-card{padding:20px}.popup .card-heading{gap:0}
+.popup .brand img.gem,.dashboard .brand img.gem{background:none;border-radius:7px;box-shadow:0 0 18px rgba(172,145,255,.2)}
+.popup .dashboard-link{display:flex;align-items:center;gap:7px;min-height:34px;padding:6px 9px 6px 11px;border:1px solid rgba(225,218,255,.18);border-radius:var(--radius-small);background:linear-gradient(145deg,rgba(255,255,255,.13),rgba(174,152,255,.06));box-shadow:inset 0 1px 0 rgba(255,255,255,.18);color:#eee8ff;font-size:11px;font-weight:600;letter-spacing:-.01em}
+.popup .dashboard-link:hover{background:rgba(187,166,255,.2)}.popup .dashboard-link svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dashboard .segmented{border-radius:var(--radius-control)}.dashboard .segmented button,.dashboard .segmented button.selected{border-radius:var(--radius-small)}
+.dashboard .setting-row select,.dashboard .time-fields input,.dashboard .distractions input,.dashboard .limits input,.dashboard .video-controls select,.dashboard .video-controls textarea{border-radius:var(--radius-small);font-weight:500}
+.dashboard .distractions form button,.dashboard .limits form button{border-radius:var(--radius-small);font-weight:650}
+.dashboard .distractions form button,.dashboard .limits form button{min-height:36px}
+.dashboard .distraction-caption,.popup .distraction-caption{border-radius:var(--radius-small)}

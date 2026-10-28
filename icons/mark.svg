@@ -1,4 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="amythest">
-  <rect width="128" height="128" rx="30" fill="#7556b8"/>
-  <path d="M64 18 C69 43 85 59 110 64 C85 69 69 85 64 110 C59 85 43 69 18 64 C43 59 59 43 64 18Z" fill="#fff"/>
+  <defs>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#b9a9ff"/>
+      <stop offset=".42" stop-color="#7c68d6"/>
+      <stop offset="1" stop-color="#3c5a91"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#fff" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="gem" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fff"/>
+      <stop offset=".62" stop-color="#efeaff"/>
+      <stop offset="1" stop-color="#b9e2ff"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="124" height="124" rx="27" fill="url(#glass)"/>
+  <path d="M8 29Q8 8 29 8h70q21 0 21 21v31Q64 38 8 60Z" fill="url(#shine)"/>
+  <rect x="4" y="4" width="120" height="120" rx="25" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="3"/>
+  <path d="M64 20C69 43 85 59 108 64C85 69 69 85 64 108C59 85 43 69 20 64C43 59 59 43 64 20Z" fill="url(#gem)"/>
 </svg>
