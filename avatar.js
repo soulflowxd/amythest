@@ -1,4 +1,4 @@
-class AmethystAvatar extends HTMLElement {
+class AmythestAvatar extends HTMLElement {
   constructor() {
     super();
     const shadow = this.attachShadow({ mode: "open" });
@@ -16,8 +16,8 @@ class AmethystAvatar extends HTMLElement {
       @keyframes happy{0%,100%{transform:scaleY(.75)}50%{transform:scaleY(.45)}}
       @keyframes wave{0%,100%{transform:rotate(0)}30%{transform:rotate(12deg)}70%{transform:rotate(-10deg)}}
       @media(prefers-reduced-motion:reduce){svg,.eye{animation:none!important}}
-    </style><svg viewBox="0 0 100 100" role="img" aria-label="Amethyst, your focus companion"><path class="body" d="M50 3 85 20 97 55 70 91 50 98 30 91 3 55 15 20Z"/><path class="facet" d="M50 3 15 20 3 55 29 40Z"/><path class="facet2" d="M50 98 70 91 97 55 72 73Z"/><path class="face" d="M20 38 Q50 24 80 38 L83 58 Q75 79 50 82 Q25 79 17 58Z"/><ellipse class="cheek" cx="26" cy="62" rx="5" ry="2.5"/><ellipse class="cheek" cx="74" cy="62" rx="5" ry="2.5"/><ellipse class="eye" cx="38" cy="51" rx="4" ry="6"/><ellipse class="eye" cx="62" cy="51" rx="4" ry="6"/><path class="mouth" d="M44 64 Q50 69 56 64"/></svg>`;
+    </style><svg viewBox="0 0 100 100" role="img" aria-label="Amythest, your focus companion"><path class="body" d="M50 3 85 20 97 55 70 91 50 98 30 91 3 55 15 20Z"/><path class="facet" d="M50 3 15 20 3 55 29 40Z"/><path class="facet2" d="M50 98 70 91 97 55 72 73Z"/><path class="face" d="M20 38 Q50 24 80 38 L83 58 Q75 79 50 82 Q25 79 17 58Z"/><ellipse class="cheek" cx="26" cy="62" rx="5" ry="2.5"/><ellipse class="cheek" cx="74" cy="62" rx="5" ry="2.5"/><ellipse class="eye" cx="38" cy="51" rx="4" ry="6"/><ellipse class="eye" cx="62" cy="51" rx="4" ry="6"/><path class="mouth" d="M44 64 Q50 69 56 64"/></svg>`;
     this.addEventListener("click", () => { this.classList.remove("wave"); void this.offsetWidth; this.classList.add("wave"); });
   }
 }
-customElements.define("amethyst-avatar", AmethystAvatar);
+customElements.define("amethyst-avatar", AmythestAvatar);
