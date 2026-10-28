@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 
 const source = fs.readFileSync("distraction-usage.js", "utf8");
-const { distractionUsage, distractionHours, allHours } = vm.runInNewContext(`${source}\n({ distractionUsage, distractionHours, allHours })`);
+const { distractionUsage, distractionTime, avatarMood, distractionHours, allHours } = vm.runInNewContext(`${source}\n({ distractionUsage, distractionTime, avatarMood, distractionHours, allHours })`);
 const allSites = { "github.com": 5 * 60000, "youtube.com": 3 * 60000, "music.youtube.com": 2 * 60000 };
 const distractions = distractionUsage(allSites, ["youtube.com"]);
 assert.equal(Object.values(distractions).reduce((sum, ms) => sum + ms, 0), 5 * 60000);
@@ -12,4 +12,9 @@ assert.equal(allSites["github.com"], 5 * 60000);
 const hours = distractionHours({ "github.com": [60000], "youtube.com": [120000] }, ["youtube.com"]);
 assert.equal(hours[0], 120000);
 assert.equal(allHours({ "github.com": [60000], "youtube.com": [120000] })[0], 180000);
+assert.equal(distractionTime({ "github.com": 60000, "youtube.com": 120000 }, ["youtube.com"], { "youtube.com": 60000, "instagram.com": 30000 }), 150000);
+assert.equal(distractionTime({ "youtube.com": 300000 }, [], { "youtube.com": 120000 }), 120000);
+assert.equal(avatarMood(0, 120), "happy");
+assert.equal(avatarMood(30 * 60000, 120), "idle");
+assert.equal(avatarMood(90 * 60000, 120), "sad");
 console.log("Distraction goal checks passed");

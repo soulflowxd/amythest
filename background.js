@@ -111,14 +111,21 @@ function recordElapsed() {
   recording = recording.catch(error => console.error("Could not save screen time", error)).then(async () => {
     const key = `usage:${dateKey(since)}`;
     const hourKey = `hoursBySite:${dateKey(since)}`;
-    const data = await chrome.storage.local.get([key, hourKey]);
+    const videoKey = `videoUsage:${dateKey(since)}`;
+    const data = await chrome.storage.local.get([key, hourKey, videoKey]);
     const usage = data[key] || {};
     usage[current.domain] = (usage[current.domain] || 0) + elapsed;
     const hoursBySite = data[hourKey] || {};
     const hours = hoursBySite[current.domain] || Array(24).fill(0);
     hours[new Date(since).getHours()] += elapsed;
     hoursBySite[current.domain] = hours;
-    await chrome.storage.local.set({ [key]: usage, [hourKey]: hoursBySite });
+    const updates = { [key]: usage, [hourKey]: hoursBySite };
+    if (current.video) {
+      const videoUsage = data[videoKey] || {};
+      videoUsage[current.domain] = (videoUsage[current.domain] || 0) + elapsed;
+      updates[videoKey] = videoUsage;
+    }
+    await chrome.storage.local.set(updates);
   });
   return recording;
 }
@@ -128,7 +135,7 @@ async function refreshActive() {
   if (!window.focused) { active = null; return; }
   const [tab] = await chrome.tabs.query({ active: true, windowId: window.id });
   const domain = hostname(tab?.url);
-  active = domain ? { domain, since: Date.now() } : null;
+  active = domain ? { domain, since: Date.now(), video: !!(youtubeVideo(tab.url) || shortContent(tab.url)) } : null;
 }
 async function applyRules() {
   const settings = await chrome.storage.local.get(DEFAULTS);
@@ -187,7 +194,10 @@ chrome.tabs.onUpdated.addListener((_id, change, tab) => {
   if (change.url && tab.active) refreshActive().catch(error => console.error("Could not track active tab", error));
 });
 chrome.webNavigation.onHistoryStateUpdated.addListener(details => {
-  if (details.frameId === 0) chrome.tabs.sendMessage(details.tabId, { type: "policyChanged" }).catch(() => {});
+  if (details.frameId === 0) {
+    chrome.tabs.sendMessage(details.tabId, { type: "policyChanged" }).catch(() => {});
+    refreshActive().catch(error => console.error("Could not track video time", error));
+  }
 }, { url: [{ hostSuffix: "youtube.com" }, { hostSuffix: "instagram.com" }, { hostSuffix: "tiktok.com" }] });
 chrome.tabs.onRemoved.addListener(refreshActive);
 chrome.windows.onFocusChanged.addListener(refreshActive);

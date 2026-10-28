@@ -35,6 +35,10 @@ async function main() {
   await recording;
   assert.ok(Object.values(saved).some(value => value?.["github.com"] >= 2000));
 
+  vm.runInContext("active = { domain: 'youtube.com', since: Date.now() - 3000, video: true }", context);
+  await vm.runInContext("recordElapsed()", context);
+  assert.ok(Object.entries(saved).some(([key, value]) => key.startsWith("videoUsage:") && value?.["youtube.com"] >= 2000));
+
   delayRead = false;
   saved.blockedSites = ["youtube.com"];
   saved.focusUntil = Date.now() + 60000;

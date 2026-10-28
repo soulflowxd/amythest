@@ -14,12 +14,15 @@ function parseDomain(raw) {
 async function render() {
   await chrome.runtime.sendMessage({ type: "flushUsage" });
   const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate() - (6-i)); return d; });
-  const keys = days.flatMap(d => [`usage:${keyFor(d)}`, `hours:${keyFor(d)}`, `hoursBySite:${keyFor(d)}`]);
+  const keys = days.flatMap(d => [`usage:${keyFor(d)}`, `videoUsage:${keyFor(d)}`, `hours:${keyFor(d)}`, `hoursBySite:${keyFor(d)}`]);
   state = await chrome.storage.local.get(["blockedSites", "siteLimits", "focusUntil", "sessionMinutes", "dailyGoalMinutes", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "hideShortsFeed", "checkLongForm", ...keys]);
   const usage = chartView === "day" ? (state[`usage:${dateKey()}`] || {}) : days.reduce((sum, d) => { for (const [site, ms] of Object.entries(state[`usage:${keyFor(d)}`] || {})) sum[site] = (sum[site] || 0) + ms; return sum; }, {});
   const rows = Object.entries(usage).sort((a,b) => b[1]-a[1]);
   const total = rows.reduce((sum, row) => sum+row[1], 0);
-  const distractionTotal = Object.values(distractionUsage(usage, state.blockedSites || [])).reduce((sum, ms) => sum + ms, 0);
+  const videoUsage = chartView === "day" ? (state[`videoUsage:${dateKey()}`] || {}) : days.reduce((sum, d) => { for (const [site, ms] of Object.entries(state[`videoUsage:${keyFor(d)}`] || {})) sum[site] = (sum[site] || 0) + ms; return sum; }, {});
+  const distractionTotal = distractionTime(usage, state.blockedSites || [], videoUsage);
+  const todayDistractionTime = distractionTime(state[`usage:${dateKey()}`] || {}, state.blockedSites || [], state[`videoUsage:${dateKey()}`] || {});
+  showAvatarMood(document.querySelector(".intro-avatar"), avatarMood(todayDistractionTime, state.dailyGoalMinutes || 120));
   $("daily-total").textContent = fmt(total);
   $("date-label").textContent = chartView === "day" ? new Intl.DateTimeFormat("en", { weekday:"long", month:"long", day:"numeric" }).format(new Date()) : `${new Intl.DateTimeFormat("en", { month:"short", day:"numeric" }).format(days[0])} – ${new Intl.DateTimeFormat("en", { month:"short", day:"numeric" }).format(days[6])}`;
   $("chart-subtitle").textContent = chartView === "day" ? "Today in Chrome" : "Last 7 days in Chrome";
@@ -62,7 +65,7 @@ async function render() {
     const row = document.createElement("div"); row.className="usage-row";
     const name = document.createElement("span"); name.textContent=domain;
     const type = document.createElement("small"); type.className = "site-type";
-    type.textContent = isDistraction(domain, state.blockedSites || []) ? "Counts toward goal" : "Tracked only";
+    type.textContent = isDistraction(domain, state.blockedSites || []) ? "Counts toward goal" : videoUsage[domain] ? "Video time counts toward goal" : "Tracked only";
     const time = document.createElement("strong"); time.textContent=fmt(ms);
     const info = document.createElement("div"); info.className = "site-info"; info.append(name,type);
     row.append(info,time); $("site-usage").append(row);

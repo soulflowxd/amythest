@@ -5,7 +5,7 @@ let settings = {};
 
 async function render() {
   await chrome.runtime.sendMessage({ type: "flushUsage" });
-  const data = await chrome.storage.local.get(["focusUntil", "pausedUntil", "sessionMinutes", "dailyGoalMinutes", "blockedSites", `usage:${dateKey()}`]);
+  const data = await chrome.storage.local.get(["focusUntil", "pausedUntil", "sessionMinutes", "dailyGoalMinutes", "blockedSites", `usage:${dateKey()}`, `videoUsage:${dateKey()}`]);
   settings = data;
   const remaining = Math.max(0, (data.focusUntil || 0) - Date.now());
   const focused = remaining > 0;
@@ -18,7 +18,8 @@ async function render() {
   $("focus-button").innerHTML = focused ? "End focus session <span>×</span>" : "Start focus session <span>→</span>";
   const usage = data[`usage:${dateKey()}`] || {};
   const rows = Object.entries(usage).sort((a,b) => b[1]-a[1]);
-  const distractionTotal = Object.values(distractionUsage(usage, data.blockedSites || [])).reduce((sum, ms) => sum + ms, 0);
+  const distractionTotal = distractionTime(usage, data.blockedSites || [], data[`videoUsage:${dateKey()}`] || {});
+  showAvatarMood($("avatar"), avatarMood(distractionTotal, data.dailyGoalMinutes || 120));
   $("total-time").textContent = fmt(rows.reduce((sum, row) => sum + row[1], 0));
   $("site-count").textContent = rows.length;
   $("distraction-caption").textContent = `Distractions: ${fmt(distractionTotal)} of ${fmt((data.dailyGoalMinutes || 120) * 60000)} goal`;
