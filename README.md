@@ -15,12 +15,12 @@ After you change the extension's files, click **Reload** on its card at `chrome:
 
 ## Use it
 
-- **See your time:** Click the amythest icon to see today's time in Chrome. Open the dashboard for an iOS-style Screen Time view. **Day** shows time by hour; **Week** shows the last seven days and your daily average. The hourly chart starts collecting data after this update.
+- **See your time:** Click the amythest icon to see today's time in Chrome. Open the dashboard for an iOS-style Screen Time view. **Day** shows time by hour; **Week** shows the last seven days and your daily average. All websites are tracked, including productive sites such as GitHub.
 - **Focus session:** Pick 15, 25, 45, or 60 minutes in the dashboard, then start a session. Websites on your distraction list will be blocked until it ends.
 - **Distraction list:** Add websites such as `youtube.com`. Subdomains such as `music.youtube.com` are included.
 - **Work hours:** Turn this on in the dashboard and choose a start and end time. Your distraction list is blocked during those hours Monday through Friday. It uses your computer's local time. Work hours are off by default.
 - **Daily site limits:** Enter a website and a number of minutes. Amythest adds up time on that site and its subdomains. Once the limit is reached, the site is blocked for the rest of the day. Limits reset at local midnight.
 - **Take a break:** The block page has a five-minute break button. It temporarily pauses all blocks, including work-hour and daily-limit blocks.
-- **Daily goal:** Set a goal for your total Chrome screen time. This is a progress guide; it does not block all websites.
+- **Distraction goal:** Set a daily goal for time on sites in your distraction list. Productive sites stay in the activity chart but do not move the goal bar unless you add them to that list. This goal is a progress guide; it does not block all websites.
 
 Your browsing totals and settings stay in Chrome on your device. Amythest has no account or server. It counts active website time while Chrome is focused, so the totals are approximate. It cannot track other browsers or apps. The animated companion is original to this project; click it for a wave.

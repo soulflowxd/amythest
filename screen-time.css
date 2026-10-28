@@ -37,6 +37,7 @@
 .screen-card .progress-track{height:7px;margin-top:16px;background:#f0ebf6}.screen-card .progress-track>div{background:#8260c2}
 .screen-list-heading{font-size:16px;font-weight:700;letter-spacing:-.025em;margin:30px 0 4px}
 .screen-card .usage-row{font-size:13px;padding:13px 0}.screen-card .usage-row strong{color:#5e478a}
+.site-info{display:flex;flex-direction:column;gap:3px;min-width:0}.site-info>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.site-type{font-size:10px;color:#87818d}.screen-card .usage-row strong{flex:none;align-self:center}
 .dashboard .panel{padding:25px}.dashboard .panel h2{font-family:inherit;font-size:19px;font-weight:700;letter-spacing:-.03em;margin-top:5px}.dashboard .panel .eyebrow{font-size:10px;letter-spacing:.11em}.dashboard .panel .muted{font-size:13px}.dashboard .distractions,.dashboard .work-hours,.dashboard .limits{grid-column:auto}.dashboard .controls{grid-column:1}.dashboard .distractions{grid-column:2}.dashboard .work-hours{grid-column:1}.dashboard .limits{grid-column:2}
 .dashboard .setting-row select,.dashboard .time-fields input,.dashboard .distractions input,.dashboard .limits input{min-height:36px}
 .dashboard .blocked-row button{min-height:30px;padding:3px 5px;color:#7355ad}

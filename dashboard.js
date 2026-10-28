@@ -14,24 +14,26 @@ function parseDomain(raw) {
 async function render() {
   await chrome.runtime.sendMessage({ type: "flushUsage" });
   const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate() - (6-i)); return d; });
-  const keys = days.flatMap(d => [`usage:${keyFor(d)}`, `hours:${keyFor(d)}`]);
+  const keys = days.flatMap(d => [`usage:${keyFor(d)}`, `hours:${keyFor(d)}`, `hoursBySite:${keyFor(d)}`]);
   state = await chrome.storage.local.get(["blockedSites", "siteLimits", "focusUntil", "sessionMinutes", "dailyGoalMinutes", "workHoursEnabled", "workStart", "workEnd", ...keys]);
   const usage = chartView === "day" ? (state[`usage:${dateKey()}`] || {}) : days.reduce((sum, d) => { for (const [site, ms] of Object.entries(state[`usage:${keyFor(d)}`] || {})) sum[site] = (sum[site] || 0) + ms; return sum; }, {});
   const rows = Object.entries(usage).sort((a,b) => b[1]-a[1]);
   const total = rows.reduce((sum, row) => sum+row[1], 0);
+  const distractionTotal = Object.values(distractionUsage(usage, state.blockedSites || [])).reduce((sum, ms) => sum + ms, 0);
   $("daily-total").textContent = fmt(total);
   $("date-label").textContent = chartView === "day" ? new Intl.DateTimeFormat("en", { weekday:"long", month:"long", day:"numeric" }).format(new Date()) : `${new Intl.DateTimeFormat("en", { month:"short", day:"numeric" }).format(days[0])} – ${new Intl.DateTimeFormat("en", { month:"short", day:"numeric" }).format(days[6])}`;
   $("chart-subtitle").textContent = chartView === "day" ? "Today in Chrome" : "Last 7 days in Chrome";
   const goalMs = (state.dailyGoalMinutes || 120) * 60000 * (chartView === "week" ? 7 : 1);
-  $("goal-progress").style.width = `${Math.min(100, total / goalMs * 100)}%`;
-  $("goal-caption").textContent = `${fmt(total)} / ${fmt(goalMs)}`;
+  $("goal-progress").style.width = `${Math.min(100, distractionTotal / goalMs * 100)}%`;
+  $("goal-caption").textContent = `${fmt(distractionTotal)} / ${fmt(goalMs)}`;
   $("secondary-label").textContent = chartView === "day" ? "MOST USED" : "DAILY AVERAGE";
   $("secondary-value").textContent = chartView === "day" ? (rows[0]?.[0] || "—") : fmt(total / 7);
   $("view-day").classList.toggle("selected", chartView === "day");
   $("view-week").classList.toggle("selected", chartView === "week");
   $("view-day").setAttribute("aria-pressed", chartView === "day" ? "true" : "false");
   $("view-week").setAttribute("aria-pressed", chartView === "week" ? "true" : "false");
-  const values = chartView === "day" ? (state[`hours:${dateKey()}`] || Array(24).fill(0)) : days.map(d => Object.values(state[`usage:${keyFor(d)}`] || {}).reduce((sum, ms) => sum + ms, 0));
+  const bySite = state[`hoursBySite:${dateKey()}`] || {};
+  const values = chartView === "day" ? allHours(bySite).map((ms, i) => ms + (state[`hours:${dateKey()}`]?.[i] || 0)) : days.map(d => Object.values(state[`usage:${keyFor(d)}`] || {}).reduce((sum, ms) => sum + ms, 0));
   const max = Math.max(...values, chartView === "day" ? 30 * 60000 : 2 * 60 * 60000);
   $("axis-top").textContent = fmt(max);
   $("axis-mid").textContent = fmt(max / 2);
@@ -56,8 +58,11 @@ async function render() {
   rows.slice(0,8).forEach(([domain, ms]) => {
     const row = document.createElement("div"); row.className="usage-row";
     const name = document.createElement("span"); name.textContent=domain;
+    const type = document.createElement("small"); type.className = "site-type";
+    type.textContent = isDistraction(domain, state.blockedSites || []) ? "Counts toward goal" : "Tracked only";
     const time = document.createElement("strong"); time.textContent=fmt(ms);
-    row.append(name,time); $("site-usage").append(row);
+    const info = document.createElement("div"); info.className = "site-info"; info.append(name,type);
+    row.append(info,time); $("site-usage").append(row);
   });
   if (!rows.length) $("site-usage").innerHTML='<div class="empty">Your browsing story starts here.</div>';
   $("blocked-list").replaceChildren();

@@ -41,13 +41,15 @@ async function recordElapsed() {
   const elapsed = Math.max(0, Math.min(now - active.since, 5 * 60 * 1000));
   if (elapsed >= 1000) {
     const key = `usage:${dateKey(active.since)}`;
-    const hourKey = `hours:${dateKey(active.since)}`;
+    const hourKey = `hoursBySite:${dateKey(active.since)}`;
     const data = await chrome.storage.local.get([key, hourKey]);
     const usage = data[key] || {};
     usage[active.domain] = (usage[active.domain] || 0) + elapsed;
-    const hours = data[hourKey] || Array(24).fill(0);
+    const hoursBySite = data[hourKey] || {};
+    const hours = hoursBySite[active.domain] || Array(24).fill(0);
     hours[new Date(active.since).getHours()] += elapsed;
-    await chrome.storage.local.set({ [key]: usage, [hourKey]: hours });
+    hoursBySite[active.domain] = hours;
+    await chrome.storage.local.set({ [key]: usage, [hourKey]: hoursBySite });
   }
   active.since = now;
 }
