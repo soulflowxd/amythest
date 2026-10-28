@@ -38,6 +38,27 @@ function youtubeShortId(url) {
     return parsed.pathname.match(/^\/shorts\/([\w-]{11})\/?$/)?.[1] || null;
   } catch { return null; }
 }
+function shortContent(url) {
+  try {
+    const { hostname: host, pathname } = new URL(url);
+    if (["youtube.com", "www.youtube.com", "m.youtube.com"].includes(host) && /^\/shorts(?:\/|$)/.test(pathname)) {
+      const id = youtubeShortId(url);
+      return { kind: "YouTube Short", key: id ? `youtube:${id}` : null };
+    }
+    if (["instagram.com", "www.instagram.com"].includes(host)) {
+      const id = pathname.match(/^\/reels?\/([\w-]+)\/?$/)?.[1];
+      if (id) return { kind: "Instagram Reel", key: `instagram:${id}` };
+      if (/^\/reels(?:\/|$)/.test(pathname)) return { kind: "Instagram Reels", key: null };
+    }
+    if (["tiktok.com", "www.tiktok.com", "m.tiktok.com"].includes(host)) {
+      if (/^\/(?:messages|message|inbox)(?:\/|$)/.test(pathname)) return null;
+      const id = pathname.match(/^\/@[^/]+\/video\/(\d+)\/?$/)?.[1];
+      if (id) return { kind: "TikTok video", key: `tiktok:${id}` };
+      if (/^\/(?:$|foryou(?:\/|$)|following(?:\/|$)|explore(?:\/|$)|search(?:\/|$)|discover(?:\/|$)|tag\/|music\/|live(?:\/|$))/.test(pathname)) return { kind: "TikTok feed", key: null };
+    }
+  } catch { /* Ignore non-web URLs. */ }
+  return null;
+}
 function validVideoReason(category, reason) {
   const words = reason.trim().match(/[a-zA-Z]{3,}/g) || [];
   return ["school", "robotics", "work", "research", "other"].includes(category) && reason.trim().length >= 15 && words.length >= 3 && new Set(reason.toLowerCase().replace(/[^a-z]/g, "")).size >= 5;
@@ -55,7 +76,7 @@ function isWorkTime({ workHoursEnabled, workStart, workEnd }, now = new Date()) 
 function blockedDomains(settings, usage, now = Date.now()) {
   if (settings.pausedUntil > now) return [];
   const scheduled = settings.focusUntil > now || isWorkTime(settings, new Date(now));
-  const domains = new Set(scheduled ? settings.blockedSites.filter(site => !(settings.checkLongForm && site === "youtube.com")) : []);
+  const domains = new Set(scheduled ? settings.blockedSites.filter(site => !(settings.checkLongForm && site === "youtube.com") && !(settings.blockShorts && ["instagram.com", "tiktok.com"].includes(site))) : []);
   for (const [site, limit] of Object.entries(settings.siteLimits)) {
     const spent = Object.entries(usage).filter(([domain]) => matches(domain, site)).reduce((sum, [, ms]) => sum + ms, 0);
     if (spent >= limit * 60000) domains.add(site);
@@ -65,9 +86,9 @@ function blockedDomains(settings, usage, now = Date.now()) {
 function sitePolicy(url, settings, usage, now = Date.now()) {
   const domain = hostname(url);
   if (!domain) return { mode: "allow" };
-  if (settings.blockShorts && youtubeShorts(url)) {
-    const shortId = youtubeShortId(url);
-    if (!shortId || !(settings.shortAccess?.[shortId]?.until > now)) return { mode: "shorts", shortId };
+  const short = settings.blockShorts ? shortContent(url) : null;
+  if (short) {
+    if (!short.key || !(settings.shortAccess?.[short.key]?.until > now)) return { mode: "shorts", shortId: short.key, shortKind: short.kind };
     return { mode: "allow" };
   }
   if (blockedDomains(settings, usage, now).some(site => matches(domain, site))) {
@@ -138,8 +159,8 @@ async function grantVideoAccess(message) {
   return { ok: true, url: video.url };
 }
 async function grantShortAccess(message) {
-  const shortId = youtubeShortId(message.url);
-  if (!shortId || !validVideoReason(message.category, message.reason || "")) return { ok: false, error: "Choose a purpose and write at least three meaningful words about why you need this Short." };
+  const shortId = shortContent(message.url)?.key;
+  if (!shortId || !validVideoReason(message.category, message.reason || "")) return { ok: false, error: "Choose a purpose and write at least three meaningful words about why you need this video." };
   const { shortAccess } = await chrome.storage.local.get(DEFAULTS);
   const now = Date.now();
   const current = Object.fromEntries(Object.entries(shortAccess).filter(([, entry]) => entry.until > now));
@@ -167,7 +188,7 @@ chrome.tabs.onUpdated.addListener((_id, change, tab) => {
 });
 chrome.webNavigation.onHistoryStateUpdated.addListener(details => {
   if (details.frameId === 0) chrome.tabs.sendMessage(details.tabId, { type: "policyChanged" }).catch(() => {});
-}, { url: [{ hostSuffix: "youtube.com" }] });
+}, { url: [{ hostSuffix: "youtube.com" }, { hostSuffix: "instagram.com" }, { hostSuffix: "tiktok.com" }] });
 chrome.tabs.onRemoved.addListener(refreshActive);
 chrome.windows.onFocusChanged.addListener(refreshActive);
 chrome.alarms.onAlarm.addListener(async () => { await recordElapsed(); await syncRules(); });
