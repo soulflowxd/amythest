@@ -4,6 +4,7 @@ const DEFAULTS = {
   dailyGoalMinutes: 120, workHoursEnabled: false, workStart: "09:00", workEnd: "17:00"
 };
 let active = null;
+let recording = Promise.resolve();
 let syncing = Promise.resolve();
 
 function dateKey(time = Date.now()) {
@@ -35,23 +36,27 @@ function blockedDomains(settings, usage, now = Date.now()) {
   }
   return [...domains].slice(0, 200);
 }
-async function recordElapsed() {
-  if (!active) return;
+function recordElapsed() {
+  if (!active) return recording;
+  const current = active;
   const now = Date.now();
-  const elapsed = Math.max(0, Math.min(now - active.since, 5 * 60 * 1000));
-  if (elapsed >= 1000) {
-    const key = `usage:${dateKey(active.since)}`;
-    const hourKey = `hoursBySite:${dateKey(active.since)}`;
+  const since = current.since;
+  const elapsed = Math.max(0, Math.min(now - since, 5 * 60 * 1000));
+  if (elapsed < 1000) return recording;
+  current.since = now;
+  recording = recording.catch(error => console.error("Could not save screen time", error)).then(async () => {
+    const key = `usage:${dateKey(since)}`;
+    const hourKey = `hoursBySite:${dateKey(since)}`;
     const data = await chrome.storage.local.get([key, hourKey]);
     const usage = data[key] || {};
-    usage[active.domain] = (usage[active.domain] || 0) + elapsed;
+    usage[current.domain] = (usage[current.domain] || 0) + elapsed;
     const hoursBySite = data[hourKey] || {};
-    const hours = hoursBySite[active.domain] || Array(24).fill(0);
-    hours[new Date(active.since).getHours()] += elapsed;
-    hoursBySite[active.domain] = hours;
+    const hours = hoursBySite[current.domain] || Array(24).fill(0);
+    hours[new Date(since).getHours()] += elapsed;
+    hoursBySite[current.domain] = hours;
     await chrome.storage.local.set({ [key]: usage, [hourKey]: hoursBySite });
-  }
-  active.since = now;
+  });
+  return recording;
 }
 async function refreshActive() {
   await recordElapsed();
@@ -71,7 +76,12 @@ async function applyRules() {
     action: { type: "redirect", redirect: { extensionPath: "/blocked.html" } },
     condition: { urlFilter: `||${domain}^`, resourceTypes: ["main_frame"] }
   }));
-  await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: current.map(r => r.id), addRules });
+  const unchanged = current.length === addRules.length && current.every((rule, i) =>
+    rule.id === addRules[i].id && rule.condition.urlFilter === addRules[i].condition.urlFilter);
+  if (!unchanged) {
+    if (current.length) await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: current.map(r => r.id) });
+    if (addRules.length) await chrome.declarativeNetRequest.updateDynamicRules({ addRules });
+  }
   await chrome.action.setBadgeText({ text: domains.length ? "ON" : "" });
   await chrome.action.setBadgeBackgroundColor({ color: "#7556b8" });
   const tabs = await chrome.tabs.query({ active: true });

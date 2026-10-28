@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
 
-const source = fs.readFileSync("background.js", "utf8").split("async function recordElapsed")[0];
+const source = fs.readFileSync("background.js", "utf8").split("function recordElapsed")[0];
 const policy = vm.runInNewContext(`${source}\n({ isWorkTime, blockedDomains })`);
 const base = {
   blockedSites: ["youtube.com"], siteLimits: { "example.com": 30 },
