@@ -6,12 +6,14 @@ Amythest helps you spend less time on distracting websites in Google Chrome. It 
 
 ## Install it in Chrome
 
-1. Download this repo as a ZIP from GitHub, then unzip it. If you already have the project folder, use that instead.
+1. Download **[amythest-0.5.7-chrome.zip](https://github.com/soulflowxd/amythest/releases/download/v0.5.7/amythest-0.5.7-chrome.zip)** and extract it. Use the extracted folder, not the ZIP itself.
 2. Open Chrome and go to `chrome://extensions`.
 3. Turn on **Developer mode** in the top right.
 4. Click **Load unpacked**.
 5. Select the folder containing `manifest.json`. Do not select the ZIP file or `manifest.json` itself.
 6. Click the puzzle-piece icon in Chrome and pin **amythest**.
+
+Amythest is a Chrome extension, not a desktop app. You do not need Iris, Git, Node, or a terminal to install it. If you arrived from Publik, use the ZIP and steps above; Publik's generated desktop-app guide is incorrect for this extension.
 
 After you change the extension's files, click **Reload** on its card at `chrome://extensions`.
 
