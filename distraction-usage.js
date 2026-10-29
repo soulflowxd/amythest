@@ -16,7 +16,7 @@ function avatarMood(distractionMs, goalMinutes) {
 function showAvatarMood(avatar, mood) {
   if (!avatar || avatar.dataset.mood === mood) return;
   avatar.dataset.mood = mood;
-  customElements.whenDefined("agent-robot-avatar").then(() => {
+  customElements.whenDefined("amythest-avatar").then(() => {
     if (avatar.isConnected && avatar.dataset.mood === mood) avatar.setState(mood);
   });
 }

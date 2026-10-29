@@ -15,7 +15,7 @@ Amythest is a Chrome Manifest V3 screen-time extension. Keep changes focused on 
 
 - Use the existing purple Windows Aero / Frutiger Aero style, bundled Inter font, consistent corner radii, and pale glossy buttons.
 - Reuse the same restrained opal-shaped amethyst mark across the icon, popup, dashboard, overlays, and README. Avoid duplicate logos in one view.
-- Keep the robot companion friendly in normal views and visibly firm on a blocked distraction. Use the existing licensed avatar assets where appropriate.
+- Use the original full-body Aero companion in normal views and its angry expression on blocked distractions. Keep it interactive and avoid crossed arms.
 
 ## Code and verification
 

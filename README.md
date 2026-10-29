@@ -1,6 +1,6 @@
 # amythest
 
-![amythest logo](icons/mark.svg)
+![amythest logo](icons/mark-clear.svg)
 
 Amythest helps you spend less time on distracting websites in Google Chrome. It shows your screen time, lets you start a focus session, and can block sites during work hours or after you reach a daily limit.
 
@@ -32,11 +32,11 @@ Written reasons for short-form and long-form videos are checked locally and are 
 
 When the long-form check is on, it replaces whole-site focus blocking for `youtube.com` so the video question can appear. The short-form switch prevents default whole-site focus blocking for `instagram.com` and `tiktok.com`, allowing normal Instagram pages and TikTok messages to work. You can still set a separate daily site limit for either domain. Turn the long-form check off if you want your distraction list to block all of YouTube during focus sessions and work hours.
 
-Reminders appear over the original website, so the tab does not change addresses. The Aero-style robot crosses its arms when a distraction is paused and animates while a written reason is being checked. Text fields keep keyboard shortcuts, including YouTube's spacebar shortcut, from interrupting typing. Amythest pauses ordinary page audio and video while a reminder is visible. The site still loads behind it; this is a self-control screen, not a network block.
+Reminders appear over the original website, so the tab does not change addresses. The glossy Aero companion turns angry when a distraction is paused, follows your cursor, and reacts with a short message when clicked or activated with Enter or Space. It animates while a written reason is being checked. Text fields keep keyboard shortcuts, including YouTube's spacebar shortcut, from interrupting typing. Amythest pauses ordinary page audio and video while a reminder is visible. The site still loads behind it; this is a self-control screen, not a network block.
 
 Your browsing totals and settings stay in Chrome on your device. Amythest has no account or server. It counts active website time while Chrome is focused, so the totals are approximate. It cannot track other browsers or apps.
 
-The soft opal-shaped ring with an amethyst gradient center is the same mark in the toolbar and on extension pages. The interface bundles [Inter](https://github.com/rsms/inter) under the SIL Open Font License, so it works offline. The animated robot companion uses [Agent Robot Avatar](https://github.com/CX-ArtLab/agent-robot-avatar) by CX ART Lab under its MIT license. Its source and license are included in `vendor/agent-robot-avatar/`.
+The soft opal-shaped ring with an amethyst gradient center is the same mark in the toolbar and on extension pages. The mark has no dark tile behind it inside the interface. The interface uses Windows Segoe UI when available and bundles [Inter](https://github.com/rsms/inter) as an offline fallback under the SIL Open Font License. The interactive, full-body companion is original Amythest artwork inspired by the Aero style. An earlier avatar library remains in `vendor/agent-robot-avatar/` with its license, but the extension no longer loads it.
 
 ## License
 
