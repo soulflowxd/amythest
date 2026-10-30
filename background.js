@@ -1,3 +1,5 @@
+if (typeof importScripts === "function") importScripts("cloud-config.js", "cloud-sync.js");
+
 const DEFAULTS = {
   blockedSites: ["instagram.com", "tiktok.com", "x.com", "youtube.com"],
   siteLimits: {}, focusUntil: 0, pausedUntil: 0, sessionMinutes: 25,
@@ -7,6 +9,10 @@ const DEFAULTS = {
 let active = null;
 let recording = Promise.resolve();
 let syncing = Promise.resolve();
+let nativeSyncing = null;
+let cloudSyncing = null;
+let applyingCloudSettings = false;
+const CLOUD_SETTING_KEYS = ["dailyGoalMinutes", "blockedSites", "siteLimits", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm"];
 
 function dateKey(time = Date.now()) {
   const d = new Date(time);
@@ -86,6 +92,7 @@ function blockedDomains(settings, usage, now = Date.now()) {
 function sitePolicy(url, settings, usage, now = Date.now()) {
   const domain = hostname(url);
   if (!domain) return { mode: "allow" };
+  if (settings.pausedUntil > now) return { mode: "allow" };
   const short = settings.blockShorts ? shortContent(url) : null;
   if (short) {
     if (!short.key || !(settings.shortAccess?.[short.key]?.until > now)) return { mode: "shorts", shortId: short.key, shortKind: short.kind };
@@ -131,6 +138,7 @@ function recordElapsed() {
 }
 async function refreshActive() {
   await recordElapsed();
+  void syncNativeUsage();
   const window = await chrome.windows.getLastFocused();
   if (!window.focused) { active = null; return; }
   const [tab] = await chrome.tabs.query({ active: true, windowId: window.id });
@@ -154,6 +162,13 @@ async function policyForUrl(url) {
   const settings = await chrome.storage.local.get(DEFAULTS);
   const data = await chrome.storage.local.get(`usage:${dateKey()}`);
   return sitePolicy(url, settings, data[`usage:${dateKey()}`] || {});
+}
+async function grantBreak(url) {
+  const policy = await policyForUrl(url);
+  if (policy.mode !== "block") return { ok: false, error: "This site is no longer blocked." };
+  const until = Date.now() + 5 * 60000;
+  await chrome.storage.local.set({ pausedUntil: until });
+  return { ok: true, until };
 }
 async function grantVideoAccess(message) {
   const video = youtubeVideo(message.url);
@@ -179,13 +194,184 @@ function syncRules() {
   syncing = syncing.catch(() => {}).then(applyRules);
   return syncing;
 }
+function dailyWebsiteSnapshot(date, usage, videoUsage, blockedSites, generatedAt) {
+  const cleanMs = value => Number.isFinite(value) ? Math.max(0, Math.min(86400000, Math.floor(value))) : 0;
+  const sites = Object.entries(usage || {})
+    .filter(([domain]) => /^[a-z0-9.-]{1,253}$/.test(domain) && !domain.startsWith(".") && !domain.endsWith("."))
+    .map(([domain, spent]) => {
+      const activeMs = cleanMs(spent);
+      const videoMs = Math.min(activeMs, cleanMs(videoUsage?.[domain]));
+      const distractionMs = blockedSites.some(site => matches(domain, site)) ? activeMs : videoMs;
+      return { domain, activeMs, videoMs, distractionMs };
+    })
+    .filter(site => site.activeMs > 0)
+    .sort((a, b) => b.activeMs - a.activeMs)
+    .slice(0, 200);
+  return { type: "dailyWebsiteUsage", version: 1, date, generatedAt, sites };
+}
+async function syncNativeUsage() {
+  if (nativeSyncing) return nativeSyncing;
+  nativeSyncing = (async () => {
+    if (typeof chrome.runtime.sendNativeMessage !== "function") return;
+    const now = Date.now();
+    const day = dateKey(now);
+    const usageKey = `usage:${day}`;
+    const videoKey = `videoUsage:${day}`;
+    const data = await chrome.storage.local.get(["nativeLastSyncAt", usageKey, videoKey, "blockedSites"]);
+    if (now - (data.nativeLastSyncAt || 0) < 60000) return;
+    await chrome.storage.local.set({ nativeLastSyncAt: now });
+    const payload = dailyWebsiteSnapshot(day, data[usageKey] || {}, data[videoKey] || {}, data.blockedSites || DEFAULTS.blockedSites, now);
+    await chrome.runtime.sendNativeMessage("com.amythest.screentime", payload);
+  })().catch(() => { /* The Windows companion is optional. */ }).finally(() => { nativeSyncing = null; });
+  return nativeSyncing;
+}
+async function cloudAccessToken() {
+  const { cloudAuth } = await chrome.storage.local.get("cloudAuth");
+  if (!cloudAuth?.token) return null;
+  if (globalThis.AmythestCloud.tokenExpiry(cloudAuth.token) > Date.now() + 5 * 60000) return cloudAuth.token;
+  if (!cloudAuth.refreshToken) return null;
+  const result = await globalThis.AmythestCloud.call("action", "auth:signIn", { refreshToken: cloudAuth.refreshToken });
+  if (!result?.tokens?.token) throw new Error("Your cloud session expired. Sign in again.");
+  const updated = { ...cloudAuth, ...result.tokens };
+  await chrome.storage.local.set({ cloudAuth: updated });
+  void sendNativeAccountSession(updated.token);
+  return updated.token;
+}
+async function sendNativeAccountSession(token) {
+  try {
+    if (typeof chrome.runtime.sendNativeMessage !== "function") return;
+    await chrome.runtime.sendNativeMessage("com.amythest.screentime", {
+      type: "accountSession", version: 1, deploymentUrl: globalThis.AmythestCloud.deployment(),
+      accessToken: token, expiresAt: globalThis.AmythestCloud.tokenExpiry(token)
+    });
+  } catch { /* The Windows companion is optional. */ }
+}
+async function cloudStatus() {
+  const data = await chrome.storage.local.get(["cloudAuth", "cloudLastSyncAt", "cloudSyncError", "cloudSettingsConflict"]);
+  return { configured: !!globalThis.AmythestCloud?.deployment(), signedIn: !!data.cloudAuth?.token,
+    email: data.cloudAuth?.email || "", lastSyncAt: data.cloudLastSyncAt || 0,
+    error: data.cloudSyncError || "", settingsConflict: !!data.cloudSettingsConflict };
+}
+async function cloudDaySummary() {
+  const token = await cloudAccessToken();
+  if (!token) return { ok: false, error: "Sign in to see your devices." };
+  const day = dateKey();
+  const days = await globalThis.AmythestCloud.call("query", "sync:getDays", { from: day, through: day }, token);
+  const windowsSettings = await globalThis.AmythestCloud.call("query", "sync:getWindowsSettings", {}, token);
+  return { ok: true, days: Array.isArray(days) ? days : [], windowsSettings };
+}
+async function setWindowsAppLimit(app, minutes) {
+  const token = await cloudAccessToken();
+  if (!token) throw new Error("Sign in to change app limits.");
+  const normalized = String(app || "").trim().toLowerCase().replace(/\.exe$/, "");
+  const value = Number(minutes);
+  if (!/^[a-z0-9][a-z0-9._-]{0,79}$/.test(normalized) || !Number.isSafeInteger(value) || value < 0 || value > 1440)
+    throw new Error("Enter a valid app and limit in minutes.");
+  const current = await globalThis.AmythestCloud.call("query", "sync:getWindowsSettings", {}, token);
+  if (!current) throw new Error("Connect the Windows app to this account first.");
+  await globalThis.AmythestCloud.call("mutation", "sync:setWindowsAppLimit", { expectedRevision: current.revision, app: normalized, minutes: value }, token);
+  return { ok: true };
+}
+async function signInCloud(email, password, flow) {
+  if (!globalThis.AmythestCloud?.deployment()) throw new Error("Cloud sync is not configured yet.");
+  const normalized = String(email || "").trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized) || normalized.length > 254) throw new Error("Enter a valid email address.");
+  if (typeof password !== "string" || password.length < 8) throw new Error("Use a password with at least eight characters.");
+  if (flow !== "signIn" && flow !== "signUp") throw new Error("Choose sign in or create account.");
+  const result = await globalThis.AmythestCloud.call("action", "auth:signIn", { provider: "password", params: { email: normalized, password, flow } });
+  if (!result?.tokens?.token || !result.tokens.refreshToken) throw new Error("Could not sign in. Check your email and password.");
+  await chrome.storage.local.set({ cloudAuth: { email: normalized, ...result.tokens }, cloudSettingsDirty: false, cloudSettingsConflict: false, cloudSyncError: "" });
+  void sendNativeAccountSession(result.tokens.token);
+  await syncCloud({ initial: true, force: true });
+  return { ok: true };
+}
+async function signOutCloud() {
+  const token = await cloudAccessToken().catch(() => null);
+  if (token) await globalThis.AmythestCloud.call("action", "auth:signOut", {}, token).catch(() => {});
+  await chrome.storage.local.set({ cloudAuth: null, cloudSettingsDirty: false, cloudSettingsConflict: false, cloudSyncError: "" });
+  try { await chrome.runtime.sendNativeMessage("com.amythest.screentime", { type: "accountSignOut", version: 1 }); }
+  catch { /* The Windows companion is optional. */ }
+  return { ok: true };
+}
+async function reloadCloudSettings() {
+  const token = await cloudAccessToken();
+  if (!token) throw new Error("Sign in to reload cloud settings.");
+  const remote = await globalThis.AmythestCloud.call("query", "sync:getSettings", {}, token);
+  if (!remote) throw new Error("No cloud settings are available yet.");
+  applyingCloudSettings = true;
+  try {
+    await chrome.storage.local.set({ ...globalThis.AmythestCloud.localSettings(remote), cloudSettingsRevision: remote.revision,
+      cloudSettingsDirty: false, cloudSettingsConflict: false, cloudSyncError: "" });
+  } finally { applyingCloudSettings = false; }
+  return { ok: true };
+}
+async function syncCloud({ initial = false, force = false } = {}) {
+  if (!globalThis.AmythestCloud?.deployment()) return;
+  if (cloudSyncing) return cloudSyncing;
+  cloudSyncing = (async () => {
+    const now = Date.now();
+    const day = dateKey(now);
+    const usageKey = `usage:${day}`;
+    const videoKey = `videoUsage:${day}`;
+    const keys = ["cloudAuth", "cloudDeviceId", "cloudLastSyncAt", "cloudSettingsDirty", "cloudSettingsRevision", "blockedSites", "siteLimits", "dailyGoalMinutes", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm", usageKey, videoKey];
+    const data = await chrome.storage.local.get(keys);
+    if (!data.cloudAuth?.token) return;
+    const token = await cloudAccessToken();
+    if (!token) throw new Error("Your cloud session expired. Sign in again.");
+    let deviceId = data.cloudDeviceId;
+    if (!deviceId) {
+      deviceId = crypto.randomUUID();
+      await chrome.storage.local.set({ cloudDeviceId: deviceId });
+    }
+    if (initial) {
+      const remote = await globalThis.AmythestCloud.call("query", "sync:getSettings", {}, token);
+      if (remote) {
+        applyingCloudSettings = true;
+        try { await chrome.storage.local.set({ ...globalThis.AmythestCloud.localSettings(remote), cloudSettingsRevision: remote.revision, cloudSettingsDirty: false }); }
+        finally { applyingCloudSettings = false; }
+      } else {
+        const result = await globalThis.AmythestCloud.call("mutation", "sync:putSettings", { expectedRevision: 0, value: globalThis.AmythestCloud.settingsValue(data) }, token);
+        await chrome.storage.local.set({ cloudSettingsRevision: result.revision, cloudSettingsDirty: false });
+      }
+    } else if (data.cloudSettingsDirty) {
+      try {
+        const result = await globalThis.AmythestCloud.call("mutation", "sync:putSettings", { expectedRevision: data.cloudSettingsRevision || 0, value: globalThis.AmythestCloud.settingsValue(data) }, token);
+        await chrome.storage.local.set({ cloudSettingsRevision: result.revision, cloudSettingsDirty: false, cloudSettingsConflict: false });
+      } catch (error) {
+        await chrome.storage.local.set({ cloudSettingsConflict: true });
+        throw error;
+      }
+    } else if (force || now - (data.cloudLastSyncAt || 0) >= 60000) {
+      const remote = await globalThis.AmythestCloud.call("query", "sync:getSettings", {}, token);
+      if (remote && remote.revision > (data.cloudSettingsRevision || 0)) {
+        applyingCloudSettings = true;
+        try { await chrome.storage.local.set({ ...globalThis.AmythestCloud.localSettings(remote), cloudSettingsRevision: remote.revision }); }
+        finally { applyingCloudSettings = false; }
+      }
+    }
+    if (force || initial || now - (data.cloudLastSyncAt || 0) >= 60000) {
+      const snapshot = dailyWebsiteSnapshot(day, data[usageKey] || {}, data[videoKey] || {}, data.blockedSites || DEFAULTS.blockedSites, now);
+      const args = globalThis.AmythestCloud.dayArgs(snapshot, deviceId);
+      await globalThis.AmythestCloud.call("mutation", "sync:putDay", args, token);
+      await chrome.storage.local.set({ cloudLastSyncAt: now });
+    }
+    await chrome.storage.local.set({ cloudSyncError: "" });
+  })().catch(async error => {
+    await chrome.storage.local.set({ cloudSyncError: error.message || "Cloud sync failed." });
+  }).finally(() => { cloudSyncing = null; });
+  return cloudSyncing;
+}
 async function init() {
   const stored = await chrome.storage.local.get(null);
   const missing = Object.fromEntries(Object.entries(DEFAULTS).filter(([key]) => stored[key] === undefined));
   if (Object.keys(missing).length) await chrome.storage.local.set(missing);
+  await chrome.storage.local.setAccessLevel?.({ accessLevel: "TRUSTED_CONTEXTS" });
   chrome.alarms.create("heartbeat", { periodInMinutes: 1 });
   await syncRules();
   await refreshActive();
+  void syncNativeUsage();
+  void syncCloud();
+  if (globalThis.AmythestCloud?.deployment()) void cloudAccessToken().then(token => { if (token) void sendNativeAccountSession(token); }).catch(() => {});
 }
 chrome.runtime.onInstalled.addListener(init);
 chrome.runtime.onStartup.addListener(init);
@@ -201,16 +387,27 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(details => {
 }, { url: [{ hostSuffix: "youtube.com" }, { hostSuffix: "instagram.com" }, { hostSuffix: "tiktok.com" }] });
 chrome.tabs.onRemoved.addListener(refreshActive);
 chrome.windows.onFocusChanged.addListener(refreshActive);
-chrome.alarms.onAlarm.addListener(async () => { await recordElapsed(); await syncRules(); });
+chrome.alarms.onAlarm.addListener(async () => { await recordElapsed(); await syncNativeUsage(); await syncCloud(); await syncRules(); });
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && Object.keys(changes).some(key => ["blockedSites", "siteLimits", "focusUntil", "pausedUntil", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm"].includes(key) || key.startsWith("usage:"))) syncRules();
+  if (area === "local" && !applyingCloudSettings && Object.keys(changes).some(key => CLOUD_SETTING_KEYS.includes(key))) {
+    chrome.storage.local.set({ cloudSettingsDirty: true }).then(() => void syncCloud());
+  }
 });
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === "flushUsage") recordElapsed().then(() => sendResponse({ ok: true }));
   else if (message.type === "syncRules") syncRules().then(() => sendResponse({ ok: true }));
   else if (message.type === "getSitePolicy") policyForUrl(message.url).then(sendResponse).catch(error => sendResponse({ mode: "allow", error: error.message }));
+  else if (message.type === "requestBreak") grantBreak(message.url).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
   else if (message.type === "requestVideoAccess") grantVideoAccess(message).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
   else if (message.type === "requestShortAccess") grantShortAccess(message).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
+  else if (message.type === "cloudStatus") cloudStatus().then(sendResponse);
+  else if (message.type === "cloudDaySummary") cloudDaySummary().then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
+  else if (message.type === "cloudSetWindowsLimit") setWindowsAppLimit(message.app, message.minutes).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
+  else if (message.type === "cloudPasswordAuth") signInCloud(message.email, message.password, message.flow).then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
+  else if (message.type === "cloudSignOut") signOutCloud().then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
+  else if (message.type === "cloudSyncNow") syncCloud({ force: true }).then(() => cloudStatus().then(sendResponse));
+  else if (message.type === "cloudReloadSettings") reloadCloudSettings().then(sendResponse).catch(error => sendResponse({ ok: false, error: error.message }));
   return true;
 });
 init();

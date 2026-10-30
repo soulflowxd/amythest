@@ -49,6 +49,14 @@ async function main() {
   assert.equal((await vm.runInContext(`grantShortAccess({ url: ${JSON.stringify(reel)}, category: "school", reason: "I need this demonstration for my class project." })`, context)).ok, true);
   assert.equal((await vm.runInContext(`policyForUrl(${JSON.stringify(reel)})`, context)).mode, "allow");
   assert.equal((await vm.runInContext("policyForUrl('https://tiktok.com/@creator/video/123456789')", context)).mode, "shorts");
+  saved.siteLimits = { "example.com": 1 };
+  saved[`usage:${vm.runInContext("dateKey()", context)}`] = { "example.com": 2 * 60000 };
+  assert.equal((await vm.runInContext("policyForUrl('https://example.com/')", context)).mode, "block");
+  assert.equal((await vm.runInContext("grantBreak('https://example.com/')", context)).ok, true);
+  assert.equal((await vm.runInContext("policyForUrl('https://example.com/')", context)).mode, "allow");
+  assert.equal((await vm.runInContext("policyForUrl('https://www.youtube.com/shorts/otherid1234')", context)).mode, "allow");
+  saved.pausedUntil = Date.now() - 1;
+  assert.equal((await vm.runInContext("policyForUrl('https://example.com/')", context)).mode, "block");
   await vm.runInContext("applyRules()", context);
   assert.deepEqual([...updates[0].removeRuleIds], [10000]);
   assert.equal(updates[0].addRules, undefined);

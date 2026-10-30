@@ -46,24 +46,24 @@
       .brand img{box-shadow:0 0 17px rgba(123,234,255,.36)}.eyebrow{color:#b9f2ff}h1{letter-spacing:-.055em}h1 em{background:linear-gradient(100deg,#fff,#b2f6ff,#67d9ea);background-clip:text;color:transparent}p{color:#d1e6f1}
       .guard-wrap{position:relative;width:112px;height:105px;margin:0 0 18px;display:grid;place-items:center;background:radial-gradient(circle,rgba(159,248,241,.25),transparent 72%)}
       .guard-wrap{cursor:pointer;outline:none}.guard-wrap:focus-visible{outline:2px solid #e7cfff;outline-offset:3px;border-radius:18px}
-      .guard-wrap svg,.guard-wrap img{display:block;width:112px;height:112px;filter:drop-shadow(0 7px 10px rgba(0,36,79,.4))}
-      .guard-wrap svg .pupils{transform:translate(var(--look-x,0px),var(--look-y,0px));transition:transform .12s ease-out}
-      .guard-wrap.rebuke svg,.guard-wrap.rebuke img{animation:guard-shake .5s ease-in-out}
-      .guard-wrap.checking svg,.guard-wrap.checking img{animation:guard-bob .72s ease-in-out infinite alternate}.guard-wrap.checking:after{content:"";position:absolute;inset:-5px;border:2px solid rgba(178,255,245,.6);border-radius:50%;animation:guard-ring 1.2s ease-out infinite}
+      .guard-wrap amythest-avatar{--avatar-size:112px;display:block;width:112px;height:112px;filter:drop-shadow(0 7px 10px rgba(42,13,91,.45))}
+      .guard-wrap.checking amythest-avatar{animation:guard-bob .72s ease-in-out infinite alternate}
+      .guard-wrap.checking:after{content:"";position:absolute;inset:-5px;border:2px solid rgba(178,255,245,.6);border-radius:50%;animation:guard-ring 1.2s ease-out infinite}
       select,textarea{background:linear-gradient(180deg,rgba(216,249,255,.19),rgba(2,43,90,.2));border-color:rgba(199,239,255,.37);border-radius:8px;color:#fff}select option{background:#164c78}textarea::placeholder{color:#b9d4e0}
       .primary{border-color:rgba(205,250,255,.61);border-radius:10px;background:linear-gradient(180deg,#9defff,#46c9ed 43%,#188fcf 47%,#146da9);box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 10px 24px rgba(0,73,142,.37);text-shadow:0 1px 2px rgba(0,38,90,.45)}.primary:hover{background:linear-gradient(180deg,#bdfaff,#68d8f3 43%,#269fd7 47%,#1a80b8)}.secondary{color:#bbf4ff}
       .veil{background:radial-gradient(circle at 76% 14%,rgba(213,169,255,.43),transparent 38%),radial-gradient(circle at 10% 72%,rgba(126,78,214,.35),transparent 45%),rgba(13,8,42,.82)}
       .card{background:linear-gradient(155deg,rgba(173,130,223,.48),rgba(83,54,152,.68) 38%,rgba(26,18,72,.94));border-color:rgba(233,205,255,.44);box-shadow:inset 0 1px 0 rgba(255,255,255,.54),inset 0 22px 28px rgba(255,255,255,.065),0 25px 75px rgba(19,7,55,.5)}
       .brand img{box-shadow:0 0 17px rgba(214,159,255,.35)}.eyebrow{color:#e2c7ff}h1 em{background:linear-gradient(100deg,#fff,#e5cfff,#b6a6f6);background-clip:text;color:transparent}p{color:#e1d7ef}
       .brand img{background:none!important;box-shadow:none!important;filter:drop-shadow(0 2px 4px rgba(25,8,65,.3))}
-      .guard-wrap{background:radial-gradient(circle,rgba(218,177,255,.29),transparent 72%)}.guard-wrap svg,.guard-wrap img{filter:drop-shadow(0 7px 10px rgba(42,13,91,.45))}.guard-wrap.checking:after{border-color:rgba(236,201,255,.67)}
+      .guard-wrap{background:radial-gradient(circle,rgba(218,177,255,.29),transparent 72%)}.guard-wrap.checking:after{border-color:rgba(236,201,255,.67)}
       .guard-wrap .avatar-speech{position:absolute;left:116px;top:14px;min-width:120px;max-width:180px;padding:9px 12px;border:1px solid rgba(238,216,255,.5);border-radius:12px;background:linear-gradient(160deg,rgba(99,62,159,.96),rgba(45,28,94,.97));box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 9px 22px rgba(25,8,72,.3);color:#fff;font-size:11px;line-height:1.4;opacity:0;transform:translateY(5px);transition:opacity .2s,transform .2s;pointer-events:none;z-index:2}
       .guard-wrap .avatar-speech.visible{opacity:1;transform:translateY(0)}
       select,textarea{background:linear-gradient(180deg,rgba(237,215,255,.19),rgba(55,28,112,.25));border-color:rgba(235,207,255,.38)}select option{background:#3b286d}textarea::placeholder{color:#d0bddf}
       .primary{border-color:rgba(240,210,255,.67);background:linear-gradient(180deg,#e6c9ff,#b983e9 43%,#8953ce 47%,#7040b1);box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 10px 24px rgba(81,38,156,.38);text-shadow:0 1px 2px rgba(46,15,88,.45)}.primary:hover{background:linear-gradient(180deg,#f0dcff,#c99bf0 43%,#9b66d9 47%,#8050c0)}.secondary{color:#eccfff}
       .primary{border:1px solid #9ab9f6;border-radius:16px;background:linear-gradient(180deg,#fff 0%,#f3f5ff 48%,#d7def9 49%,#d6d9ef 100%);box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 rgba(92,89,154,.18),0 4px 0 rgba(72,83,136,.62),0 9px 20px rgba(9,16,58,.23);color:#252047;text-shadow:0 1px 0 rgba(255,255,255,.8)}.primary:hover{background:linear-gradient(180deg,#fff,#faf8ff 48%,#e7ddfa 49%,#dfd8f2)}.primary:active{transform:translateY(3px);box-shadow:inset 0 1px 0 #fff,0 1px 0 rgba(72,83,136,.63),0 3px 9px rgba(9,16,58,.18)}
+      .card{border-radius:14px}.primary{border-radius:7px;min-height:44px}.brand{font-weight:700;letter-spacing:-.025em}.eyebrow{font-size:11px;letter-spacing:.06em}.hint,.note,.error{font-size:12px}.secondary{min-height:36px}
       @keyframes guard-bob{from{transform:translateY(2px) rotate(-2deg)}to{transform:translateY(-5px) rotate(2deg)}}@keyframes guard-ring{from{opacity:.7;transform:scale(.78)}to{opacity:0;transform:scale(1.22)}}@keyframes guard-shake{20%{transform:rotate(-5deg)}45%{transform:rotate(5deg)}70%{transform:rotate(-3deg)}}
-      @media(max-width:520px){.card{padding:24px}h1{font-size:34px}.guard-wrap .avatar-speech{left:104px;max-width:135px}}@media(prefers-reduced-motion:reduce){.veil{backdrop-filter:none;-webkit-backdrop-filter:none}.guard-wrap.checking svg,.guard-wrap.checking img,.guard-wrap.rebuke svg,.guard-wrap.rebuke img,.guard-wrap.checking:after{animation:none}}
+      @media(max-width:520px){.card{padding:24px}h1{font-size:34px}.guard-wrap .avatar-speech{left:104px;max-width:135px}}@media(prefers-reduced-motion:reduce){.veil{backdrop-filter:none;-webkit-backdrop-filter:none}.guard-wrap.checking amythest-avatar,.guard-wrap.checking:after{animation:none}}
     </style><div class="veil"><main class="card" role="dialog" aria-modal="true" aria-labelledby="amythest-title"><div class="brand"><img src="${chrome.runtime.getURL("icons/mark-clear.svg")}" alt=""><span>amythest</span></div><div id="content"></div></main></div>`;
     document.documentElement.appendChild(host);
     return shadow;
@@ -74,7 +74,7 @@
     if (policy.mode === "allow") { host?.remove(); host = null; return; }
     const shadow = makeOverlay();
     const content = shadow.getElementById("content");
-    const guardMarkup = `<div class="guard-wrap" role="button" tabindex="0" aria-label="Interact with the angry Amythest companion"><img src="${chrome.runtime.getURL("icons/guard-avatar.svg")}" alt="" aria-hidden="true"><span class="avatar-speech" role="status" aria-live="polite"></span></div>`;
+    const guardMarkup = `<div class="guard-wrap"><amythest-avatar data-mood="angry" aria-label="Interact with the angry Amythest companion"></amythest-avatar><span class="avatar-speech" role="status" aria-live="polite"></span></div>`;
     if (policy.mode === "checking") {
       content.innerHTML = `${guardMarkup}<span class="eyebrow">CHECKING THIS VIDEO</span><h1 id="amythest-title">One moment, <em>please.</em></h1><p>Amythest is checking whether this video needs a reason.</p>`;
       shadow.querySelector(".guard-wrap")?.classList.add("checking");
@@ -100,44 +100,27 @@
       const reason = policy.focusUntil > Date.now() ? "You're in a focus session." : policy.workHours ? "You're within your work hours." : "You've reached today's limit for this site.";
       content.innerHTML = `${guardMarkup}<span class="eyebrow">A GENTLE REMINDER</span><h1 id="amythest-title">Your attention is <em>worth protecting.</em></h1><p id="block-reason"></p><button id="break" class="primary" type="button">Take a 5-minute break <span>→</span></button><p class="note">Your website will stay open behind this reminder.</p>`;
       shadow.getElementById("block-reason").textContent = `${reason} Take a breath, then return to what matters to you.`;
-      shadow.getElementById("break").addEventListener("click", async () => {
-        await chrome.storage.local.set({ pausedUntil: Date.now() + 5 * 60000 });
-        await refresh();
+      shadow.getElementById("break").addEventListener("click", async event => {
+        const button = event.currentTarget;
+        button.disabled = true;
+        try {
+          const result = await chrome.runtime.sendMessage({ type: "requestBreak", url: location.href });
+          if (!result?.ok) { shadow.querySelector(".note").textContent = result?.error || "Could not start a break. Please try again."; return; }
+          await refresh();
+        } catch { shadow.querySelector(".note").textContent = "Could not start a break. Please try again."; }
+        finally { button.disabled = false; }
       });
     }
     const guard = shadow.querySelector(".guard-wrap");
-    fetch(chrome.runtime.getURL("icons/guard-avatar.svg")).then(response => {
-      if (!response.ok) throw new Error("avatar unavailable");
-      return response.text();
-    }).then(svg => {
-      if (guard?.isConnected) guard.querySelector("img")?.insertAdjacentHTML("beforebegin", svg);
-      guard?.querySelector("img")?.remove();
-    }).catch(() => { /* The image remains visible if inline SVG cannot load. */ });
     const react = () => {
       const speech = guard?.querySelector(".avatar-speech");
       if (!speech) return;
-      guard.classList.remove("rebuke"); void guard.offsetWidth; guard.classList.add("rebuke");
       speech.textContent = policy.mode === "video" ? "Tell me why this video matters." : policy.mode === "shorts" ? "One video at a time." : "Take a breath first.";
       speech.classList.add("visible");
       clearTimeout(speech.hideTimer);
       speech.hideTimer = setTimeout(() => speech.classList.remove("visible"), 2400);
-      setTimeout(() => guard.classList.remove("rebuke"), 550);
     };
-    guard?.addEventListener("click", react);
-    guard?.addEventListener("keydown", event => {
-      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.stopPropagation(); react(); }
-    });
-    const veil = shadow.querySelector(".veil");
-    if (veil?.avatarPointerMove) veil.removeEventListener("pointermove", veil.avatarPointerMove);
-    veil.avatarPointerMove = event => {
-      if (!guard?.isConnected) return;
-      const box = guard.getBoundingClientRect();
-      const x = box.left + box.width / 2, y = box.top + box.height * .26;
-      const scale = Math.max(box.width * 1.7, 1);
-      guard.style.setProperty("--look-x", `${Math.max(-4, Math.min(4, (event.clientX - x) / scale * 4))}px`);
-      guard.style.setProperty("--look-y", `${Math.max(-3, Math.min(3, (event.clientY - y) / scale * 3))}px`);
-    };
-    veil.addEventListener("pointermove", veil.avatarPointerMove);
+    guard?.querySelector("amythest-avatar")?.addEventListener("avatar-reaction", react);
     pauseMedia();
   }
 

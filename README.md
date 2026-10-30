@@ -6,16 +6,28 @@ Amythest helps you spend less time on distracting websites in Google Chrome. It 
 
 ## Install it in Chrome
 
-1. Download **[amythest-0.5.7-chrome.zip](https://github.com/soulflowxd/amythest/releases/download/v0.5.7/amythest-0.5.7-chrome.zip)** and extract it. Use the extracted folder, not the ZIP itself.
+1. Download **[amythest-0.6.0-chrome.zip](https://github.com/soulflowxd/amythest/releases/download/v0.6.0/amythest-0.6.0-chrome.zip)** and extract it. Use the extracted folder, not the ZIP itself.
 2. Open Chrome and go to `chrome://extensions`.
 3. Turn on **Developer mode** in the top right.
 4. Click **Load unpacked**.
 5. Select the folder containing `manifest.json`. Do not select the ZIP file or `manifest.json` itself.
 6. Click the puzzle-piece icon in Chrome and pin **amythest**.
 
-Amythest is a Chrome extension, not a desktop app. You do not need Iris, Git, Node, or a terminal to install it. If you arrived from Publik, use the ZIP and steps above; Publik's generated desktop-app guide is incorrect for this extension.
+This ZIP installs the Chrome extension. You do not need Iris, Git, Node, or a terminal for it. If you arrived from Publik, use the ZIP and steps above; Publik's generated guide does not describe the Chrome extension correctly.
 
 After you change the extension's files, click **Reload** on its card at `chrome://extensions`.
+
+The ZIP contains the Chrome extension. Download the Windows app separately if you want desktop program tracking.
+
+## Windows companion
+
+Amythest also has a separate Windows app for tracking time in desktop programs. Download the [Windows installer](https://github.com/soulflowxd/amythest/releases/download/v0.6.0/amythest-0.6.0-windows-setup.exe) for a Start menu shortcut and uninstall support, or download the [portable ZIP](https://github.com/soulflowxd/amythest/releases/download/v0.6.0/amythest-0.6.0-windows.zip), extract it, and open `Amythest.exe`. See [the Windows guide](windows/README.md) for connection steps. Keep the Chrome extension installed to manage individual websites and videos. The two apps store their totals separately on your device.
+
+The Windows app follows [Amythest's design guide](DESIGN.md) and uses the same dashboard structure as the extension. Its **Websites** view can show Chrome's per-domain activity after you connect the extension using the steps in [the Windows guide](windows/README.md).
+
+![Actual Windows app showing sample screen time data](docs/screenshots/amythest-windows-dashboard.png)
+
+This is a screenshot of the built Windows app with sample data. It does not show anyone's browsing or app history.
 
 ## Use it
 
@@ -34,9 +46,13 @@ Written reasons for short-form and long-form videos are checked locally and are 
 
 When the long-form check is on, it replaces whole-site focus blocking for `youtube.com` so the video question can appear. The short-form switch prevents default whole-site focus blocking for `instagram.com` and `tiktok.com`, allowing normal Instagram pages and TikTok messages to work. You can still set a separate daily site limit for either domain. Turn the long-form check off if you want your distraction list to block all of YouTube during focus sessions and work hours.
 
-Reminders appear over the original website, so the tab does not change addresses. The glossy Aero companion turns angry when a distraction is paused, follows your cursor, and reacts with a short message when clicked or activated with Enter or Space. It animates while a written reason is being checked. Text fields keep keyboard shortcuts, including YouTube's spacebar shortcut, from interrupting typing. Amythest pauses ordinary page audio and video while a reminder is visible. The site still loads behind it; this is a self-control screen, not a network block.
+Reminders appear over the original website, so the tab does not change addresses. The same full-body Aero companion used in the popup appears angry on blocked pages. Inspired by the earlier interactive robot, it blinks at varied intervals, follows your cursor with its eyes and head, glances around when idle, reacts to clicks and keyboard activation, and lets you gently drag its head. Its body keeps the reference silhouette and does not grow on hover. It animates while a written reason is being checked. **Take a 5-minute break** temporarily clears site and video reminders, then the current rules resume automatically. Text fields keep keyboard shortcuts, including YouTube's spacebar shortcut, from interrupting typing. Amythest pauses ordinary page audio and video while a reminder is visible. The site still loads behind it; this is a self-control screen, not a network block.
 
-Your browsing totals and settings stay in Chrome on your device. Amythest has no account or server. It counts active website time while Chrome is focused, so the totals are approximate. It cannot track other browsers or apps.
+## Optional account sync
+
+Amythest's account backend uses **Convex**, like the [2026-scouting project](https://github.com/soulflowxd/2026-scouting), with email and password sign-in. There is no website to sign into: the extension dashboard contains the account controls. The separate Amythest development deployment is connected in `cloud-config.js`; no email delivery is needed for sign-in. See [account backend setup](convex/README.md), then reload the unpacked extension. Email addresses are not verified, and password recovery is not available yet. Never put an auth signing key in the extension or Windows app.
+
+When you sign in, Amythest syncs daily totals by device, Chrome website limits, and Windows app limits. The extension account card can edit Windows app limits; the Windows Account view can edit Chrome website limits. Each type of limit applies only to its own platform. Saves check the latest version so a concurrent change is not silently replaced. The Windows app receives a short-lived sign-in token through its local Chrome bridge and syncs desktop totals and app boundaries separately. Website domain totals are synced; page URLs, titles, and typed reasons are not. Without an account, browsing totals and settings stay on your device and local tracking keeps working. Active website time is approximate and covers Chrome while it is focused.
 
 The soft opal-shaped ring with an amethyst gradient center is the same mark in the toolbar and on extension pages. The mark has no dark tile behind it inside the interface. The interface uses Windows Segoe UI when available and bundles [Inter](https://github.com/rsms/inter) as an offline fallback under the SIL Open Font License. The interactive, full-body companion is original Amythest artwork inspired by the Aero style. An earlier avatar library remains in `vendor/agent-robot-avatar/` with its license, but the extension no longer loads it.
 

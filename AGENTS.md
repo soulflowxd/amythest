@@ -1,6 +1,6 @@
 # Amythest project guide
 
-Amythest is a Chrome Manifest V3 screen-time extension. Keep changes focused on the extension in this repository.
+Amythest has a Chrome Manifest V3 extension and a native Windows companion in `windows/`. Keep changes focused on the part being requested.
 
 ## Product behavior
 
@@ -24,6 +24,7 @@ Amythest is a Chrome Manifest V3 screen-time extension. Keep changes focused on 
 - Run the relevant Node tests in `tests/` after behavior changes, for example `node --test tests/*.test.js` (use the shell's supported glob syntax). Verify UI changes in Chrome when practical.
 - Update `README.md` when user-visible behavior or install steps change. Keep license notices for the bundled avatar and font.
 - Never commit secrets or local browsing data. Inspect the diff before committing or pushing.
+- Follow `DESIGN.md` for visual work. The Windows app is built with `windows/build.ps1`; run its core tests and inspect the native window after changes. It tracks desktop processes separately from the Chrome extension's website totals.
 
 ## User's Codex usage limit
 

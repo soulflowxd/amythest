@@ -14,8 +14,8 @@ async function render() {
   $("focus-subtitle").textContent = paused ? "Your break ends soon." : focused ? "Your distractions can wait." : "A little intention goes a long way.";
   const seconds = Math.ceil(remaining / 1000);
   $("timer").textContent = focused ? `${String(Math.floor(seconds/60)).padStart(2,"0")}:${String(seconds%60).padStart(2,"0")}` : `${data.sessionMinutes || 25}:00`;
-  $("timer-caption").textContent = focused ? "REMAINING IN THIS SESSION" : "MINUTE FOCUS SESSION";
-  $("focus-button").innerHTML = focused ? "End focus session <span>×</span>" : "Start focus session <span>→</span>";
+  $("timer-caption").textContent = focused ? "Remaining in this session" : "Focus session length";
+  $("focus-button").textContent = focused ? "End focus session" : "Start focus session";
   const usage = data[`usage:${dateKey()}`] || {};
   const rows = Object.entries(usage).sort((a,b) => b[1]-a[1]);
   const distractionTotal = distractionTime(usage, data.blockedSites || [], data[`videoUsage:${dateKey()}`] || {});

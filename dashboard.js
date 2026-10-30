@@ -29,7 +29,7 @@ async function render() {
   const goalMs = (state.dailyGoalMinutes || 120) * 60000 * (chartView === "week" ? 7 : 1);
   $("goal-progress").style.width = `${Math.min(100, distractionTotal / goalMs * 100)}%`;
   $("goal-caption").textContent = `${fmt(distractionTotal)} / ${fmt(goalMs)}`;
-  $("secondary-label").textContent = chartView === "day" ? "MOST USED" : "DAILY AVERAGE";
+  $("secondary-label").textContent = chartView === "day" ? "Most used" : "Daily average";
   $("secondary-value").textContent = chartView === "day" ? (rows[0]?.[0] || "—") : fmt(total / 7);
   $("view-day").classList.toggle("selected", chartView === "day");
   $("view-week").classList.toggle("selected", chartView === "week");
@@ -89,7 +89,7 @@ async function render() {
   });
   if (!Object.keys(state.siteLimits || {}).length) $("limits-list").innerHTML = '<div class="empty">No limits set yet.</div>';
   const remaining = Math.max(0,(state.focusUntil || 0)-Date.now());
-  $("start-focus").innerHTML = remaining ? 'End focus session <span>×</span>' : 'Start a focus session <span>→</span>';
+  $("start-focus").textContent = remaining ? 'End focus session' : 'Start a focus session';
   $("focus-status").textContent = remaining ? `${Math.ceil(remaining/60000)} minutes remaining. You have this.` : "No session running. Start whenever you're ready.";
   document.body.removeAttribute("data-loading");
 }
@@ -127,5 +127,101 @@ $("start-focus").addEventListener("click", async () => {
   await chrome.runtime.sendMessage({ type:"syncRules" }); render();
 });
 render(); setInterval(render,30000);
+const deviceSummary = document.createElement("div");
+deviceSummary.id = "cloud-device-summary";
+deviceSummary.className = "cloud-device-summary";
+deviceSummary.setAttribute("aria-live", "polite");
+$("cloud-actions").after(deviceSummary);
+async function renderCloudDevices(signedIn) {
+  deviceSummary.replaceChildren();
+  if (!signedIn) return;
+  const result = await chrome.runtime.sendMessage({ type: "cloudDaySummary" });
+  if (!result?.ok) { deviceSummary.textContent = result?.error || "Device totals are unavailable."; return; }
+  const heading = document.createElement("strong");
+  heading.textContent = "Today across your devices";
+  deviceSummary.append(heading);
+  if (!result.days.length) deviceSummary.append(" No synced activity yet.");
+  for (const day of result.days) {
+    const row = document.createElement("div");
+    row.className = "cloud-device-row";
+    const source = day.source === "chrome" ? "Chrome" : "Windows";
+    const minutes = Math.floor((day.activeMs || 0) / 60000);
+    row.textContent = `${source} ${String(day.deviceId || "").slice(0, 6)} · ${minutes}m active · ${Math.floor((day.distractionMs || 0) / 60000)}m distractions`;
+    deviceSummary.append(row);
+  }
+  const limits = result.windowsSettings?.appLimits || [];
+  const label = document.createElement("strong");
+  label.textContent = "Windows app limits";
+  deviceSummary.append(label);
+  if (!limits.length) deviceSummary.append(" No app limits set.");
+  for (const limit of limits) {
+    const row = document.createElement("div");
+    row.className = "cloud-device-row";
+    row.textContent = `${limit.app}.exe · ${limit.minutes} min/day `;
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "Remove";
+    remove.addEventListener("click", () => cloudAction(remove, "cloudSetWindowsLimit", { app: limit.app, minutes: 0 }));
+    row.append(remove);
+    deviceSummary.append(row);
+  }
+}
+async function renderCloudStatus() {
+  const status = await chrome.runtime.sendMessage({ type: "cloudStatus" });
+  const configured = !!status?.configured;
+  const signedIn = !!status?.signedIn;
+  $("cloud-email-form").hidden = !configured || signedIn;
+  $("cloud-app-limit-form").hidden = !signedIn;
+  $("cloud-actions").hidden = !signedIn;
+  $("cloud-reload").hidden = !status?.settingsConflict;
+  $("cloud-status").textContent = !configured
+    ? "Cloud sync is not configured in this build. Your activity still stays on this device."
+    : signedIn
+      ? `Signed in as ${status.email}. ${status.lastSyncAt ? `Last synced ${new Date(status.lastSyncAt).toLocaleString()}.` : "Waiting for first sync."}`
+      : "Sign in or create an account to sync across devices.";
+  $("cloud-message").textContent = status?.settingsConflict
+    ? "Settings changed on another device. Reload cloud settings to use that version."
+    : status?.error || "";
+  await renderCloudDevices(signedIn);
+}
+async function cloudAction(button, type, fields = {}) {
+  button.disabled = true;
+  $("cloud-message").textContent = "";
+  try {
+    const result = await chrome.runtime.sendMessage({ type, ...fields });
+    if (!result?.ok && result?.error) throw new Error(result.error);
+    return result;
+  } catch (error) {
+    $("cloud-message").textContent = error.message || "Cloud request failed.";
+    return null;
+  } finally {
+    button.disabled = false;
+    await renderCloudStatus();
+  }
+}
+$("cloud-email-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const button = event.submitter || event.currentTarget.querySelector("button");
+  const flow = button.dataset.flow;
+  const password = $("cloud-password").value;
+  if (await cloudAction(button, "cloudPasswordAuth", { email: $("cloud-email").value, password, flow })) {
+    $("cloud-password").value = "";
+    await renderCloudStatus();
+  }
+});
+$("cloud-app-limit-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const button = event.currentTarget.querySelector("button");
+  if (await cloudAction(button, "cloudSetWindowsLimit", { app: $("cloud-app").value, minutes: Number($("cloud-app-minutes").value) })) {
+    $("cloud-app").value = "";
+    $("cloud-app-minutes").value = "";
+  }
+});
+$("cloud-sync-now").addEventListener("click", event => cloudAction(event.currentTarget, "cloudSyncNow"));
+$("cloud-reload").addEventListener("click", event => cloudAction(event.currentTarget, "cloudReloadSettings"));
+$("cloud-sign-out").addEventListener("click", async event => {
+  await cloudAction(event.currentTarget, "cloudSignOut");
+});
+renderCloudStatus();
 $("view-day").addEventListener("click", () => { chartView = "day"; render(); });
 $("view-week").addEventListener("click", () => { chartView = "week"; render(); });

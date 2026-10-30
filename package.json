@@ -1,0 +1,19 @@
+{
+  "name": "amythest-sync",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "typecheck": "tsc --noEmit && node -e \"process.stdout.write('typecheck passed\\n')\"",
+    "test:sync": "node --test tests/account-backend.test.js"
+  },
+  "dependencies": {
+    "@auth/core": "0.41.3",
+    "@convex-dev/auth": "0.0.96",
+    "@oslojs/crypto": "^1.0.1",
+    "convex": "1.48.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "typescript": "^5.9.3"
+  }
+}
