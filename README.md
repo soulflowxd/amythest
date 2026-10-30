@@ -4,6 +4,10 @@
 
 Amythest helps you spend less time on distracting websites in Google Chrome. It shows your screen time, lets you start a focus session, and can block sites during work hours or after you reach a daily limit.
 
+![Amythest Chrome extension popup showing the focus timer and today's activity](docs/screenshots/amythest-chrome-popup.png)
+
+Chrome extension screenshot. The screen time values are from the example shown in the app.
+
 ## Install it in Chrome
 
 1. Download **[amythest-0.6.0-chrome.zip](https://github.com/soulflowxd/amythest/releases/download/v0.6.0/amythest-0.6.0-chrome.zip)** and extract it. Use the extracted folder, not the ZIP itself.
