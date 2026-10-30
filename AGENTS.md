@@ -9,7 +9,8 @@ Amythest has a Chrome Manifest V3 extension and a native Windows companion in `w
 - Short-form checks apply to YouTube Shorts, Instagram Reels, and TikTok video content without blocking ordinary Instagram pages or TikTok messages. A reason unlocks only the selected short video for a limited time.
 - Long-form checks ask for a meaningful reason before temporarily unlocking one YouTube video. Navigating to another video must require a new reason, including YouTube's in-page navigation. Amythest cannot verify whether a reason is true; describe this honestly.
 - Preserve ordinary typing in reason fields, especially spaces and YouTube keyboard shortcuts.
-- Keep settings and browsing data local to Chrome. Do not add secrets, credentials, telemetry, or a server without an explicit user request.
+- Local tracking works without an account. Account sync is opt-in through the existing Convex backend; sync daily totals and limits, never page URLs, titles, typed reasons, secrets, or raw local browsing files.
+- Keep platform boundaries clear: the extension measures websites, while the Windows companion measures desktop processes. A shared account can show both totals and sync each platform's limits.
 
 ## Visual direction
 
@@ -25,6 +26,8 @@ Amythest has a Chrome Manifest V3 extension and a native Windows companion in `w
 - Update `README.md` when user-visible behavior or install steps change. Keep license notices for the bundled avatar and font.
 - Never commit secrets or local browsing data. Inspect the diff before committing or pushing.
 - Follow `DESIGN.md` for visual work. The Windows app is built with `windows/build.ps1`; run its core tests and inspect the native window after changes. It tracks desktop processes separately from the Chrome extension's website totals.
+- The Windows installer and portable ZIP come from `windows/build.ps1 -Package`. Versioned Chrome and Windows downloads belong in one GitHub release. The screenshot in `docs/screenshots/` must be captured from the built app with sample data, never private usage data.
+- Publik lists the GitHub release. After publishing a release, verify its assets and install links; Publik may refresh the listing later. Do not claim the Publik page changed until it is checked.
 
 ## User's Codex usage limit
 
