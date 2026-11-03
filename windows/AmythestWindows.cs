@@ -315,6 +315,7 @@ namespace Amythest.Windows
     {
         private readonly Label title;
         private readonly Label message;
+        private readonly Button breakButton;
         public event EventHandler BreakRequested;
         public BlockForm()
         {
@@ -335,17 +336,18 @@ namespace Amythest.Windows
             card.Controls.Add(title);
             message = Ui.Label("", 30, 106, 430, 72, 14, false, Palette.Muted);
             card.Controls.Add(message);
-            Button breakButton = Ui.Button("Take a 5-minute break", 30, 220, 430, 48);
+            breakButton = Ui.Button("Take a 5-minute break", 30, 220, 430, 48);
             breakButton.Click += delegate { if (BreakRequested != null) BreakRequested(this, EventArgs.Empty); };
             card.Controls.Add(breakButton);
             card.Controls.Add(Ui.Label("This is a self-control pause. You can switch to another app.", 30, 278, 430, 24, 10, false, Palette.Muted));
             Deactivate += delegate { Hide(); };
             KeyDown += delegate(object sender, KeyEventArgs e) { if (e.KeyCode == Keys.Escape) Hide(); };
         }
-        public void ShowFor(string app, string reason)
+        public void ShowFor(string app, string reason, bool hardMode = false)
         {
             title.Text = "Hold on, " + app + ".";
-            message.Text = reason + " Switch to something that supports what you want to do.";
+            message.Text = reason + (hardMode ? " Hard Mode is active until this focus session ends." : " Switch to something that supports what you want to do.");
+            breakButton.Visible = !hardMode;
             if (!Visible) Show();
             BringToFront();
         }
@@ -449,6 +451,8 @@ namespace Amythest.Windows
         private CheckBox workEnabled;
         private DateTimePicker workStart, workEnd;
         private Button focusButton;
+        private CheckBox hardModeCheck;
+        private ComboBox focusDuration;
 
         public MainForm() : this(null) { }
 
@@ -477,11 +481,11 @@ namespace Amythest.Windows
             }
             BuildUi();
             blocker = new BlockForm();
-            blocker.BreakRequested += delegate { settings.PausedUntil = DateTime.Now.AddMinutes(5); Save(); blocker.Hide(); RefreshSummary(); };
+            blocker.BreakRequested += delegate { if (settings.HardModeUntil > DateTime.Now && settings.FocusUntil > DateTime.Now) return; settings.PausedUntil = DateTime.Now.AddMinutes(5); Save(); blocker.Hide(); RefreshSummary(); };
             tray = new NotifyIcon { Icon = Icon ?? SystemIcons.Application, Text = "Amythest screen time", Visible = true };
             ContextMenu menu = new ContextMenu();
             menu.MenuItems.Add("Open Amythest", delegate { Show(); WindowState = FormWindowState.Normal; Activate(); });
-            menu.MenuItems.Add("Quit", delegate { quitting = true; Close(); });
+            menu.MenuItems.Add("Quit", delegate { if (settings.HardModeUntil > DateTime.Now && settings.FocusUntil > DateTime.Now) { MessageBox.Show("Hard Mode runs until " + settings.FocusUntil.ToString("h:mm tt") + ". Windows can still stop or uninstall this app.", "Amythest Hard Mode"); return; } quitting = true; Close(); });
             tray.ContextMenu = menu;
             tray.DoubleClick += delegate { Show(); WindowState = FormWindowState.Normal; Activate(); };
             FormClosing += delegate(object sender, FormClosingEventArgs e) { if (!quitting) { e.Cancel = true; Hide(); } };
@@ -540,7 +544,7 @@ namespace Amythest.Windows
             GlassStrip footer = new GlassStrip();
             Controls.Add(footer);
             focusButton = Ui.Button("Start 25-minute focus", 24, 14, 270, 44);
-            focusButton.Click += delegate { settings.FocusUntil = settings.FocusUntil > DateTime.Now ? DateTime.MinValue : DateTime.Now.AddMinutes(25); settings.PausedUntil = DateTime.MinValue; Save(); RefreshSummary(); };
+            focusButton.Click += delegate { if (settings.FocusUntil > DateTime.Now && settings.HardModeUntil > DateTime.Now) return; settings.FocusUntil = settings.FocusUntil > DateTime.Now ? DateTime.MinValue : DateTime.Now.AddMinutes(settings.SessionMinutes); settings.HardModeUntil = settings.HardModeEnabled ? settings.FocusUntil : DateTime.MinValue; settings.PausedUntil = DateTime.MinValue; Save(); RefreshSummary(); };
             focusLabel = Ui.Label("No focus session running", 315, 19, 450, 36, 11, false, Color.FromArgb(236, 231, 252));
             footer.Controls.Add(Ui.Label("Amythest keeps your time in view.", 24, 7, 560, 25, 10, false, Color.FromArgb(236, 231, 252)));
 
@@ -580,9 +584,19 @@ namespace Amythest.Windows
             todayPage.Controls.Add(focusCard);
             focusCard.Controls.Add(Ui.Label("Focus sessions", 20, 17, 320, 28, 15, true, Palette.Lilac));
             focusCard.Controls.Add(Ui.Label("Pause distracting apps while you focus.", 20, 49, 340, 25, 10, false, Palette.Muted));
-            focusButton.SetBounds(20, 91, 270, 40);
+            focusDuration = new ComboBox { Left = 20, Top = 93, Width = 112, Height = 40, DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 10) };
+            focusDuration.Items.AddRange(new object[] { "15 minutes", "25 minutes", "45 minutes", "60 minutes" });
+            int selectedDuration = new[] { 15, 25, 45, 60 }.ToList().IndexOf(settings.SessionMinutes);
+            focusDuration.SelectedIndex = selectedDuration < 0 ? 1 : selectedDuration;
+            focusDuration.SelectedIndexChanged += delegate { settings.SessionMinutes = new[] { 15, 25, 45, 60 }[focusDuration.SelectedIndex]; Save(); RefreshSummary(); };
+            focusCard.Controls.Add(focusDuration);
+            focusButton.SetBounds(144, 91, 195, 40);
             focusCard.Controls.Add(focusButton);
-            focusLabel.SetBounds(20, 144, 340, 40);
+            focusCard.Resize += delegate { focusButton.Width = Math.Max(125, focusCard.ClientSize.Width - 164); };
+            hardModeCheck = new CheckBox { Text = "Hard Mode for next session", Left = 20, Top = 139, Width = 280, Height = 24, ForeColor = Palette.Muted, Checked = settings.HardModeEnabled, BackColor = Color.Transparent };
+            hardModeCheck.CheckedChanged += delegate { settings.HardModeEnabled = hardModeCheck.Checked; Save(); };
+            focusCard.Controls.Add(hardModeCheck);
+            focusLabel.SetBounds(20, 164, 340, 22);
             focusLabel.ForeColor = Palette.Muted;
             focusCard.Controls.Add(focusLabel);
             AeroCard guidanceCard = new AeroCard();
@@ -606,7 +620,7 @@ namespace Amythest.Windows
                 usageList.SetBounds(27, 293, Math.Max(180, leftWidth - 54), Math.Max(70, summary.ClientSize.Height - 317));
                 int rightX = 30 + leftWidth;
                 int rightWidth = Math.Max(300, todayPage.ClientSize.Width - rightX - 14);
-                focusCard.SetBounds(rightX, 14, rightWidth, 190);
+                focusCard.SetBounds(rightX, 14, rightWidth, 200);
                 guidanceCard.SetBounds(rightX, 217, rightWidth, Math.Max(115, todayPage.ClientSize.Height - 232));
             };
 
@@ -858,7 +872,7 @@ namespace Amythest.Windows
                 usage[app] = current + elapsed;
                 hours[now.Hour] = Math.Min(3600000, hours[now.Hour] + elapsed);
                 string reason = AppPolicy.BlockReason(app, usage[app], settings, now, settings.FocusUntil, settings.PausedUntil);
-                if (reason != null && !blocker.Visible) blocker.ShowFor(app, reason);
+                if (reason != null && !blocker.Visible) blocker.ShowFor(app, reason, settings.HardModeUntil > now && settings.FocusUntil > now);
             }
             if (++saveTicks >= 10) { saveTicks = 0; store.SaveUsage(day, usage); store.SaveHours(day, hours); RefreshWebsites(); hourChart.Hours = hours; }
             if (++cloudTicks >= 60) { cloudTicks = 0; SyncCloud(); }
@@ -883,10 +897,14 @@ namespace Amythest.Windows
             goalBar.Fraction = (double)distracting / ((long)settings.GoalMinutes * 60000);
             if (settings.FocusUntil > DateTime.Now)
             {
-                focusButton.Text = "End focus session";
-                focusLabel.Text = "Focus ends at " + settings.FocusUntil.ToString("h:mm tt");
+                bool hard = settings.HardModeUntil > DateTime.Now;
+                focusButton.Text = hard ? "Hard Mode active" : "End focus session";
+                focusButton.Enabled = !hard;
+                focusDuration.Enabled = false;
+                hardModeCheck.Enabled = false;
+                focusLabel.Text = "Focus ends at " + settings.FocusUntil.ToString("h:mm tt") + (hard ? " · no breaks" : "");
             }
-            else { focusButton.Text = "Start a 25-minute focus session"; focusLabel.Text = "No focus session running"; }
+            else { focusButton.Text = "Start focus session"; focusButton.Enabled = true; focusDuration.Enabled = true; hardModeCheck.Enabled = true; focusLabel.Text = "No focus session running"; }
         }
         private void RefreshToday()
         {
@@ -953,7 +971,7 @@ namespace Amythest.Windows
                     cloudDeviceList.BeginUpdate();
                     cloudDeviceList.Items.Clear();
                     if (result.Days != null) foreach (CloudDay entry in result.Days.OrderByDescending(item => item.activeMs)) {
-                        string source = entry.source == "chrome" ? "Chrome" : "Windows";
+                        string source = entry.source == "chrome" ? "Chrome" : entry.source == "android" ? "Android" : "Windows";
                         string device = entry.deviceId == null ? "" : entry.deviceId.Substring(0, Math.Min(6, entry.deviceId.Length));
                         ListViewItem row = new ListViewItem(source + " " + device);
                         row.SubItems.Add(TimeText(entry.activeMs));
@@ -972,10 +990,13 @@ namespace Amythest.Windows
             foreach (string app in settings.DistractingApps.OrderBy(x => x)) distractionList.Items.Add(app);
             limitList.Items.Clear();
             foreach (KeyValuePair<string, int> pair in settings.DailyLimits.OrderBy(x => x.Key)) limitList.Items.Add(pair.Key + " · " + pair.Value + " min/day");
+            long weekTotal = usage.Values.Sum();
+            for (int offset = 1; offset < 7; offset++) weekTotal += store.LoadUsage(DateTime.Today.AddDays(-offset)).Values.Sum();
             if (boundaryOverview != null) boundaryOverview.Text =
                 settings.DistractingApps.Count + " distracting app" + (settings.DistractingApps.Count == 1 ? "" : "s") + "\n" +
                 settings.DailyLimits.Count + " daily app limit" + (settings.DailyLimits.Count == 1 ? "" : "s") + "\n" +
-                (settings.WorkEnabled ? "Work hours are on" : "Work hours are off") + "\n\n" +
+                (settings.WorkEnabled ? "Work hours are on" : "Work hours are off") + "\n" +
+                "Past 7 days in Windows: " + TimeText(weekTotal) + "\n\n" +
                 "Chrome website limits are shown in Account.";
             RefreshSummary(); RefreshToday();
         }

@@ -236,3 +236,4 @@ html { scrollbar-color: #8d86bd #dfe3f3; }
 .cloud-device-summary { margin-top: 18px; padding: 14px 16px; border: 1px solid rgba(104, 117, 171, .32); border-radius: 12px; background: rgba(242, 245, 255, .72); color: #283556; }
 .cloud-device-row { padding-top: 8px; font-size: .9rem; }
 .account-panel [hidden] { display: none !important; }
+.hard-mode-control{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:16px 0;color:var(--aero-ink);font-size:13px;font-weight:650}.hard-mode-control input{accent-color:#7953bc;width:18px;height:18px}.hard-mode-control small{display:block;flex-basis:100%;padding-left:26px;color:var(--aero-muted);font-size:11px;font-weight:400;line-height:1.45}.hard-mode-control input:focus-visible{outline:2px solid #7652b2;outline-offset:3px}.primary-button:disabled{opacity:.65;cursor:not-allowed}

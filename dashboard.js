@@ -15,7 +15,7 @@ async function render() {
   await chrome.runtime.sendMessage({ type: "flushUsage" });
   const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate() - (6-i)); return d; });
   const keys = days.flatMap(d => [`usage:${keyFor(d)}`, `videoUsage:${keyFor(d)}`, `hours:${keyFor(d)}`, `hoursBySite:${keyFor(d)}`]);
-  state = await chrome.storage.local.get(["blockedSites", "siteLimits", "focusUntil", "sessionMinutes", "dailyGoalMinutes", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "hideShortsFeed", "checkLongForm", ...keys]);
+  state = await chrome.storage.local.get(["blockedSites", "siteLimits", "focusUntil", "sessionMinutes", "hardModeEnabled", "hardModeUntil", "dailyGoalMinutes", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "hideShortsFeed", "checkLongForm", ...keys]);
   const usage = chartView === "day" ? (state[`usage:${dateKey()}`] || {}) : days.reduce((sum, d) => { for (const [site, ms] of Object.entries(state[`usage:${keyFor(d)}`] || {})) sum[site] = (sum[site] || 0) + ms; return sum; }, {});
   const rows = Object.entries(usage).sort((a,b) => b[1]-a[1]);
   const total = rows.reduce((sum, row) => sum+row[1], 0);
@@ -89,8 +89,12 @@ async function render() {
   });
   if (!Object.keys(state.siteLimits || {}).length) $("limits-list").innerHTML = '<div class="empty">No limits set yet.</div>';
   const remaining = Math.max(0,(state.focusUntil || 0)-Date.now());
-  $("start-focus").textContent = remaining ? 'End focus session' : 'Start a focus session';
-  $("focus-status").textContent = remaining ? `${Math.ceil(remaining/60000)} minutes remaining. You have this.` : "No session running. Start whenever you're ready.";
+  const hard = remaining && state.hardModeUntil > Date.now();
+  $("start-focus").textContent = hard ? "Hard Mode active" : remaining ? 'End focus session' : 'Start a focus session';
+  $("start-focus").disabled = !!hard;
+  hardControl.querySelector("input").checked = !!state.hardModeEnabled;
+  hardControl.querySelector("input").disabled = !!remaining;
+  $("focus-status").textContent = hard ? `${Math.ceil(remaining/60000)} minutes remaining. Breaks and early stop are off.` : remaining ? `${Math.ceil(remaining/60000)} minutes remaining. You have this.` : "No session running. Start whenever you're ready.";
   document.body.removeAttribute("data-loading");
 }
 
@@ -121,9 +125,16 @@ $("hide-shorts-feed").addEventListener("change", e => chrome.storage.local.set({
 $("check-long-form").addEventListener("change", e => chrome.storage.local.set({ checkLongForm: e.target.checked }));
 $("duration").addEventListener("change", e => chrome.storage.local.set({ sessionMinutes:Number(e.target.value) }));
 $("goal").addEventListener("change", e => chrome.storage.local.set({ dailyGoalMinutes:Number(e.target.value) }));
+const hardControl = document.createElement("label");
+hardControl.className = "hard-mode-control";
+hardControl.innerHTML = '<input type="checkbox"> Hard Mode for next session <small>No early stop or breaks. You can still disable the extension or its permissions.</small>';
+$("start-focus").before(hardControl);
+hardControl.querySelector("input").addEventListener("change", event => chrome.storage.local.set({ hardModeEnabled: event.target.checked }));
 $("start-focus").addEventListener("click", async () => {
   const focused=(state.focusUntil || 0)>Date.now();
-  await chrome.storage.local.set({ focusUntil:focused?0:Date.now()+(state.sessionMinutes || 25)*60000, pausedUntil:0 });
+  if (focused && state.hardModeUntil > Date.now()) return;
+  const until = focused ? 0 : Date.now() + (state.sessionMinutes || 25) * 60000;
+  await chrome.storage.local.set({ focusUntil: until, hardModeUntil: !focused && state.hardModeEnabled ? until : 0, pausedUntil: 0 });
   await chrome.runtime.sendMessage({ type:"syncRules" }); render();
 });
 render(); setInterval(render,30000);
@@ -144,7 +155,7 @@ async function renderCloudDevices(signedIn) {
   for (const day of result.days) {
     const row = document.createElement("div");
     row.className = "cloud-device-row";
-    const source = day.source === "chrome" ? "Chrome" : "Windows";
+    const source = day.source === "chrome" ? "Chrome" : day.source === "android" ? "Android" : "Windows";
     const minutes = Math.floor((day.activeMs || 0) / 60000);
     row.textContent = `${source} ${String(day.deviceId || "").slice(0, 6)} · ${minutes}m active · ${Math.floor((day.distractionMs || 0) / 60000)}m distractions`;
     deviceSummary.append(row);

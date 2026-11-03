@@ -5,7 +5,7 @@ let settings = {};
 
 async function render() {
   await chrome.runtime.sendMessage({ type: "flushUsage" });
-  const data = await chrome.storage.local.get(["focusUntil", "pausedUntil", "sessionMinutes", "dailyGoalMinutes", "blockedSites", `usage:${dateKey()}`, `videoUsage:${dateKey()}`]);
+  const data = await chrome.storage.local.get(["focusUntil", "pausedUntil", "sessionMinutes", "hardModeEnabled", "hardModeUntil", "dailyGoalMinutes", "blockedSites", `usage:${dateKey()}`, `videoUsage:${dateKey()}`]);
   settings = data;
   const remaining = Math.max(0, (data.focusUntil || 0) - Date.now());
   const focused = remaining > 0;
@@ -15,7 +15,11 @@ async function render() {
   const seconds = Math.ceil(remaining / 1000);
   $("timer").textContent = focused ? `${String(Math.floor(seconds/60)).padStart(2,"0")}:${String(seconds%60).padStart(2,"0")}` : `${data.sessionMinutes || 25}:00`;
   $("timer-caption").textContent = focused ? "Remaining in this session" : "Focus session length";
-  $("focus-button").textContent = focused ? "End focus session" : "Start focus session";
+  const hard = focused && data.hardModeUntil > Date.now();
+  $("focus-button").textContent = hard ? "Hard Mode active" : focused ? "End focus session" : "Start focus session";
+  $("focus-button").disabled = hard;
+  hardControl.querySelector("input").checked = !!data.hardModeEnabled;
+  hardControl.querySelector("input").disabled = focused;
   const usage = data[`usage:${dateKey()}`] || {};
   const rows = Object.entries(usage).sort((a,b) => b[1]-a[1]);
   const distractionTotal = distractionTime(usage, data.blockedSites || [], data[`videoUsage:${dateKey()}`] || {});
@@ -35,9 +39,16 @@ async function render() {
   document.body.removeAttribute("data-loading");
 }
 
+const hardControl = document.createElement("label");
+hardControl.className = "hard-mode-control";
+hardControl.innerHTML = '<input type="checkbox"> Hard Mode for next session <small>No early stop or breaks. Device permissions can still be changed.</small>';
+$("focus-button").before(hardControl);
+hardControl.querySelector("input").addEventListener("change", event => chrome.storage.local.set({ hardModeEnabled: event.target.checked }));
 $("focus-button").addEventListener("click", async () => {
   const focused = (settings.focusUntil || 0) > Date.now();
-  await chrome.storage.local.set({ focusUntil: focused ? 0 : Date.now() + (settings.sessionMinutes || 25) * 60000, pausedUntil: 0 });
+  if (focused && settings.hardModeUntil > Date.now()) return;
+  const until = focused ? 0 : Date.now() + (settings.sessionMinutes || 25) * 60000;
+  await chrome.storage.local.set({ focusUntil: until, hardModeUntil: !focused && settings.hardModeEnabled ? until : 0, pausedUntil: 0 });
   await chrome.runtime.sendMessage({ type: "syncRules" });
   render();
 });

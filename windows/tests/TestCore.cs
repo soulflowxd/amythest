@@ -29,16 +29,22 @@ internal static class TestCore
         Check(AppPolicy.BlockReason("discord", 0, settings, weekday, DateTime.MinValue, DateTime.MinValue) != null, "work-hour distraction block");
         Check(AppPolicy.BlockReason("steam", 10 * 60000, settings, weekday, DateTime.MinValue, DateTime.MinValue) != null, "daily app limit");
         Check(AppPolicy.BlockReason("discord", 0, settings, weekday, DateTime.MinValue, weekday.AddMinutes(5)) == null, "break bypass");
+        settings.HardModeEnabled = true;
+        settings.HardModeUntil = weekday.AddMinutes(25);
+        Check(AppPolicy.BlockReason("discord", 0, settings, weekday, weekday.AddMinutes(25), weekday.AddMinutes(5)) != null, "hard mode ignores break");
         Check(AppPolicy.BlockReason("explorer", 99999999, settings, weekday, weekday.AddMinutes(25), DateTime.MinValue) == null, "protected process");
 
         string folder = Path.Combine(Path.GetTempPath(), "amythest-core-test-" + Guid.NewGuid().ToString("N"));
         LocalStore store = new LocalStore(folder);
         settings.GoalMinutes = 90;
+        settings.SessionMinutes = 45;
         settings.FocusUntil = weekday.AddMinutes(25);
         store.SaveSettings(settings);
         Settings restored = store.LoadSettings();
         Check(restored.GoalMinutes == 90 && restored.DistractingApps.Contains("discord"), "settings round trip");
+        Check(restored.SessionMinutes == 45, "focus duration round trip");
         Check(restored.FocusUntil == settings.FocusUntil, "focus time round trip");
+        Check(restored.HardModeEnabled && restored.HardModeUntil == settings.HardModeUntil, "hard mode settings round trip");
         Dictionary<string, long> usage = new Dictionary<string, long>();
         usage["chrome"] = 12345;
         store.SaveUsage(weekday, usage);

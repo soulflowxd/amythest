@@ -14,7 +14,7 @@ export default defineSchema({
   dailySnapshots: defineTable({
     userId: v.id("users"),
     deviceId: v.string(),
-    source: v.union(v.literal("chrome"), v.literal("windows")),
+    source: v.union(v.literal("chrome"), v.literal("windows"), v.literal("android")),
     date: v.string(),
     activeMs: v.number(),
     distractionMs: v.number(),
@@ -37,6 +37,17 @@ export default defineSchema({
     checkLongForm: v.boolean(),
   }).index("by_user", ["userId"]),
   windowsSettings: defineTable({
+    userId: v.id("users"),
+    revision: v.number(),
+    updatedAt: v.number(),
+    goalMinutes: v.number(),
+    distractingApps: v.array(v.string()),
+    appLimits: v.array(v.object({ app: v.string(), minutes: v.number() })),
+    workEnabled: v.boolean(),
+    workStartMinutes: v.number(),
+    workEndMinutes: v.number(),
+  }).index("by_user", ["userId"]),
+  androidSettings: defineTable({
     userId: v.id("users"),
     revision: v.number(),
     updatedAt: v.number(),

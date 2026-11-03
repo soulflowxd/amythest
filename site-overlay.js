@@ -83,6 +83,9 @@
       content.innerHTML = `${guardMarkup}<span class="eyebrow">SHORT-FORM FEED PAUSED</span><h1 id="amythest-title">Keep your <em>attention.</em></h1><p>${policy.shortKind || "This feed"} is paused. Open a specific video to ask for access to just that one. Messages and other pages stay available.</p>${escapeLink}`;
     } else if (policy.mode === "video" || policy.mode === "shorts") {
       const isShort = policy.mode === "shorts";
+      if (policy.hard) {
+        content.innerHTML = `${guardMarkup}<h1 id="amythest-title">Hard Mode is active.</h1><p>This video stays paused until your focus session ends. Video unlocks are off for this session.</p>`;
+      } else {
       content.innerHTML = `${guardMarkup}<span class="eyebrow">${isShort ? "ONE VIDEO, WITH INTENTION" : "WATCH WITH INTENTION"}</span><h1 id="amythest-title">${isShort ? "Why this <em>video?</em>" : "What are you here to <em>learn?</em>"}</h1><p>${isShort ? `Tell yourself why this ${policy.shortKind || "short video"} is worth watching. A reason unlocks only this video for 5 minutes.` : "Pick a purpose and describe what you need from this video. Access lasts 15 minutes."}</p><form id="reason-form"><label for="purpose">Purpose</label><select id="purpose" required><option value="">Choose a purpose</option><option value="school">School</option><option value="robotics">Robotics</option><option value="work">Work</option><option value="research">Research</option><option value="other">Another purposeful task</option></select><label for="reason">What will you use this video for?</label><textarea id="reason" rows="3" minlength="15" maxlength="280" placeholder="I need this robotics tutorial to wire my sensor." required></textarea><p class="hint">Write at least three meaningful words. Amythest cannot verify your reason.</p><div id="error" class="error" role="alert"></div><button class="primary" type="submit">${isShort ? "Watch this video for 5 minutes" : "Watch for 15 minutes"} <span>→</span></button></form>`;
       shadow.getElementById("reason-form").addEventListener("submit", async event => {
         event.preventDefault();
@@ -96,11 +99,12 @@
         } catch { shadow.getElementById("error").textContent = "Please try again."; }
         finally { button.disabled = false; shadow.querySelector(".guard-wrap")?.classList.remove("checking"); }
       });
+      }
     } else {
       const reason = policy.focusUntil > Date.now() ? "You're in a focus session." : policy.workHours ? "You're within your work hours." : "You've reached today's limit for this site.";
-      content.innerHTML = `${guardMarkup}<span class="eyebrow">A GENTLE REMINDER</span><h1 id="amythest-title">Your attention is <em>worth protecting.</em></h1><p id="block-reason"></p><button id="break" class="primary" type="button">Take a 5-minute break <span>→</span></button><p class="note">Your website will stay open behind this reminder.</p>`;
+      content.innerHTML = `${guardMarkup}<span class="eyebrow">A GENTLE REMINDER</span><h1 id="amythest-title">Your attention is <em>worth protecting.</em></h1><p id="block-reason"></p>${policy.hard ? '<p class="note">Hard Mode is active. Breaks are off until this session ends.</p>' : '<button id="break" class="primary" type="button">Take a 5-minute break <span>→</span></button>'}<p class="note">Your website will stay open behind this reminder.</p>`;
       shadow.getElementById("block-reason").textContent = `${reason} Take a breath, then return to what matters to you.`;
-      shadow.getElementById("break").addEventListener("click", async event => {
+      shadow.getElementById("break")?.addEventListener("click", async event => {
         const button = event.currentTarget;
         button.disabled = true;
         try {
@@ -150,7 +154,7 @@
   }
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && Object.keys(changes).some(key => key.startsWith("usage:") || ["blockedSites", "siteLimits", "focusUntil", "pausedUntil", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm", "videoAccess", "shortAccess"].includes(key))) refresh();
+    if (area === "local" && Object.keys(changes).some(key => key.startsWith("usage:") || ["blockedSites", "siteLimits", "focusUntil", "hardModeUntil", "pausedUntil", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm", "videoAccess", "shortAccess"].includes(key))) refresh();
   });
   chrome.runtime.onMessage.addListener(message => { if (message.type === "policyChanged") { onLocationChange(); refresh(); } });
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });

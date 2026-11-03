@@ -15,10 +15,13 @@ namespace Amythest.Windows
         public int CloudRevision = 0;
         public string CloudFingerprint = "";
         public int GoalMinutes = 120;
+        public int SessionMinutes = 25;
         public bool WorkEnabled = false;
         public int WorkStartMinutes = 9 * 60;
         public int WorkEndMinutes = 17 * 60;
         public DateTime FocusUntil = DateTime.MinValue;
+        public DateTime HardModeUntil = DateTime.MinValue;
+        public bool HardModeEnabled = false;
         public DateTime PausedUntil = DateTime.MinValue;
         public readonly HashSet<string> DistractingApps = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         public readonly Dictionary<string, int> DailyLimits = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -55,7 +58,7 @@ namespace Amythest.Windows
 
         public static string BlockReason(string app, long todayMs, Settings settings, DateTime now, DateTime focusUntil, DateTime pausedUntil)
         {
-            if (app == null || Protected.Contains(app) || pausedUntil > now) return null;
+            if (app == null || Protected.Contains(app) || (pausedUntil > now && !(settings.HardModeUntil > now && focusUntil > now))) return null;
             int limit;
             if (settings.DailyLimits.TryGetValue(app, out limit) && todayMs >= (long)limit * 60000)
                 return "You've reached today's limit for " + app + ".";
@@ -90,6 +93,7 @@ namespace Amythest.Windows
                 string[] cells = line.Split('\t');
                 int value;
                 if (cells.Length == 2 && cells[0] == "goal" && int.TryParse(cells[1], out value)) settings.GoalMinutes = Math.Max(1, Math.Min(1440, value));
+                else if (cells.Length == 2 && cells[0] == "session-minutes" && int.TryParse(cells[1], out value)) settings.SessionMinutes = Math.Max(5, Math.Min(180, value));
                 else if (cells.Length == 2 && cells[0] == "cloud-revision" && int.TryParse(cells[1], out value)) settings.CloudRevision = Math.Max(0, value);
                 else if (cells.Length == 2 && cells[0] == "cloud-fingerprint") settings.CloudFingerprint = cells[1];
                 else if (cells.Length == 4 && cells[0] == "work")
@@ -117,6 +121,12 @@ namespace Amythest.Windows
                     long ticks;
                     if (long.TryParse(cells[1], out ticks)) { try { settings.FocusUntil = DateTime.FromBinary(ticks); } catch { } }
                 }
+                else if (cells.Length == 2 && cells[0] == "hard-enabled") settings.HardModeEnabled = cells[1] == "true";
+                else if (cells.Length == 2 && cells[0] == "hard-until")
+                {
+                    long ticks;
+                    if (long.TryParse(cells[1], out ticks)) { try { settings.HardModeUntil = DateTime.FromBinary(ticks); } catch { } }
+                }
                 else if (cells.Length == 2 && cells[0] == "paused")
                 {
                     long ticks;
@@ -130,10 +140,13 @@ namespace Amythest.Windows
         {
             List<string> lines = new List<string>();
             lines.Add("goal\t" + settings.GoalMinutes);
+            lines.Add("session-minutes\t" + settings.SessionMinutes);
             lines.Add("cloud-revision\t" + settings.CloudRevision);
             lines.Add("cloud-fingerprint\t" + settings.CloudFingerprint);
             lines.Add("work\t" + (settings.WorkEnabled ? "true" : "false") + "\t" + settings.WorkStartMinutes + "\t" + settings.WorkEndMinutes);
             lines.Add("focus\t" + settings.FocusUntil.ToBinary().ToString(CultureInfo.InvariantCulture));
+            lines.Add("hard-enabled\t" + (settings.HardModeEnabled ? "true" : "false"));
+            lines.Add("hard-until\t" + settings.HardModeUntil.ToBinary().ToString(CultureInfo.InvariantCulture));
             lines.Add("paused\t" + settings.PausedUntil.ToBinary().ToString(CultureInfo.InvariantCulture));
             foreach (string app in settings.DistractingApps.OrderBy(x => x)) lines.Add("distraction\t" + app);
             foreach (KeyValuePair<string, int> pair in settings.DailyLimits.OrderBy(x => x.Key)) lines.Add("limit\t" + pair.Key + "\t" + pair.Value);

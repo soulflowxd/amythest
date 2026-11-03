@@ -57,6 +57,16 @@ async function main() {
   assert.equal((await vm.runInContext("policyForUrl('https://www.youtube.com/shorts/otherid1234')", context)).mode, "allow");
   saved.pausedUntil = Date.now() - 1;
   assert.equal((await vm.runInContext("policyForUrl('https://example.com/')", context)).mode, "block");
+  saved.focusUntil = Date.now() + 60000;
+  saved.hardModeUntil = saved.focusUntil;
+  saved.pausedUntil = Date.now() + 60000;
+  saved.shortAccess["youtube:abcdefghijk"] = { until: Date.now() + 60000 };
+  assert.equal((await vm.runInContext(`policyForUrl(${JSON.stringify(shortUrl)})`, context)).hard, true);
+  assert.equal((await vm.runInContext(`grantShortAccess({ url: ${JSON.stringify(shortUrl)}, category: "robotics", reason: "I need this sensor wiring tip." })`, context)).ok, false);
+  assert.equal((await vm.runInContext(`grantVideoAccess({ url: ${JSON.stringify(video)}, category: "school", reason: "I need this tutorial for school." })`, context)).ok, false);
+  assert.equal((await vm.runInContext("grantBreak('https://example.com/')", context)).ok, false);
+  saved.focusUntil = Date.now() - 1;
+  saved.pausedUntil = Date.now() - 1;
   await vm.runInContext("applyRules()", context);
   assert.deepEqual([...updates[0].removeRuleIds], [10000]);
   assert.equal(updates[0].addRules, undefined);

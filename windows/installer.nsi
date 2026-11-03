@@ -1,6 +1,6 @@
 Unicode true
 Name "Amythest for Windows"
-OutFile "${OUTPUT}\amythest-0.6.0-windows-setup.exe"
+OutFile "${OUTPUT}\amythest-0.7.0-windows-setup.exe"
 InstallDir "$LOCALAPPDATA\Programs\Amythest"
 InstallDirRegKey HKCU "Software\Amythest" "InstallDir"
 RequestExecutionLevel user

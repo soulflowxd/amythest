@@ -10,7 +10,7 @@ Chrome extension screenshot. The screen time values are from the example shown i
 
 ## Install it in Chrome
 
-1. Download **[amythest-0.6.0-chrome.zip](https://github.com/soulflowxd/amythest/releases/download/v0.6.0/amythest-0.6.0-chrome.zip)** and extract it. Use the extracted folder, not the ZIP itself.
+1. Download **[amythest-0.7.0-chrome.zip](https://github.com/soulflowxd/amythest/releases/download/v0.7.0/amythest-0.7.0-chrome.zip)** and extract it. Use the extracted folder, not the ZIP itself.
 2. Open Chrome and go to `chrome://extensions`.
 3. Turn on **Developer mode** in the top right.
 4. Click **Load unpacked**.
@@ -23,9 +23,19 @@ After you change the extension's files, click **Reload** on its card at `chrome:
 
 The ZIP contains the Chrome extension. Download the Windows app separately if you want desktop program tracking.
 
+## Android APK (early build)
+
+The Android companion has Home, Apps, Timer, and Account views. It shows actual app time and a seven-day chart, lets you mark distracting apps, set daily app limits and weekday work hours, and start a focus timer. With Usage Access, Accessibility, and notifications enabled, it can remind you to leave a distracting app during focus, work hours, or after a limit. It does not close apps. Sign in with the same Amythest account to sync Android daily totals and Android app boundaries alongside separate Chrome and Windows activity. Build and install the APK with the steps in [the Android guide](android/README.md).
+
+Download the [Android APK](https://github.com/soulflowxd/amythest/releases/download/v0.7.0/amythest-0.7.0-android.apk) and follow the permission steps in the Android guide.
+
+![Actual Android app dashboard running in an emulator with sample usage](docs/screenshots/amythest-android-dashboard.png)
+
+**iPhone and Mac versions are coming soon.**
+
 ## Windows companion
 
-Amythest also has a separate Windows app for tracking time in desktop programs. Download the [Windows installer](https://github.com/soulflowxd/amythest/releases/download/v0.6.0/amythest-0.6.0-windows-setup.exe) for a Start menu shortcut and uninstall support, or download the [portable ZIP](https://github.com/soulflowxd/amythest/releases/download/v0.6.0/amythest-0.6.0-windows.zip), extract it, and open `Amythest.exe`. See [the Windows guide](windows/README.md) for connection steps. Keep the Chrome extension installed to manage individual websites and videos. The two apps store their totals separately on your device.
+Amythest also has a separate Windows app for tracking time in desktop programs. Download the [Windows installer](https://github.com/soulflowxd/amythest/releases/download/v0.7.0/amythest-0.7.0-windows-setup.exe) for a Start menu shortcut and uninstall support, or download the [portable ZIP](https://github.com/soulflowxd/amythest/releases/download/v0.7.0/amythest-0.7.0-windows.zip), extract it, and open `Amythest.exe`. See [the Windows guide](windows/README.md) for connection steps. Keep the Chrome extension installed to manage individual websites and videos. The two apps store their totals separately on your device.
 
 The Windows app follows [Amythest's design guide](DESIGN.md) and uses the same dashboard structure as the extension. Its **Websites** view can show Chrome's per-domain activity after you connect the extension using the steps in [the Windows guide](windows/README.md).
 
@@ -33,10 +43,18 @@ The Windows app follows [Amythest's design guide](DESIGN.md) and uses the same d
 
 This is a screenshot of the built Windows app with sample data. It does not show anyone's browsing or app history.
 
+| Feature | Chrome extension | Windows app | Android APK |
+| --- | --- | --- | --- |
+| Activity | Sites, videos, hourly and seven-day views | Desktop apps, hourly view, seven-day total | Apps and seven-day chart |
+| Boundaries | Site limits, work hours, and video reasons | App limits and work hours | App limits and work-hour reminders |
+| Focus and Hard Mode | Blocks selected sites and disables early exit or breaks | Reminds on selected apps and disables early exit or breaks | Sends app notifications and disables early exit |
+| Account sync | Website totals and site rules | Desktop totals and Windows app rules | Android totals and Android app rules |
+
 ## Use it
 
 - **See your time:** Click the amythest icon to see today's time in Chrome. Open the dashboard for an iOS-style Screen Time view. **Day** shows time by hour; **Week** shows the last seven days and your daily average. All websites are tracked, including productive sites such as GitHub.
 - **Focus session:** Pick 15, 25, 45, or 60 minutes in the dashboard, then start a session. Websites on your distraction list will be blocked until it ends.
+- **Hard Mode:** Enable it before starting a focus session in Chrome, Windows, or Android. Until that session expires, the in-app End control is disabled. Chrome and Windows also disable their break controls; Chrome pauses checked videos without a reason unlock. Android currently sends reminders rather than blocking apps, so its Hard Mode only locks its own timer controls. You can still disable an extension, app, or system permission outside Amythest. Hard Mode is a commitment aid, not tamper protection.
 - **Distraction list:** Add websites such as `youtube.com`. Subdomains such as `music.youtube.com` are included.
 - **Work hours:** Turn this on in the dashboard and choose a start and end time. Your distraction list is blocked during those hours Monday through Friday. It uses your computer's local time. Work hours are off by default.
 - **Daily site limits:** Enter a website and a number of minutes. Amythest adds up time on that site and its subdomains. Once the limit is reached, the site is blocked for the rest of the day. Limits reset at local midnight.
@@ -56,7 +74,7 @@ Reminders appear over the original website, so the tab does not change addresses
 
 Amythest's account backend uses **Convex**, like the [2026-scouting project](https://github.com/soulflowxd/2026-scouting), with email and password sign-in. There is no website to sign into: the extension dashboard contains the account controls. The separate Amythest development deployment is connected in `cloud-config.js`; no email delivery is needed for sign-in. See [account backend setup](convex/README.md), then reload the unpacked extension. Email addresses are not verified, and password recovery is not available yet. Never put an auth signing key in the extension or Windows app.
 
-When you sign in, Amythest syncs daily totals by device, Chrome website limits, and Windows app limits. The extension account card can edit Windows app limits; the Windows Account view can edit Chrome website limits. Each type of limit applies only to its own platform. Saves check the latest version so a concurrent change is not silently replaced. The Windows app receives a short-lived sign-in token through its local Chrome bridge and syncs desktop totals and app boundaries separately. Website domain totals are synced; page URLs, titles, and typed reasons are not. Without an account, browsing totals and settings stay on your device and local tracking keeps working. Active website time is approximate and covers Chrome while it is focused.
+When you sign in, Amythest syncs daily totals by device, Chrome website limits, Windows app limits, and Android app boundaries. The extension account card can edit Windows app limits; the Windows Account view can edit Chrome website limits. Each type of limit applies only to its own platform. Saves check the latest version so a concurrent change is not silently replaced. The Windows app receives a short-lived sign-in token through its local Chrome bridge and syncs desktop totals and app boundaries separately. Website domain totals and Android package IDs selected for boundaries are synced; page URLs, titles, and typed reasons are not. Without an account, browsing totals and settings stay on your device and local tracking keeps working. Active website time is approximate and covers Chrome while it is focused.
 
 The soft opal-shaped ring with an amethyst gradient center is the same mark in the toolbar and on extension pages. The mark has no dark tile behind it inside the interface. The interface uses Windows Segoe UI when available and bundles [Inter](https://github.com/rsms/inter) as an offline fallback under the SIL Open Font License. The interactive, full-body companion is original Amythest artwork inspired by the Aero style. An earlier avatar library remains in `vendor/agent-robot-avatar/` with its license, but the extension no longer loads it.
 

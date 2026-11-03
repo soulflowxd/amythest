@@ -29,7 +29,7 @@ async function requireUser(ctx: Parameters<typeof getAuthUserId>[0]) {
 export const putDay = mutation({
   args: {
     deviceId: v.string(),
-    source: v.union(v.literal("chrome"), v.literal("windows")),
+    source: v.union(v.literal("chrome"), v.literal("windows"), v.literal("android")),
     date: v.string(),
     activeMs: v.number(),
     distractionMs: v.number(),
@@ -45,7 +45,7 @@ export const putDay = mutation({
     if (args.sites.length > 200 || args.sites.some(s => !validDomain(s.domain) || ![s.activeMs, s.distractionMs, s.videoMs].every(validMs))) throw new ConvexError("Invalid sites");
     if (new Set(args.sites.map(s => s.domain)).size !== args.sites.length) throw new ConvexError("Duplicate sites");
     if (!Number.isSafeInteger(args.observedAt) || args.observedAt > now + 300_000 || args.observedAt < now - 90 * 86_400_000) throw new ConvexError("Invalid snapshot time");
-    if (args.source === "windows" && args.sites.length) throw new ConvexError("Windows snapshots cannot include websites");
+    if (args.source !== "chrome" && args.sites.length) throw new ConvexError("App snapshots cannot include websites");
     const existing = await ctx.db.query("dailySnapshots")
       .withIndex("by_user_device_source_date", q => q.eq("userId", userId).eq("deviceId", args.deviceId).eq("source", args.source).eq("date", args.date))
       .unique();
@@ -114,6 +114,42 @@ const windowsSettings = v.object({
 const appPattern = /^[a-z0-9][a-z0-9._-]{0,79}$/;
 const protectedApps = new Set(["amythest", "explorer", "taskmgr", "cmd", "powershell", "pwsh"]);
 const validApp = (name: string) => appPattern.test(name) && !protectedApps.has(name);
+
+const androidSettings = v.object({
+  goalMinutes: v.number(), distractingApps: v.array(v.string()),
+  appLimits: v.array(v.object({ app: v.string(), minutes: v.number() })),
+  workEnabled: v.boolean(), workStartMinutes: v.number(), workEndMinutes: v.number(),
+});
+const validPackage = (name: string) => /^[a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z][a-zA-Z0-9_]*)+$/.test(name) && name.length <= 180 && name !== "com.amythest.app";
+
+export const getAndroidSettings = query({
+  args: {},
+  handler: async ctx => {
+    const userId = await requireUser(ctx);
+    const row = await ctx.db.query("androidSettings").withIndex("by_user", q => q.eq("userId", userId)).unique();
+    if (!row) return null;
+    const { _id, _creationTime, userId: _userId, ...value } = row;
+    return value;
+  },
+});
+
+export const putAndroidSettings = mutation({
+  args: { expectedRevision: v.number(), value: androidSettings },
+  handler: async (ctx, args) => {
+    const userId = await requireUser(ctx);
+    const s = args.value;
+    if (!Number.isSafeInteger(s.goalMinutes) || s.goalMinutes < 1 || s.goalMinutes > 1440) throw new ConvexError("Invalid Android goal");
+    if (s.distractingApps.length > 200 || s.distractingApps.some(a => !validPackage(a)) || new Set(s.distractingApps).size !== s.distractingApps.length) throw new ConvexError("Invalid Android distracting apps");
+    if (s.appLimits.length > 200 || s.appLimits.some(x => !validPackage(x.app) || !Number.isSafeInteger(x.minutes) || x.minutes < 1 || x.minutes > 1440) || new Set(s.appLimits.map(x => x.app)).size !== s.appLimits.length) throw new ConvexError("Invalid Android app limits");
+    if (![s.workStartMinutes, s.workEndMinutes].every(x => Number.isSafeInteger(x) && x >= 0 && x < 1440)) throw new ConvexError("Invalid Android work hours");
+    const row = await ctx.db.query("androidSettings").withIndex("by_user", q => q.eq("userId", userId)).unique();
+    if (args.expectedRevision !== (row?.revision ?? 0)) throw new ConvexError("Android settings changed on another device; sync before saving");
+    const record = { ...s, userId, revision: (row?.revision ?? 0) + 1, updatedAt: Date.now() };
+    if (row) await ctx.db.patch(row._id, record);
+    else await ctx.db.insert("androidSettings", record);
+    return { revision: record.revision, updatedAt: record.updatedAt };
+  },
+});
 
 export const getWindowsSettings = query({
   args: {},

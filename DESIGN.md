@@ -21,7 +21,7 @@ The Windows app should feel like the Chrome extension dashboard opened as its ow
 1. Thin Windows 7 glass caption with joined minimize, maximize, and red close controls.
 2. Amythest wordmark and the same “See where your time goes” introduction as the extension dashboard.
 3. A large activity card within Today, with day total, distraction goal, an hourly activity chart, and the most used apps. Do not place a separate metric banner above the tabs.
-4. Companion cards for focus sessions and a boundary summary beside the activity card. Boundaries holds Windows app controls; Account shows cloud Chrome website limits. Windows-only controls must clearly say “apps”; browser controls must clearly say “sites.”
+4. Companion cards for focus sessions and a boundary summary beside the activity card. The focus card has a duration choice and Hard Mode commitment. The boundary summary includes actual seven-day desktop time. Boundaries holds Windows app controls; Account shows cloud Chrome website limits. Windows-only controls must clearly say “apps”; browser controls must clearly say “sites.”
 5. A Websites view with the Chrome extension’s domain totals, including video and distraction time. This is a breakdown of Chrome usage, not additional desktop time.
 
 Use the dashboard’s spacious card rhythm, heading hierarchy, and purple Aero palette. The desktop title controls remain true to the Windows 7 screenshot. Avoid a compact utility/tray layout as the main experience.
@@ -38,3 +38,7 @@ The cards must stay inside the content area when resized. Keep the tab panel vis
 ## Verification
 
 Build the Windows app, run core policy tests, launch the EXE, and inspect the window at its default size. Check the Today and Boundaries views, focus state, and blocked reminder. Update this document when the visual system changes.
+
+## Android dashboard
+
+The Android app carries the same amethyst mark, purple glass frame, porcelain activity surfaces, and navy text. It uses four persistent bottom destinations: Home, Apps, Timer, and Account. Home leads with actual daily app time and distraction progress, followed by most used apps, a focus entry, and a seven-day chart. Apps contains selection, per-app limits, the daily goal, and work-hour reminders. Timer has the adjustable duration and Hard Mode commitment. Account shows separate Android, Chrome, and Windows totals and permission status. Use Android's native controls and readable tap targets; keep the glass effect in the frame and controls rather than tinting data into illegibility. Never fabricate scores, streaks, or time saved.
