@@ -1,11 +1,15 @@
 # Amythest for Android (early APK)
 
-This companion has Home, Apps, Timer, and Account screens. Home shows today's app usage and a seven-day chart. Apps lets you choose distractions, set a daily limit for an app, and turn on weekday work-hour reminders. Timer supports 5–180 minute focus sessions. Amythest can remind you to hop off a distracting app during focus or work hours, or after a daily limit. It does not block or close apps.
+This companion has Home, Apps, and Timer tabs. Tap the profile icon for Settings and account sync. Home shows today's app usage, a seven-day chart, and completed focus progress. Apps lets you choose distractions, set a daily limit for an app, and turn on weekday work-hour reminders. Timer supports 5–180 minute focus sessions with a digital clock. Amythest can remind you to hop off a distracting app during focus or work hours, or after a daily limit. It does not block or close apps.
+
+Focus minutes, completed sessions, streaks, and focus points are recorded locally when a timer finishes. Ending a session early earns no points. One completed focus minute earns one point; points have no monetary value. Sleep and referral rewards are not in this build.
+
+To check timer accounting without a phone, run `powershell -ExecutionPolicy Bypass -File android/test.ps1`.
 
 ## Install
 
 1. Build with `powershell -ExecutionPolicy Bypass -File android/build.ps1`.
-2. Copy `android/dist/amythest-0.7.2-android.apk` to your phone and open it, or download it from the [v0.7.2 release](https://github.com/soulflowxd/amythest/releases/tag/v0.7.2).
+2. Copy `android/dist/amythest-0.7.3-android.apk` to your phone and open it, or download it from the [v0.7.3 release](https://github.com/soulflowxd/amythest/releases/tag/v0.7.3).
 3. If Android asks, allow installation from the app used to open the APK.
 4. Open Amythest and tap **Allow Usage Access**, then enable Amythest in Android settings.
 5. Amythest also offers **App awareness**. Choose **Open settings** in its prompt or card, then enable Amythest under Accessibility. This lets it observe foreground app package names locally; it does not read screen text.
@@ -17,7 +21,7 @@ Turn on **Hard Mode** on the Timer screen. This preference stays on for every fu
 
 ## Account sync
 
-Open **Account** and sign in with the same Amythest email and password used by the Chrome extension. Android uploads daily totals to the existing Convex development deployment under its own `android` source. The account view shows separate Android, Chrome, and Windows snapshots. Android also syncs its daily goal, selected distracting package IDs, per-app limits, and work hours to other Android installations on that account. It never uploads screen text, app labels, or full local browsing files. Local tracking works without signing in. Chrome website limits and Windows app limits remain platform specific. If two Android devices change settings before either syncs, Amythest reports the conflict rather than silently replacing the cloud version.
+Tap the profile icon, then sign in with the same Amythest email and password used by the Chrome extension. Android uploads daily totals to the existing Convex development deployment under its own `android` source. Settings shows separate Android, Chrome, and Windows snapshots. Android also syncs its daily goal, selected distracting package IDs, per-app limits, and work hours to other Android installations on that account. Focus points and streaks stay local for now. It never uploads screen text, app labels, or full local browsing files. Local tracking works without signing in. Chrome website limits and Windows app limits remain platform specific. If two Android devices change settings before either syncs, Amythest reports the conflict rather than silently replacing the cloud version.
 
 Account email ownership is not verified. Password recovery is not available yet. The password is never stored on the phone; the refresh token is encrypted using an app-specific Android Keystore key before being saved in private app storage. Existing unencrypted refresh tokens migrate on the next launch; if migration cannot complete, Amythest signs out and asks you to sign in again. Android backup is disabled for this app.
 

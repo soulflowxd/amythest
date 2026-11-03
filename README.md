@@ -25,9 +25,9 @@ The ZIP contains the Chrome extension. Download the Windows app separately if yo
 
 ## Android APK (early build)
 
-The Android companion has Home, Apps, Timer, and Account views. It shows actual app time and a seven-day chart, lets you mark distracting apps, set daily app limits and weekday work hours, and start a focus timer. With Usage Access, Accessibility, and notifications enabled, it can remind you to leave a distracting app during focus, work hours, or after a limit. It does not close apps. Sign in with the same Amythest account to sync Android daily totals and Android app boundaries alongside separate Chrome and Windows activity. Build and install the APK with the steps in [the Android guide](android/README.md).
+The Android companion has Home, Apps, and Timer tabs, with Settings in the profile button. Home shows actual app time, a seven-day chart, completed focus minutes, a session streak, and points earned from completed focus minutes. Apps lets you mark distractions, set daily app limits and weekday work hours. With Usage Access, Accessibility, and notifications enabled, Amythest can remind you to leave a distracting app during focus, work hours, or after a limit. It does not close apps. Sign in with the same Amythest account to sync Android daily totals and Android app boundaries alongside separate Chrome and Windows activity. Build and install the APK with the steps in [the Android guide](android/README.md).
 
-Download the [Android APK](https://github.com/soulflowxd/amythest/releases/download/v0.7.2/amythest-0.7.2-android.apk) and follow the permission steps in the Android guide.
+Download the [Android APK](https://github.com/soulflowxd/amythest/releases/download/v0.7.3/amythest-0.7.3-android.apk) and follow the permission steps in the Android guide.
 
 ![Actual Android app dashboard running in an emulator with sample usage](docs/screenshots/amythest-android-dashboard.png)
 
