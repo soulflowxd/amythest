@@ -12,13 +12,13 @@ namespace Amythest.Windows
 {
     internal static class Palette
     {
-        public static readonly Color Background = Color.FromArgb(32, 39, 69);
-        public static readonly Color Card = Color.FromArgb(246, 247, 252);
-        public static readonly Color Ink = Color.FromArgb(36, 48, 79);
-        public static readonly Color Muted = Color.FromArgb(95, 107, 134);
-        public static readonly Color Lilac = Color.FromArgb(96, 72, 148);
-        public static readonly Color Border = Color.FromArgb(156, 166, 204);
-        public static readonly Color White = Color.FromArgb(251, 250, 255);
+        public static readonly Color Background = Color.FromArgb(8, 7, 12);
+        public static readonly Color Card = Color.FromArgb(22, 20, 29);
+        public static readonly Color Ink = Color.FromArgb(246, 243, 252);
+        public static readonly Color Muted = Color.FromArgb(174, 168, 186);
+        public static readonly Color Lilac = Color.FromArgb(204, 177, 250);
+        public static readonly Color Border = Color.FromArgb(64, 54, 82);
+        public static readonly Color White = Color.FromArgb(35, 31, 44);
     }
 
     internal sealed class GlassStrip : Panel
@@ -27,7 +27,7 @@ namespace Amythest.Windows
         protected override void OnPaintBackground(PaintEventArgs e)
         {
             Rectangle rect = new Rectangle(0, 0, Math.Max(1, Width), Math.Max(1, Height));
-            using (LinearGradientBrush brush = new LinearGradientBrush(rect, Color.FromArgb(119, 105, 176), Color.FromArgb(47, 48, 100), LinearGradientMode.Vertical))
+            using (LinearGradientBrush brush = new LinearGradientBrush(rect, Color.FromArgb(62, 46, 87), Color.FromArgb(18, 16, 27), LinearGradientMode.Vertical))
                 e.Graphics.FillRectangle(brush, rect);
             using (SolidBrush sheen = new SolidBrush(Color.FromArgb(38, 255, 255, 255)))
                 e.Graphics.FillRectangle(sheen, 0, 0, Width, Height / 2);
@@ -181,21 +181,28 @@ namespace Amythest.Windows
     {
         public AeroTabs()
         {
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             DrawMode = TabDrawMode.OwnerDrawFixed;
+            BackColor = Palette.Background;
             SizeMode = TabSizeMode.Fixed;
             ItemSize = new Size(142, 34);
             Font = new Font("Segoe UI", 10, FontStyle.Bold);
         }
-        protected override void OnDrawItem(DrawItemEventArgs e)
+        protected override void OnPaint(PaintEventArgs e)
         {
-            bool selected = e.Index == SelectedIndex;
-            Rectangle rect = GetTabRect(e.Index);
-            Color top = selected ? Color.FromArgb(250, 251, 255) : Color.FromArgb(157, 155, 197);
-            Color bottom = selected ? Color.FromArgb(230, 235, 249) : Color.FromArgb(111, 105, 159);
-            using (LinearGradientBrush brush = new LinearGradientBrush(rect, top, bottom, LinearGradientMode.Vertical)) e.Graphics.FillRectangle(brush, rect);
-            using (Pen edge = new Pen(Color.FromArgb(112, 118, 166))) e.Graphics.DrawRectangle(edge, rect.Left, rect.Top, rect.Width - 1, rect.Height - 1);
-            Color textColor = selected ? Palette.Ink : Color.White;
-            TextRenderer.DrawText(e.Graphics, TabPages[e.Index].Text, Font, rect, textColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+            e.Graphics.Clear(Palette.Background);
+            for (int index = 0; index < TabCount; index++) DrawTab(e.Graphics, index);
+        }
+        private void DrawTab(Graphics graphics, int index)
+        {
+            bool selected = index == SelectedIndex;
+            Rectangle rect = GetTabRect(index);
+            Color top = selected ? Color.FromArgb(66, 49, 91) : Color.FromArgb(34, 29, 46);
+            Color bottom = selected ? Color.FromArgb(43, 34, 59) : Color.FromArgb(23, 21, 31);
+            using (LinearGradientBrush brush = new LinearGradientBrush(rect, top, bottom, LinearGradientMode.Vertical)) graphics.FillRectangle(brush, rect);
+            using (Pen edge = new Pen(Palette.Border)) graphics.DrawRectangle(edge, rect.Left, rect.Top, rect.Width - 1, rect.Height - 1);
+            Color textColor = selected ? Palette.Ink : Palette.Muted;
+            TextRenderer.DrawText(graphics, TabPages[index].Text, Font, rect, textColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
         }
     }
 
@@ -209,13 +216,13 @@ namespace Amythest.Windows
             Rectangle rect = new Rectangle(1, 1, Width - 3, Height - 3);
             if (rect.Width <= 0 || rect.Height <= 0) return;
             using (GraphicsPath path = Ui.RoundRect(rect, 16))
-            using (LinearGradientBrush brush = new LinearGradientBrush(rect, Color.FromArgb(224, 226, 246), Palette.Card, LinearGradientMode.Vertical))
+            using (LinearGradientBrush brush = new LinearGradientBrush(rect, Color.FromArgb(35, 30, 45), Palette.Card, LinearGradientMode.Vertical))
             using (Pen border = new Pen(Palette.Border))
             {
                 e.Graphics.FillPath(brush, path);
                 e.Graphics.DrawPath(border, path);
             }
-            using (Pen shine = new Pen(Color.FromArgb(220, 255, 255, 255))) e.Graphics.DrawLine(shine, 18, 2, Width - 19, 2);
+            using (Pen shine = new Pen(Color.FromArgb(55, 255, 255, 255))) e.Graphics.DrawLine(shine, 18, 2, Width - 19, 2);
         }
     }
 
@@ -265,7 +272,7 @@ namespace Amythest.Windows
         protected override void OnPaint(PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            using (SolidBrush track = new SolidBrush(Color.FromArgb(183, 189, 215))) e.Graphics.FillRectangle(track, 0, 0, Width, Height);
+            using (SolidBrush track = new SolidBrush(Color.FromArgb(64, 55, 78))) e.Graphics.FillRectangle(track, 0, 0, Width, Height);
             int fill = (int)(Width * fraction);
             if (fill > 0)
             {
@@ -285,7 +292,7 @@ namespace Amythest.Windows
         {
             base.OnPaint(e);
             int chartTop = 7, chartBottom = Math.Max(8, Height - 22);
-            using (Pen grid = new Pen(Color.FromArgb(211, 216, 232)))
+            using (Pen grid = new Pen(Color.FromArgb(62, 54, 72)))
             {
                 e.Graphics.DrawLine(grid, 0, chartBottom, Width, chartBottom);
                 e.Graphics.DrawLine(grid, 0, (chartTop + chartBottom) / 2, Width, (chartTop + chartBottom) / 2);
@@ -309,6 +316,33 @@ namespace Amythest.Windows
                         new Rectangle((int)(hour * slot), chartBottom + 2, 35, 17), Palette.Muted);
             }
         }
+    }
+
+    internal sealed class GeodeView : Control
+    {
+        private readonly Bitmap art;
+        private int stage = 1;
+        public int Stage { get { return stage; } set { stage = Math.Max(0, Math.Min(3, value)); Invalidate(); } }
+        public GeodeView()
+        {
+            DoubleBuffered = true;
+            BackColor = Palette.Card;
+            AccessibleName = "Amethyst geode showing today's distraction budget";
+            string path = Path.Combine(Application.StartupPath, "amythest-geode-stages.png");
+            if (File.Exists(path)) { using (Bitmap loaded = new Bitmap(path)) art = new Bitmap(loaded); }
+        }
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            e.Graphics.Clear(Palette.Card);
+            if (art == null) return;
+            e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            int tileWidth = art.Width / 2, tileHeight = art.Height / 2;
+            Rectangle source = new Rectangle((stage % 2) * tileWidth, (stage / 2) * tileHeight, tileWidth, tileHeight);
+            float scale = 1.38f * Math.Min((float)Width / tileWidth, (float)Height / tileHeight);
+            int width = (int)(tileWidth * scale), height = (int)(tileHeight * scale);
+            e.Graphics.DrawImage(art, new Rectangle((Width - width) / 2, (Height - height) / 2, width, height), source, GraphicsUnit.Pixel);
+        }
+        protected override void Dispose(bool disposing) { if (disposing && art != null) art.Dispose(); base.Dispose(disposing); }
     }
 
     internal sealed class BlockForm : Form
@@ -442,7 +476,8 @@ namespace Amythest.Windows
         private Label bridgeStatus;
         private Label accountStatus;
         private Label accountPageStatus;
-        private Label boundaryOverview;
+        private Label geodeStatus;
+        private GeodeView geodeView;
         private Button useCloudLimits;
         private CloudWindowsSettings pendingCloudLimits;
         private ListBox distractionList, limitList;
@@ -522,9 +557,9 @@ namespace Amythest.Windows
             Controls.Add(header);
             header.Controls.Add(new LogoMark { Left = 26, Top = 14, Width = 44, Height = 44 });
             header.Controls.Add(Ui.Label("amythest", 79, 14, 330, 32, 19, true, Color.White));
-            header.Controls.Add(Ui.Label("See where your time goes.", 26, 59, 650, 38, 25, true, Color.White));
-            header.Controls.Add(Ui.Label("Your apps, websites, and focus in one clear view.", 28, 99, 650, 22, 11, false, Color.FromArgb(228, 224, 249)));
-            Label edition = Ui.Label("SCREEN TIME DASHBOARD", 0, 25, 210, 20, 9, true, Color.FromArgb(234, 230, 255));
+            header.Controls.Add(Ui.Label("Your focus, in view.", 26, 59, 650, 38, 25, true, Color.White));
+            header.Controls.Add(Ui.Label("Windows apps, Chrome websites, and the space between.", 28, 99, 650, 22, 11, false, Color.FromArgb(222, 212, 240)));
+            Label edition = Ui.Label("TODAY  /  DESKTOP", 0, 25, 210, 20, 9, true, Color.FromArgb(218, 198, 244));
             edition.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             header.Controls.Add(edition);
             header.Resize += delegate { edition.Left = header.ClientSize.Width - 235; };
@@ -573,8 +608,9 @@ namespace Amythest.Windows
             hourChart = new HourChart { Left = 14, Top = 76, Width = 480, Height = 96, Anchor = AnchorStyles.Top | AnchorStyles.Left };
             hourChart.Hours = hours;
             summary.Controls.Add(hourChart);
+            summary.Controls.Add(Ui.Label("APP                                    TIME                     TYPE", 27, 279, 460, 22, 9, true, Palette.Muted));
             usageList = new ListView { Left = 14, Top = 186, Width = 480, Height = 160, Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left,
-                View = View.Details, FullRowSelect = true, GridLines = true, BackColor = Palette.White, ForeColor = Palette.Ink, BorderStyle = BorderStyle.FixedSingle,
+                View = View.Details, FullRowSelect = true, GridLines = false, HeaderStyle = ColumnHeaderStyle.None, BackColor = Palette.Card, ForeColor = Palette.Ink, BorderStyle = BorderStyle.None,
                 Font = new Font("Segoe UI", 10) };
             usageList.Columns.Add("App", 170);
             usageList.Columns.Add("Time", 90);
@@ -601,33 +637,35 @@ namespace Amythest.Windows
             focusCard.Controls.Add(focusLabel);
             AeroCard guidanceCard = new AeroCard();
             todayPage.Controls.Add(guidanceCard);
-            guidanceCard.Controls.Add(Ui.Label("Your boundaries", 20, 17, 320, 28, 15, true, Palette.Lilac));
-            boundaryOverview = Ui.Label("", 20, 55, 350, 150, 11, false, Palette.Muted);
-            guidanceCard.Controls.Add(boundaryOverview);
-            Button editBoundaries = Ui.Button("Edit app boundaries", 20, 0, 215, 38);
-            editBoundaries.Anchor = AnchorStyles.Left | AnchorStyles.Bottom;
-            editBoundaries.Click += delegate { tabs.SelectedTab = boundaryPage; };
-            guidanceCard.Controls.Add(editBoundaries);
+            guidanceCard.Controls.Add(Ui.Label("Your geode", 20, 17, 320, 28, 18, true, Palette.Ink));
+            guidanceCard.Controls.Add(Ui.Label("Shaped by distracting app time against today's budget.", 20, 48, 350, 34, 10, false, Palette.Muted));
+            geodeView = new GeodeView { Left = 35, Top = 72, Width = 320, Height = 165, Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right };
+            guidanceCard.Controls.Add(geodeView);
+            geodeStatus = Ui.Label("Allow time to see your geode", 20, 241, 350, 24, 11, true, Palette.Lilac);
+            guidanceCard.Controls.Add(geodeStatus);
             guidanceCard.Resize += delegate {
-                boundaryOverview.Width = Math.Max(200, guidanceCard.ClientSize.Width - 40);
-                editBoundaries.Top = guidanceCard.ClientSize.Height - 57;
+                geodeView.Width = Math.Max(160, guidanceCard.ClientSize.Width - 70);
+                geodeStatus.Width = Math.Max(200, guidanceCard.ClientSize.Width - 40);
             };
             todayPage.Resize += delegate {
                 int leftWidth = Math.Max(430, (todayPage.ClientSize.Width - 54) / 2);
                 summary.SetBounds(14, 14, leftWidth, Math.Max(200, todayPage.ClientSize.Height - 28));
                 goalBar.Width = Math.Max(120, summary.ClientSize.Width - goalBar.Left - 24);
                 hourChart.SetBounds(27, 146, Math.Max(180, leftWidth - 54), 112);
-                usageList.SetBounds(27, 293, Math.Max(180, leftWidth - 54), Math.Max(70, summary.ClientSize.Height - 317));
+                usageList.SetBounds(27, 309, Math.Max(180, leftWidth - 54), Math.Max(70, summary.ClientSize.Height - 333));
                 int rightX = 30 + leftWidth;
                 int rightWidth = Math.Max(300, todayPage.ClientSize.Width - rightX - 14);
-                focusCard.SetBounds(rightX, 14, rightWidth, 200);
-                guidanceCard.SetBounds(rightX, 217, rightWidth, Math.Max(115, todayPage.ClientSize.Height - 232));
+                int rightHeight = Math.Max(450, todayPage.ClientSize.Height - 28);
+                int heroHeight = Math.Max(255, rightHeight - 212);
+                guidanceCard.SetBounds(rightX, 14, rightWidth, heroHeight);
+                focusCard.SetBounds(rightX, 26 + heroHeight, rightWidth, 200);
             };
 
             websitesPage.Controls.Add(Ui.Label("Chrome website time", 14, 12, 600, 28, 14, true, Palette.Lilac));
             websitesPage.Controls.Add(Ui.Label("Site totals come from the Amythest Chrome extension. Chrome app time stays separate to avoid double counting.", 14, 42, 810, 42, 10, false, Palette.Muted));
-            websiteList = new ListView { Left = 14, Top = 88, Width = 830, Height = 200, Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
-                View = View.Details, FullRowSelect = true, GridLines = true, BackColor = Palette.White, ForeColor = Palette.Ink, BorderStyle = BorderStyle.FixedSingle,
+            websitesPage.Controls.Add(Ui.Label("WEBSITE                                              ACTIVE                   VIDEO                 DISTRACTION", 14, 84, 810, 22, 9, true, Palette.Muted));
+            websiteList = new ListView { Left = 14, Top = 108, Width = 830, Height = 200, Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
+                View = View.Details, FullRowSelect = true, GridLines = false, HeaderStyle = ColumnHeaderStyle.None, BackColor = Palette.Card, ForeColor = Palette.Ink, BorderStyle = BorderStyle.None,
                 Font = new Font("Segoe UI", 10) };
             websiteList.Columns.Add("Website", 280);
             websiteList.Columns.Add("Active", 130);
@@ -657,7 +695,7 @@ namespace Amythest.Windows
             websitesPage.Controls.Add(accountStatus);
             websitesPage.Resize += delegate {
                 int bottom = websitesPage.ClientSize.Height;
-                websiteList.Height = Math.Max(90, bottom - 185);
+                websiteList.Height = Math.Max(90, bottom - 207);
                 bridgeStatus.Top = bottom - 82;
                 extensionId.Top = bottom - 51;
                 connectChrome.Top = bottom - 55;
@@ -682,8 +720,9 @@ namespace Amythest.Windows
             };
             accountPage.Controls.Add(useCloudLimits);
             accountPage.Controls.Add(Ui.Label("Today across your devices", 14, 145, 650, 27, 14, true, Palette.Lilac));
-            cloudDeviceList = new ListView { Left = 14, Top = 181, Width = 830, Height = 190, Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
-                View = View.Details, FullRowSelect = true, GridLines = true, BackColor = Palette.White, ForeColor = Palette.Ink, BorderStyle = BorderStyle.FixedSingle, Font = new Font("Segoe UI", 10) };
+            accountPage.Controls.Add(Ui.Label("SOURCE                                   ACTIVE                   DISTRACTION              VIDEO", 14, 177, 810, 22, 9, true, Palette.Muted));
+            cloudDeviceList = new ListView { Left = 14, Top = 201, Width = 830, Height = 166, Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
+                View = View.Details, FullRowSelect = true, GridLines = false, HeaderStyle = ColumnHeaderStyle.None, BackColor = Palette.Card, ForeColor = Palette.Ink, BorderStyle = BorderStyle.None, Font = new Font("Segoe UI", 10) };
             cloudDeviceList.Columns.Add("Source", 200);
             cloudDeviceList.Columns.Add("Active", 130);
             cloudDeviceList.Columns.Add("Distraction", 150);
@@ -724,7 +763,7 @@ namespace Amythest.Windows
                 BackColor = Palette.White, ForeColor = Palette.Ink, BorderStyle = BorderStyle.FixedSingle, Font = new Font("Segoe UI", 10) };
             accountPage.Controls.Add(cloudSiteLimits);
             accountPage.Resize += delegate {
-                cloudDeviceList.Height = Math.Max(80, (accountPage.ClientSize.Height - 220) / 2);
+                cloudDeviceList.Height = Math.Max(80, (accountPage.ClientSize.Height - 220) / 2 - 20);
                 Control heading = accountPage.Controls.Cast<Control>().FirstOrDefault(c => c is Label && c.Text == "Chrome website limits");
                 if (heading != null) heading.Top = cloudDeviceList.Bottom + 12;
                 siteLimitDomain.Top = cloudDeviceList.Bottom + 45;
@@ -895,6 +934,9 @@ namespace Amythest.Windows
             totalLabel.Text = TimeText(total);
             distractionLabel.Text = TimeText(distracting) + " / " + TimeText((long)settings.GoalMinutes * 60000);
             goalBar.Fraction = (double)distracting / ((long)settings.GoalMinutes * 60000);
+            double fraction = (double)distracting / Math.Max(1L, (long)settings.GoalMinutes * 60000);
+            if (geodeView != null) geodeView.Stage = fraction >= 1 ? 0 : fraction >= .65 ? 1 : fraction >= .30 ? 2 : 3;
+            if (geodeStatus != null) geodeStatus.Text = fraction >= 1 ? "Budget reached · geode resting" : fraction >= .65 ? "Near your distraction budget" : fraction >= .30 ? "Room to focus today" : "Your geode is open";
             if (settings.FocusUntil > DateTime.Now)
             {
                 bool hard = settings.HardModeUntil > DateTime.Now;
@@ -992,12 +1034,6 @@ namespace Amythest.Windows
             foreach (KeyValuePair<string, int> pair in settings.DailyLimits.OrderBy(x => x.Key)) limitList.Items.Add(pair.Key + " · " + pair.Value + " min/day");
             long weekTotal = usage.Values.Sum();
             for (int offset = 1; offset < 7; offset++) weekTotal += store.LoadUsage(DateTime.Today.AddDays(-offset)).Values.Sum();
-            if (boundaryOverview != null) boundaryOverview.Text =
-                settings.DistractingApps.Count + " distracting app" + (settings.DistractingApps.Count == 1 ? "" : "s") + "\n" +
-                settings.DailyLimits.Count + " daily app limit" + (settings.DailyLimits.Count == 1 ? "" : "s") + "\n" +
-                (settings.WorkEnabled ? "Work hours are on" : "Work hours are off") + "\n" +
-                "Past 7 days in Windows: " + TimeText(weekTotal) + "\n\n" +
-                "Chrome website limits are shown in Account.";
             RefreshSummary(); RefreshToday();
         }
         private void Save() { store.SaveSettings(settings); store.SaveUsage(day, usage); store.SaveHours(day, hours); }

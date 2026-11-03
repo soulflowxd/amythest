@@ -32,6 +32,7 @@ $hostExe = Join-Path $dist 'Amythest.NativeHost.exe'
 & $compiler /nologo /target:exe /optimize+ "/out:$hostExe" /reference:System.Web.Extensions.dll /reference:System.Security.dll (Join-Path $PSScriptRoot 'NativeBridge.cs') (Join-Path $PSScriptRoot 'NativeHost.cs')
 if ($LASTEXITCODE -ne 0) { throw 'Chrome bridge compilation failed.' }
 Copy-Item -LiteralPath $png -Destination (Join-Path $dist 'icon48.png') -Force
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'amythest-geode-stages.png') -Destination (Join-Path $dist 'amythest-geode-stages.png') -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\LICENSE') -Destination (Join-Path $dist 'LICENSE') -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'README.md') -Destination (Join-Path $dist 'README.md') -Force
 
@@ -47,8 +48,8 @@ if ($LASTEXITCODE -ne 0) { throw 'Windows cloud test compilation failed.' }
 if ($LASTEXITCODE -ne 0) { throw 'Windows cloud tests failed.' }
 
 if ($Package) {
-    $zip = Join-Path $dist 'amythest-0.7.2-windows.zip'
-    Compress-Archive -Path (Join-Path $dist 'Amythest.exe'), $hostExe, (Join-Path $dist 'icon48.png'), (Join-Path $dist 'LICENSE'), (Join-Path $dist 'README.md') -DestinationPath $zip -Force
+    $zip = Join-Path $dist 'amythest-0.7.5-windows.zip'
+    Compress-Archive -Path (Join-Path $dist 'Amythest.exe'), $hostExe, (Join-Path $dist 'icon48.png'), (Join-Path $dist 'amythest-geode-stages.png'), (Join-Path $dist 'LICENSE'), (Join-Path $dist 'README.md') -DestinationPath $zip -Force
     Write-Output $zip
     $compilerCandidates = @(
         (Join-Path $PSScriptRoot 'dist-codex\nsis\makensis.exe'),
@@ -59,7 +60,7 @@ if ($Package) {
     if ($nsis) {
         & $nsis "/DDIST=$dist" "/DOUTPUT=$dist" (Join-Path $PSScriptRoot 'installer.nsi')
         if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed.' }
-        Write-Output (Join-Path $dist 'amythest-0.7.2-windows-setup.exe')
+        Write-Output (Join-Path $dist 'amythest-0.7.5-windows-setup.exe')
     } else {
         Write-Warning 'NSIS was not found. Portable ZIP built; install NSIS 3 to also build the setup EXE.'
     }

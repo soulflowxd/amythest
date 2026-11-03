@@ -11,15 +11,15 @@ This is a **separate Convex project for Amythest**, modeled on the Convex Auth s
 
 The two sources are kept separate. Chrome time is included in Windows `chrome.exe` process time; clients must not add those two totals together as though they were independent time.
 
-## Current development deployment
+## Deployments
 
-The repository is connected to the separate Amythest development deployment `necessary-marlin-189` (`https://necessary-marlin-189.convex.cloud`). Sync functions and Convex Auth signing keys have been deployed. The public URL is in `cloud-config.js`; the signing key is only in Convex. Password sign-in is enabled without email delivery. Email addresses are unverified, and password recovery is unavailable until a mail provider is configured. This is a development deployment, not a production release.
+Development is `necessary-marlin-189` (`https://necessary-marlin-189.convex.cloud`). The production deployment is `courteous-crane-553` (`https://courteous-crane-553.convex.cloud`). The code and schema were deployed to production on November 3, 2026. The public production URL is in `cloud-config.js` and the Android client; the Windows app receives it from the extension bridge. Signing keys live only in each Convex deployment. Password sign-in requires no email delivery. Email addresses are unverified, and password recovery is unavailable until a mail provider is configured. Development accounts and snapshots do not migrate automatically to production. Users upgrading from development must sign out and create a production account.
 
 ## Account setup and production
 
-1. The development project and signing keys are already set up. Sign in or create an account in the extension dashboard with an email address and a password of at least eight characters. No Resend key or email code is required. The email is an account identifier, **not verified ownership**; choose a strong unique password and keep it safe because password recovery is unavailable.
+1. The production project and separate signing keys are set up. Sign in or create an account in the extension dashboard with an email address and a password of at least eight characters. No Resend key or email code is required. The email is an account identifier, **not verified ownership**; choose a strong unique password and keep it safe because password recovery is unavailable.
 2. For another deployment, sign in with `npx convex login`, run `npx convex dev --configure existing --team luqman-khan-feae5 --project amythest --dev-deployment cloud --once`, then `npx @convex-dev/auth` if that deployment has no signing keys. Keep `.env.local` out of Git.
-3. For a production release, deploy with `npx convex deploy` and change the extension's public URL in `cloud-config.js` to that production deployment. The Windows app receives that URL from the extension through the local bridge. A deployment URL is public configuration, not a secret.
+3. For future backend updates, run `npx convex deploy` after the typecheck and sync tests. Production environment variable **names** can be checked with `npx convex env list --names-only --prod`; never print signing-key values in a terminal or log. The Windows app receives the production URL from the extension through the local bridge. A deployment URL is public configuration, not a secret.
 
 Local tracking continues without an account. Do not use the scouting deployment URL or its credentials.
 

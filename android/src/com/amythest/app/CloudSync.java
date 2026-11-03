@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class CloudSync {
-  private static final String BASE="https://necessary-marlin-189.convex.cloud";
+  private static final String BASE="https://courteous-crane-553.convex.cloud";
   private final SharedPreferences prefs;
   private final TokenVault vault;
   private String settingsMessage="";

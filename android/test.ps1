@@ -8,3 +8,7 @@ New-Item -ItemType Directory -Force $classes | Out-Null
 if($LASTEXITCODE){throw 'FocusLedger test compile failed'}
 & "$jbr\java.exe" -cp "$classes;$androidJar" com.amythest.app.FocusLedgerTest
 if($LASTEXITCODE){throw 'FocusLedger test failed'}
+& "$jbr\javac.exe" -encoding UTF-8 -source 8 -target 8 -classpath $androidJar -d $classes "$PSScriptRoot\src\com\amythest\app\GeodeLevel.java" "$PSScriptRoot\tests\GeodeLevelTest.java"
+if($LASTEXITCODE){throw 'GeodeLevel test compile failed'}
+& "$jbr\java.exe" -cp "$classes;$androidJar" com.amythest.app.GeodeLevelTest
+if($LASTEXITCODE){throw 'GeodeLevel test failed'}

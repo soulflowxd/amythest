@@ -10,7 +10,7 @@ Chrome extension screenshot. The screen time values are from the example shown i
 
 ## Install it in Chrome
 
-1. Download **[amythest-0.7.2-chrome.zip](https://github.com/soulflowxd/amythest/releases/download/v0.7.2/amythest-0.7.2-chrome.zip)** and extract it. Use the extracted folder, not the ZIP itself.
+1. Download **[amythest-0.7.5-chrome.zip](https://github.com/soulflowxd/amythest/releases/download/v0.7.5/amythest-0.7.5-chrome.zip)** and extract it. Use the extracted folder, not the ZIP itself.
 2. Open Chrome and go to `chrome://extensions`.
 3. Turn on **Developer mode** in the top right.
 4. Click **Load unpacked**.
@@ -25,19 +25,21 @@ The ZIP contains the Chrome extension. Download the Windows app separately if yo
 
 ## Android APK (early build)
 
-The Android companion has Home, Apps, and Timer tabs, with Settings in the profile button. Home shows actual app time, a seven-day chart, completed focus minutes, a session streak, and points earned from completed focus minutes. Apps lets you mark distractions, set daily app limits and weekday work hours. With Usage Access, Accessibility, and notifications enabled, Amythest can remind you to leave a distracting app during focus, work hours, or after a limit. It does not close apps. Sign in with the same Amythest account to sync Android daily totals and Android app boundaries alongside separate Chrome and Windows activity. Build and install the APK with the steps in [the Android guide](android/README.md).
+The Android companion opens with a short geode introduction, then has Home, Apps, and Timer tabs, with Settings in the profile button. Home shows an original amethyst geode that opens or closes according to distracting app time compared with your chosen daily budget. It also shows actual screen time, completed focus minutes, streak, sessions, and points earned from completed minutes. Apps lets you mark distractions, set daily app limits and weekday work hours. Timer includes 15- and 45-minute presets. With Usage Access, Accessibility, and notifications enabled, Amythest can remind you to leave a distracting app during focus, work hours, or after a limit. It does not close apps. Sign in with the same Amythest account to sync Android daily totals and Android app boundaries alongside separate Chrome and Windows activity. Build and install the APK with the steps in [the Android guide](android/README.md).
 
-Download the [Android APK](https://github.com/soulflowxd/amythest/releases/download/v0.7.3/amythest-0.7.3-android.apk) and follow the permission steps in the Android guide.
+Download the [Android APK](https://github.com/soulflowxd/amythest/releases/download/v0.7.5/amythest-0.7.5-android.apk) and follow the permission steps in the Android guide.
 
 ![Actual Android app dashboard running in an emulator with sample usage](docs/screenshots/amythest-android-dashboard.png)
+
+![The first Android onboarding screen showing the closed geode](docs/screenshots/amythest-android-onboarding.png)
 
 **iPhone and Mac versions are coming soon.**
 
 ## Windows companion
 
-Amythest also has a separate Windows app for tracking time in desktop programs. Download the [Windows installer](https://github.com/soulflowxd/amythest/releases/download/v0.7.2/amythest-0.7.2-windows-setup.exe) for a Start menu shortcut and uninstall support, or download the [portable ZIP](https://github.com/soulflowxd/amythest/releases/download/v0.7.2/amythest-0.7.2-windows.zip), extract it, and open `Amythest.exe`. See [the Windows guide](windows/README.md) for connection steps. Keep the Chrome extension installed to manage individual websites and videos. The two apps store their totals separately on your device.
+Amythest also has a separate Windows app for tracking time in desktop programs. Download the [Windows installer](https://github.com/soulflowxd/amythest/releases/download/v0.7.5/amythest-0.7.5-windows-setup.exe) for a Start menu shortcut and uninstall support, or download the [portable ZIP](https://github.com/soulflowxd/amythest/releases/download/v0.7.5/amythest-0.7.5-windows.zip), extract it, and open `Amythest.exe`. See [the Windows guide](windows/README.md) for connection steps. Keep the Chrome extension installed to manage individual websites and videos. The two apps store their totals separately on your device.
 
-The Windows app follows [Amythest's design guide](DESIGN.md) and uses the same dashboard structure as the extension. Its **Websites** view can show Chrome's per-domain activity after you connect the extension using the steps in [the Windows guide](windows/README.md).
+The Windows app follows [Amythest's design guide](DESIGN.md): a dark desktop dashboard, a geode tied to the Windows distraction budget, and Windows 7 style window controls. Its **Websites** view can show Chrome's per-domain activity after you connect the extension using the steps in [the Windows guide](windows/README.md).
 
 ![Actual Windows app showing sample screen time data](docs/screenshots/amythest-windows-dashboard.png)
 
@@ -72,7 +74,7 @@ Reminders appear over the original website, so the tab does not change addresses
 
 ## Optional account sync
 
-Amythest's account backend uses **Convex**, like the [2026-scouting project](https://github.com/soulflowxd/2026-scouting), with email and password sign-in. There is no website to sign into: the extension dashboard contains the account controls. The separate Amythest development deployment is connected in `cloud-config.js`; no email delivery is needed for sign-in. See [account backend setup](convex/README.md), then reload the unpacked extension. Email addresses are not verified, and password recovery is not available yet. Never put an auth signing key in the extension or Windows app.
+Amythest's account backend uses **Convex**, like the [2026-scouting project](https://github.com/soulflowxd/2026-scouting), with email and password sign-in. There is no website to sign into: the extension dashboard contains the account controls. Chrome and Android now use Amythest's separate **production** Convex deployment; the Windows app receives its endpoint through the extension bridge. No email delivery is needed for sign-in. See [account backend setup](convex/README.md), then reload the unpacked extension. Accounts created on the earlier development deployment do not move automatically: sign out and create a new production account to sync across updated devices. Email addresses are not verified, and password recovery is not available yet. Never put an auth signing key in the extension or Windows app.
 
 When you sign in, Amythest syncs daily totals by device, Chrome website limits, Windows app limits, and Android app boundaries. The extension account card can edit Windows app limits; the Windows Account view can edit Chrome website limits. Each type of limit applies only to its own platform. Saves check the latest version so a concurrent change is not silently replaced. The Windows app receives a short-lived sign-in token through its local Chrome bridge and protects it with Windows user encryption. Android encrypts its refresh token with Android Keystore. Website domain totals and Android package IDs selected for boundaries are synced; page URLs, titles, and typed reasons are not. Without an account, browsing totals and settings stay on your device and local tracking keeps working. Active website time is approximate and covers Chrome while it is focused.
 

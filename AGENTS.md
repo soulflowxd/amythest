@@ -19,10 +19,10 @@ By default, only soulflowxd should edit the Windows and Android apps. Other cont
 
 ## Visual direction
 
-- Use the existing purple Windows Aero / Frutiger Aero style, bundled Inter font, consistent corner radii, and pale glossy buttons.
+- Keep the Chrome extension's existing purple Aero style and bundled Inter font. Android and Windows now use a near-black geode dashboard with restrained purple labels; Windows retains its Windows 7 style caption buttons and pale glossy actions. Follow `DESIGN.md` for thresholds and spacing.
 - Reuse the same restrained opal-shaped amethyst mark across the icon, popup, dashboard, overlays, and README. Avoid duplicate logos in one view.
 - Use the original full-body Aero companion in normal views and its angry expression on blocked distractions. Keep it interactive and avoid crossed arms.
-- Android follows the supplied Opal screen hierarchy using Amythest branding: Home has the original amethyst-on-rock artwork without a rectangular background, Apps groups distractions and rules, Timer has an LCD-style display, and the profile button opens Settings. Keep the Pixel Private Space explanation in documentation, not an in-app card.
+- Android follows the supplied screen hierarchy using Amythest branding: first-run onboarding and Home use the original four-state amethyst geode without a rectangular background. The geode follows the selected distraction budget and is never a wellness score. Apps groups distractions and rules, Timer has an LCD-style display, and the profile button opens Settings. Keep the Pixel Private Space explanation in documentation, not an in-app card.
 
 ## Code and verification
 
@@ -32,6 +32,7 @@ By default, only soulflowxd should edit the Windows and Android apps. Other cont
 - Update `README.md` when user-visible behavior or install steps change. Keep license notices for the bundled avatar and font.
 - Never commit secrets or local browsing data. Inspect the diff before committing or pushing.
 - Treat account tokens, signing keys, deployment credentials, and `.env.local` as secrets. Do not print their values in tool output, logs, screenshots, tests, or release notes. Scan tracked files and release archives before publishing. Android refresh tokens must remain encrypted with Android Keystore; Windows account tokens remain protected with Windows user encryption.
+- Convex production and development have separate account data and signing keys. Only deployment URLs belong in public client configuration; rotate any key accidentally printed by a tool before a client release.
 - Follow `DESIGN.md` for visual work. The Windows app is built with `windows/build.ps1`; run its core tests and inspect the native window after changes. It tracks desktop processes separately from the Chrome extension's website totals.
 - The Android APK is built with `android/build.ps1`; run `android/test.ps1` for focus accounting, verify the APK signature, and exercise Home, Apps, Timer, Settings/account, and permissions on an emulator after UI or policy changes. Use only synthetic emulator data in screenshots.
 - The Windows installer and portable ZIP come from `windows/build.ps1 -Package`. Versioned Chrome and Windows downloads belong in one GitHub release. The screenshot in `docs/screenshots/` must be captured from the built app with sample data, never private usage data.
