@@ -5,7 +5,7 @@ This companion has Home, Apps, Timer, and Account screens. Home shows today's ap
 ## Install
 
 1. Build with `powershell -ExecutionPolicy Bypass -File android/build.ps1`.
-2. Copy `android/dist/amythest-0.7.0-android.apk` to your phone and open it, or download it from the [v0.7.0 release](https://github.com/soulflowxd/amythest/releases/tag/v0.7.0).
+2. Copy `android/dist/amythest-0.7.1-android.apk` to your phone and open it, or download it from the [v0.7.1 release](https://github.com/soulflowxd/amythest/releases/tag/v0.7.1).
 3. If Android asks, allow installation from the app used to open the APK.
 4. Open Amythest and tap **Allow Usage Access**, then enable Amythest in Android settings.
 5. Amythest also offers **App awareness**. Choose **Open settings** in its prompt or card, then enable Amythest under Accessibility. This lets it observe foreground app package names locally; it does not read screen text.
@@ -19,7 +19,7 @@ Turn on **Hard Mode for next session** on the Timer screen before starting. Amyt
 
 Open **Account** and sign in with the same Amythest email and password used by the Chrome extension. Android uploads daily totals to the existing Convex development deployment under its own `android` source. The account view shows separate Android, Chrome, and Windows snapshots. Android also syncs its daily goal, selected distracting package IDs, per-app limits, and work hours to other Android installations on that account. It never uploads screen text, app labels, or full local browsing files. Local tracking works without signing in. Chrome website limits and Windows app limits remain platform specific. If two Android devices change settings before either syncs, Amythest reports the conflict rather than silently replacing the cloud version.
 
-Account email ownership is not verified. Password recovery is not available yet. The password is never stored on the phone; the refresh token is kept in Android's private app storage, and Android backup is disabled for this app.
+Account email ownership is not verified. Password recovery is not available yet. The password is never stored on the phone; the refresh token is encrypted using an app-specific Android Keystore key before being saved in private app storage. Existing unencrypted refresh tokens migrate on the next launch; if migration cannot complete, Amythest signs out and asks you to sign in again. Android backup is disabled for this app.
 
 This is a development-signed APK. Android may warn about installing outside the Play Store. Keep the same signing key for upgrades; the local build key lives in ignored `android/dist/` and is not a production release key.
 

@@ -6,6 +6,8 @@
 *.p12
 *.pfx
 *.key
+*.keystore
+*.jks
 credentials.json
 secrets.json
 *.secret.json

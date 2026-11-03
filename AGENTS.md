@@ -29,11 +29,8 @@ By default, only soulflowxd should edit the Windows and Android apps. Other cont
 - Run the relevant Node tests in `tests/` after behavior changes, for example `node --test tests/*.test.js` (use the shell's supported glob syntax). Verify UI changes in Chrome when practical.
 - Update `README.md` when user-visible behavior or install steps change. Keep license notices for the bundled avatar and font.
 - Never commit secrets or local browsing data. Inspect the diff before committing or pushing.
+- Treat account tokens, signing keys, deployment credentials, and `.env.local` as secrets. Do not print their values in tool output, logs, screenshots, tests, or release notes. Scan tracked files and release archives before publishing. Android refresh tokens must remain encrypted with Android Keystore; Windows account tokens remain protected with Windows user encryption.
 - Follow `DESIGN.md` for visual work. The Windows app is built with `windows/build.ps1`; run its core tests and inspect the native window after changes. It tracks desktop processes separately from the Chrome extension's website totals.
 - The Android APK is built with `android/build.ps1`; verify its signature and exercise Home, Apps, Timer, Account, and permissions on an emulator after UI or policy changes. Use only synthetic emulator data in screenshots.
 - The Windows installer and portable ZIP come from `windows/build.ps1 -Package`. Versioned Chrome and Windows downloads belong in one GitHub release. The screenshot in `docs/screenshots/` must be captured from the built app with sample data, never private usage data.
 - Publik lists the GitHub release. After publishing a release, verify its assets and install links; Publik may refresh the listing later. Do not claim the Publik page changed until it is checked.
-
-## User's Codex usage limit
-
-Check remaining Codex usage during substantial work. If the task is finished, stop at or before 15% remaining. If unfinished, stop once remaining usage reaches 10%; report what is left. Do not redeem a usage reset without the user's explicit confirmation.

@@ -14,9 +14,10 @@ import java.util.UUID;
 public final class CloudSync {
   private static final String BASE="https://necessary-marlin-189.convex.cloud";
   private final SharedPreferences prefs;
+  private final TokenVault vault;
   private String settingsMessage="";
-  public CloudSync(Context context){prefs=context.getSharedPreferences("amythest",0);}
-  public boolean signedIn(){return !prefs.getString("refreshToken","").isEmpty();}
+  public CloudSync(Context context){prefs=context.getSharedPreferences("amythest",0);vault=new TokenVault(context);}
+  public boolean signedIn(){return vault.hasToken();}
   private JSONObject call(String kind,String path,JSONObject args,String token)throws Exception{
     URL url=new URL(BASE+"/api/"+kind);HttpURLConnection connection=(HttpURLConnection)url.openConnection();
     connection.setRequestMethod("POST");connection.setConnectTimeout(10000);connection.setReadTimeout(10000);connection.setDoOutput(true);connection.setRequestProperty("Content-Type","application/json");
@@ -33,11 +34,12 @@ public final class CloudSync {
     if(password.length()<8)throw new IllegalArgumentException("Use at least eight password characters.");
     JSONObject params=new JSONObject().put("email",email.trim().toLowerCase(java.util.Locale.ROOT)).put("password",password).put("flow",create?"signUp":"signIn");
     JSONObject tokens=call("action","auth:signIn",new JSONObject().put("provider","password").put("params",params),"").getJSONObject("value").getJSONObject("tokens");
-    prefs.edit().putString("token",tokens.getString("token")).putString("refreshToken",tokens.getString("refreshToken")).putString("accountEmail",email.trim()).remove("androidSettingsFingerprint").remove("androidSettingsRevision").apply();
+    vault.store(tokens.getString("refreshToken"));
+    prefs.edit().putString("accountEmail",email.trim()).remove("androidSettingsFingerprint").remove("androidSettingsRevision").apply();
   }
   private String token()throws Exception{
-    JSONObject tokens=call("action","auth:signIn",new JSONObject().put("refreshToken",prefs.getString("refreshToken","")),"").getJSONObject("value").getJSONObject("tokens");
-    String token=tokens.getString("token");prefs.edit().putString("token",token).putString("refreshToken",tokens.getString("refreshToken")).apply();return token;
+    JSONObject tokens=call("action","auth:signIn",new JSONObject().put("refreshToken",vault.read()),"").getJSONObject("value").getJSONObject("tokens");
+    vault.store(tokens.getString("refreshToken"));return tokens.getString("token");
   }
   public JSONArray sync(String date,long activeMs,long distractionMs)throws Exception{
     String access=token();String device=prefs.getString("deviceId","");if(device.isEmpty()){device=UUID.randomUUID().toString().replace("-","");prefs.edit().putString("deviceId",device).apply();}
@@ -80,5 +82,5 @@ public final class CloudSync {
     }
     prefs.edit().putInt("androidSettingsRevision",revision).putString("androidSettingsFingerprint",current).apply();
   }
-  public void signOut(){prefs.edit().remove("token").remove("refreshToken").remove("accountEmail").remove("androidSettingsFingerprint").remove("androidSettingsRevision").apply();}
+  public void signOut(){vault.clear();prefs.edit().remove("accountEmail").remove("androidSettingsFingerprint").remove("androidSettingsRevision").apply();}
 }

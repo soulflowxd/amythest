@@ -8,8 +8,8 @@ This is a native Windows companion to the Amythest Chrome extension. It tracks t
 
 Choose one download:
 
-- **Installer:** Run `amythest-0.7.0-windows-setup.exe`. It installs for your Windows account, adds a Start menu shortcut, and can be removed from Installed Apps. No administrator permission is needed.
-- **Portable:** Extract `amythest-0.7.0-windows.zip` into a folder and open `Amythest.exe`. Keep `Amythest.NativeHost.exe` and `icon48.png` beside it.
+- **Installer:** Run `amythest-0.7.1-windows-setup.exe`. It installs for your Windows account, adds a Start menu shortcut, and can be removed from Installed Apps. No administrator permission is needed.
+- **Portable:** Extract `amythest-0.7.1-windows.zip` into a folder and open `Amythest.exe`. Keep `Amythest.NativeHost.exe` and `icon48.png` beside it.
 
 Leave Amythest running to track time. Closing its window sends it to the system tray; right-click the tray icon to reopen it or quit. Uninstalling the app leaves local screen-time data in `%LOCALAPPDATA%\Amythest` so it can be restored later.
 
@@ -45,4 +45,4 @@ Connect Chrome as described above, then create an account or sign in with email 
 
 ## Build from source
 
-On Windows, run `powershell -ExecutionPolicy Bypass -File windows\build.ps1 -Package` from the repository root. The script uses the Windows .NET Framework C# compiler and produces `windows\dist\Amythest.exe`, `windows\dist\Amythest.NativeHost.exe`, and `windows\dist\amythest-0.7.0-windows.zip`. If NSIS 3 is available, it also produces `windows\dist\amythest-0.7.0-windows-setup.exe` from `windows\installer.nsi`. Pass `-OutputDirectory` to build elsewhere when the installed or portable EXE is running. It compiles and runs core and bridge tests before packaging. The repository's MIT license also covers the Windows app.
+On Windows, run `powershell -ExecutionPolicy Bypass -File windows\build.ps1 -Package` from the repository root. The script uses the Windows .NET Framework C# compiler and produces `windows\dist\Amythest.exe`, `windows\dist\Amythest.NativeHost.exe`, and `windows\dist\amythest-0.7.1-windows.zip`. If NSIS 3 is available, it also produces `windows\dist\amythest-0.7.1-windows-setup.exe` from `windows\installer.nsi`. Pass `-OutputDirectory` to build elsewhere when the installed or portable EXE is running. It compiles and runs core and bridge tests before packaging. The repository's MIT license also covers the Windows app.
