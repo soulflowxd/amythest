@@ -14,7 +14,7 @@ By default, only soulflowxd should edit the Windows and Android apps. Other cont
 - Local tracking works without an account. Account sync is opt-in through the existing Convex backend; sync daily totals and limits, never page URLs, titles, typed reasons, secrets, or raw local browsing files.
 - Android Usage Access measures app time and Accessibility observes foreground package IDs for reminders. It does not block or close other apps, nor can the main-profile install read locked Pixel Private Space. Android app package IDs selected as boundaries sync only after account sign-in.
 - Keep platform boundaries clear: the extension measures websites, while the Windows companion measures desktop processes. A shared account can show both totals and sync each platform's limits.
-- Hard Mode is chosen before a focus session. While active, the app must disable its early-stop and in-app break paths until the deadline; Chrome must also deny checked-video reason unlocks for that session. This is a self-control aid, not uninstall or permission tamper protection. Android currently sends reminders rather than blocking apps; describe that limit plainly.
+- Hard Mode is a persistent preference that applies to every focus session until turned off. While a Hard Mode session is active, the app must disable its early-stop and in-app break paths until the deadline; Chrome must also deny checked-video reason unlocks for that session. This is a self-control aid, not uninstall or permission tamper protection. Android currently sends reminders rather than blocking apps; describe that limit plainly.
 
 ## Visual direction
 

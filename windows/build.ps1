@@ -47,7 +47,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Windows cloud test compilation failed.' }
 if ($LASTEXITCODE -ne 0) { throw 'Windows cloud tests failed.' }
 
 if ($Package) {
-    $zip = Join-Path $dist 'amythest-0.7.1-windows.zip'
+    $zip = Join-Path $dist 'amythest-0.7.2-windows.zip'
     Compress-Archive -Path (Join-Path $dist 'Amythest.exe'), $hostExe, (Join-Path $dist 'icon48.png'), (Join-Path $dist 'LICENSE'), (Join-Path $dist 'README.md') -DestinationPath $zip -Force
     Write-Output $zip
     $compilerCandidates = @(
@@ -59,7 +59,7 @@ if ($Package) {
     if ($nsis) {
         & $nsis "/DDIST=$dist" "/DOUTPUT=$dist" (Join-Path $PSScriptRoot 'installer.nsi')
         if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed.' }
-        Write-Output (Join-Path $dist 'amythest-0.7.1-windows-setup.exe')
+        Write-Output (Join-Path $dist 'amythest-0.7.2-windows-setup.exe')
     } else {
         Write-Warning 'NSIS was not found. Portable ZIP built; install NSIS 3 to also build the setup EXE.'
     }

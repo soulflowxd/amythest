@@ -8,8 +8,8 @@ This is a native Windows companion to the Amythest Chrome extension. It tracks t
 
 Choose one download:
 
-- **Installer:** Run `amythest-0.7.1-windows-setup.exe`. It installs for your Windows account, adds a Start menu shortcut, and can be removed from Installed Apps. No administrator permission is needed.
-- **Portable:** Extract `amythest-0.7.1-windows.zip` into a folder and open `Amythest.exe`. Keep `Amythest.NativeHost.exe` and `icon48.png` beside it.
+- **Installer:** Run `amythest-0.7.2-windows-setup.exe`. It installs for your Windows account, adds a Start menu shortcut, and can be removed from Installed Apps. No administrator permission is needed.
+- **Portable:** Extract `amythest-0.7.2-windows.zip` into a folder and open `Amythest.exe`. Keep `Amythest.NativeHost.exe` and `icon48.png` beside it.
 
 Leave Amythest running to track time. Closing its window sends it to the system tray; right-click the tray icon to reopen it or quit. Uninstalling the app leaves local screen-time data in `%LOCALAPPDATA%\Amythest` so it can be restored later.
 
@@ -24,7 +24,7 @@ The app uses the Windows .NET Framework 4.x desktop runtime. It does not need No
 - **Distracting apps:** Enter a process name such as `discord.exe`. The `.exe` suffix is optional. While a focus session or work hours are active, opening one shows a full-screen reminder.
 - **Daily app limits:** Set a minute limit for any app. After the limit, that app shows the reminder until the next local day.
 - **Work hours:** Set a weekday start and end time. Overnight schedules are supported.
-- **Focus session:** Choose 15, 25, 45, or 60 minutes and start from the main window. Turn on **Hard Mode for next session** before starting to disable the early-end button and five-minute break until the timer expires. The tray's Quit action also refuses while Hard Mode is active; Windows can still end or uninstall the process.
+- **Focus session:** Choose 15, 25, 45, or 60 minutes and start from the main window. Turn on **Hard Mode** to apply it to every future focus session until you turn it off. During a Hard Mode session, the early-end button and five-minute break are unavailable until the timer expires. The tray's Quit action also refuses while Hard Mode is active; Windows can still end or uninstall the process.
 - **Week at a glance:** Today shows your hourly chart; its boundary summary also shows total desktop app time from the past seven days.
 - **Five-minute break:** The reminder lets you temporarily pause blocking. It never closes another app or deletes its data.
 
@@ -45,4 +45,4 @@ Connect Chrome as described above, then create an account or sign in with email 
 
 ## Build from source
 
-On Windows, run `powershell -ExecutionPolicy Bypass -File windows\build.ps1 -Package` from the repository root. The script uses the Windows .NET Framework C# compiler and produces `windows\dist\Amythest.exe`, `windows\dist\Amythest.NativeHost.exe`, and `windows\dist\amythest-0.7.1-windows.zip`. If NSIS 3 is available, it also produces `windows\dist\amythest-0.7.1-windows-setup.exe` from `windows\installer.nsi`. Pass `-OutputDirectory` to build elsewhere when the installed or portable EXE is running. It compiles and runs core and bridge tests before packaging. The repository's MIT license also covers the Windows app.
+On Windows, run `powershell -ExecutionPolicy Bypass -File windows\build.ps1 -Package` from the repository root. The script uses the Windows .NET Framework C# compiler and produces `windows\dist\Amythest.exe`, `windows\dist\Amythest.NativeHost.exe`, and `windows\dist\amythest-0.7.2-windows.zip`. If NSIS 3 is available, it also produces `windows\dist\amythest-0.7.2-windows-setup.exe` from `windows\installer.nsi`. Pass `-OutputDirectory` to build elsewhere when the installed or portable EXE is running. It compiles and runs core and bridge tests before packaging. The repository's MIT license also covers the Windows app.

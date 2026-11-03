@@ -5,7 +5,7 @@ This companion has Home, Apps, Timer, and Account screens. Home shows today's ap
 ## Install
 
 1. Build with `powershell -ExecutionPolicy Bypass -File android/build.ps1`.
-2. Copy `android/dist/amythest-0.7.1-android.apk` to your phone and open it, or download it from the [v0.7.1 release](https://github.com/soulflowxd/amythest/releases/tag/v0.7.1).
+2. Copy `android/dist/amythest-0.7.2-android.apk` to your phone and open it, or download it from the [v0.7.2 release](https://github.com/soulflowxd/amythest/releases/tag/v0.7.2).
 3. If Android asks, allow installation from the app used to open the APK.
 4. Open Amythest and tap **Allow Usage Access**, then enable Amythest in Android settings.
 5. Amythest also offers **App awareness**. Choose **Open settings** in its prompt or card, then enable Amythest under Accessibility. This lets it observe foreground app package names locally; it does not read screen text.
@@ -13,7 +13,7 @@ This companion has Home, Apps, Timer, and Account screens. Home shows today's ap
 
 ## Hard Mode
 
-Turn on **Hard Mode for next session** on the Timer screen before starting. Amythest then disables its early-stop button until the timer expires. Android reminders still appear, but this APK does not block other apps. Android settings can revoke access or uninstall Amythest, so Hard Mode is a commitment aid rather than device-level protection.
+Turn on **Hard Mode** on the Timer screen. This preference stays on for every future focus session until you turn it off. During a Hard Mode session, Amythest disables its early-stop button until the timer expires. Android reminders still appear, but this APK does not block other apps. Android settings can revoke access or uninstall Amythest, so Hard Mode is a commitment aid rather than device-level protection.
 
 ## Account sync
 

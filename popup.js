@@ -41,7 +41,7 @@ async function render() {
 
 const hardControl = document.createElement("label");
 hardControl.className = "hard-mode-control";
-hardControl.innerHTML = '<input type="checkbox"> Hard Mode for next session <small>No early stop or breaks. Device permissions can still be changed.</small>';
+hardControl.innerHTML = '<input type="checkbox"> Hard Mode <small>Stays on for every focus session until you turn it off. No early stop or breaks while active. Device permissions can still be changed.</small>';
 $("focus-button").before(hardControl);
 hardControl.querySelector("input").addEventListener("change", event => chrome.storage.local.set({ hardModeEnabled: event.target.checked }));
 $("focus-button").addEventListener("click", async () => {

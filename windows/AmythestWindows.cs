@@ -593,7 +593,7 @@ namespace Amythest.Windows
             focusButton.SetBounds(144, 91, 195, 40);
             focusCard.Controls.Add(focusButton);
             focusCard.Resize += delegate { focusButton.Width = Math.Max(125, focusCard.ClientSize.Width - 164); };
-            hardModeCheck = new CheckBox { Text = "Hard Mode for next session", Left = 20, Top = 139, Width = 280, Height = 24, ForeColor = Palette.Muted, Checked = settings.HardModeEnabled, BackColor = Color.Transparent };
+            hardModeCheck = new CheckBox { Text = "Hard Mode (stays on)", Left = 20, Top = 139, Width = 280, Height = 24, ForeColor = Palette.Muted, Checked = settings.HardModeEnabled, BackColor = Color.Transparent };
             hardModeCheck.CheckedChanged += delegate { settings.HardModeEnabled = hardModeCheck.Checked; Save(); };
             focusCard.Controls.Add(hardModeCheck);
             focusLabel.SetBounds(20, 164, 340, 22);

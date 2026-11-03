@@ -127,7 +127,7 @@ $("duration").addEventListener("change", e => chrome.storage.local.set({ session
 $("goal").addEventListener("change", e => chrome.storage.local.set({ dailyGoalMinutes:Number(e.target.value) }));
 const hardControl = document.createElement("label");
 hardControl.className = "hard-mode-control";
-hardControl.innerHTML = '<input type="checkbox"> Hard Mode for next session <small>No early stop or breaks. You can still disable the extension or its permissions.</small>';
+hardControl.innerHTML = '<input type="checkbox"> Hard Mode <small>Stays on for every focus session until you turn it off. No early stop or breaks while active. You can still disable the extension or its permissions.</small>';
 $("start-focus").before(hardControl);
 hardControl.querySelector("input").addEventListener("change", event => chrome.storage.local.set({ hardModeEnabled: event.target.checked }));
 $("start-focus").addEventListener("click", async () => {
