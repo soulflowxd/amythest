@@ -26,8 +26,8 @@ public final class OnboardingActivity extends Activity {
   @Override public void onCreate(Bundle state) {
     super.onCreate(state);
     if (getSharedPreferences("amythest", 0).getBoolean("onboardingComplete", false)) { openApp(); return; }
-    getWindow().setStatusBarColor(Color.rgb(5, 4, 8));
-    getWindow().setNavigationBarColor(Color.rgb(5, 4, 8));
+    getWindow().setStatusBarColor(Color.rgb(5, 5, 6));
+    getWindow().setNavigationBarColor(Color.rgb(5, 5, 6));
     render();
   }
 
@@ -44,11 +44,9 @@ public final class OnboardingActivity extends Activity {
     button.setText(value); button.setTextSize(15); button.setAllCaps(false);
     button.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
     button.setTextColor(primary ? Color.rgb(26, 18, 39) : white);
-    GradientDrawable background = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-        primary ? new int[]{Color.WHITE, Color.rgb(219, 202, 249)} :
-            new int[]{Color.rgb(43, 36, 58), Color.rgb(24, 21, 34)});
-    background.setCornerRadius(dp(22));
-    background.setStroke(dp(1), primary ? Color.rgb(255, 255, 255) : Color.rgb(111, 89, 147));
+    GradientDrawable background = new GradientDrawable();
+    background.setColor(primary ? Color.WHITE : Color.rgb(28, 28, 31));
+    background.setCornerRadius(dp(26));
     button.setBackground(background);
     return button;
   }
@@ -61,7 +59,9 @@ public final class OnboardingActivity extends Activity {
   private void render() {
     LinearLayout shell = new LinearLayout(this);
     shell.setOrientation(1); shell.setPadding(dp(28), dp(26), dp(28), dp(22));
-    shell.setBackgroundColor(Color.rgb(6, 5, 10)); setContentView(shell);
+    shell.setBackgroundColor(Color.rgb(5, 5, 6)); setContentView(shell);
+    shell.setOnApplyWindowInsetsListener((v,insets)->{v.setPadding(dp(28),dp(26)+insets.getSystemWindowInsetTop(),dp(28),dp(22)+insets.getSystemWindowInsetBottom());return insets.consumeSystemWindowInsets();});
+    shell.requestApplyInsets();
     LinearLayout brand = new LinearLayout(this); brand.setGravity(Gravity.CENTER_VERTICAL);
     ImageView mark = new ImageView(this);
     mark.setImageResource(getResources().getIdentifier("icon", "drawable", getPackageName()));
@@ -112,7 +112,7 @@ public final class OnboardingActivity extends Activity {
       openApp();
     }});
     Button skip = button(step == 3 ? "Not now" : "Skip introduction", false);
-    LinearLayout.LayoutParams skipSpace = new LinearLayout.LayoutParams(-1, dp(44));
+    LinearLayout.LayoutParams skipSpace = new LinearLayout.LayoutParams(-1, dp(48));
     skipSpace.topMargin = dp(10); shell.addView(skip, skipSpace);
     skip.setOnClickListener(v -> { if (step == 3) { openAppFromSkip(); } else { step = 3; render(); } });
   }

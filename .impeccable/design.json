@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-04T01:57:59.8579418Z",
+  "title": "Design System: Amythest native apps",
+  "extensions": {
+    "colorMeta": {
+      "canvas": { "role": "neutral", "displayName": "Native canvas" },
+      "surface": { "role": "neutral", "displayName": "Android charcoal section" },
+      "accent": { "role": "primary", "displayName": "Android amethyst accent" },
+      "windows-accent": { "role": "primary", "displayName": "Windows amethyst accent" }
+    },
+    "typographyMeta": {
+      "windows-body": { "displayName": "Windows body", "purpose": "Default Segoe UI supporting copy; app activity rows use the separate 11pt style." },
+      "android-body": { "displayName": "Android body", "purpose": "System sans-serif with native text scaling for supporting descriptions; controls use the separate 15sp style." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "geode-stage", "value": "240ms", "purpose": "Crossfade through adjacent geode artwork; Android checks animator availability and Windows follows system animation preference." }
+    ],
+    "breakpoints": [
+      { "name": "windows-minimum", "value": "940px", "purpose": "Minimum supported desktop width; verify at 940 by 700 and default 1100 by 800." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary focus action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "HTML representation of the native Android white primary action.",
+      "html": "<button class=\"ds-primary\">Start focus session</button>",
+      "css": ".ds-primary{min-height:48px;padding:12px 28px;border:0;border-radius:26px;background:#fff;color:#08080a;font:600 15px sans-serif;cursor:pointer}.ds-primary:hover{background:#eeeaf4}.ds-primary:active{background:#ddd6e8}.ds-primary:focus-visible{outline:2px solid #c3aaff;outline-offset:3px}.ds-primary:disabled{opacity:.5;cursor:default}"
+    },
+    {
+      "name": "Secondary action",
+      "kind": "button",
+      "description": "Flat charcoal native secondary action, without bevel or decorative outline.",
+      "html": "<button class=\"ds-secondary\">Create account</button>",
+      "css": ".ds-secondary{min-height:48px;padding:12px 24px;border:0;border-radius:18px;background:#222225;color:#f9f9fa;font:500 15px sans-serif;cursor:pointer}.ds-secondary:hover{background:#303034}.ds-secondary:active{background:#39393e}.ds-secondary:focus-visible{outline:2px solid #c3aaff;outline-offset:3px}"
+    },
+    {
+      "name": "Charcoal content section",
+      "kind": "card",
+      "description": "Native Android section represented in HTML. Windows uses the same flat construction with a 22px radius.",
+      "html": "<section class=\"ds-section\"><h3>Screen time</h3><strong>45m</strong><p>Today on this device</p></section>",
+      "css": ".ds-section{padding:22px;border-radius:24px;background:#141416;color:#f9f9fa;font:15px sans-serif}.ds-section h3{margin:0 0 16px;font-size:18px}.ds-section strong{font-size:40px}.ds-section p{margin:10px 0 0;color:#aaaab1}"
+    },
+    {
+      "name": "Account field",
+      "kind": "input",
+      "description": "Flat native editing field with a visible focus boundary.",
+      "html": "<input class=\"ds-field\" type=\"email\" aria-label=\"Email address\" placeholder=\"Email\">",
+      "css": ".ds-field{min-height:48px;padding:0 14px;border:1px solid transparent;border-radius:13px;background:#1f1f22;color:#f9f9fa;font:15px sans-serif}.ds-field::placeholder{color:#aaaab1}.ds-field:hover{background:#252529}.ds-field:focus-visible{outline:2px solid #c3aaff;outline-offset:2px}"
+    },
+    {
+      "name": "Windows primary navigation",
+      "kind": "nav",
+      "description": "Four top destinations with a lavender underline for the selected view. This is a representation of the owner-drawn WinForms navigation.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main\"><button aria-current=\"page\">Home</button><button>Apps</button><button>Timer</button><button>Settings</button></nav>",
+      "css": ".ds-nav{display:flex;gap:18px;background:#050506}.ds-nav button{min-height:34px;min-width:100px;padding:6px 20px;border:0;border-bottom:2px solid transparent;background:transparent;color:#aea8ba;font:600 14px 'Segoe UI',sans-serif;cursor:pointer}.ds-nav button[aria-current]{border-bottom-color:#ccb1fa;color:#f6f3fc}.ds-nav button:hover{color:#fff}.ds-nav button:focus-visible{outline:2px solid #ccb1fa;outline-offset:2px}"
+    },
+    {
+      "name": "Daily distraction budget",
+      "kind": "custom",
+      "description": "Text and a thin progress bar convey the budget without implying a health score. Example values are illustrative.",
+      "html": "<div class=\"ds-budget\"><span>Distraction budget</span><strong>31m / 2h</strong><progress value=\"31\" max=\"120\" aria-label=\"31 of 120 distraction minutes\"></progress></div>",
+      "css": ".ds-budget{display:grid;gap:9px;background:#141417;color:#f6f3fc;font:15px 'Segoe UI',sans-serif}.ds-budget span{color:#aea8ba}.ds-budget strong{font-size:28px}.ds-budget progress{width:100%;height:5px;border:0;accent-color:#ccb1fa}.ds-budget progress::-webkit-progress-bar{background:#28282c}.ds-budget progress::-webkit-progress-value{background:#ccb1fa}"
+    }
+  ],
+  "narrative": {
+    "northStar": "A quiet view of your attention",
+    "overview": "The native apps follow the supplied Opal hierarchy using Amythest branding: a black canvas, original animated amethyst geode, flat charcoal groups, white primary actions and restrained lavender state cues. Windows uses top Home, Apps, Timer and Settings destinations; Android uses bottom Home, Apps and Timer with Settings through the profile action. Chrome's existing Aero surface is outside this native redesign.",
+    "keyCharacteristics": ["Original geode leads Home", "Flat tonal layering", "White primary actions", "Truthful local metrics", "Native navigation and editing"],
+    "rules": [
+      { "name": "Accent signals state", "body": "Use lavender for selected navigation and progress; use white for headings and neutral gray for descriptions.", "section": "colors" },
+      { "name": "Art has no frame", "body": "Keep the geode silhouette complete on the black canvas and let stage transitions finish before captures.", "section": "elevation" }
+    ],
+    "dos": ["Preserve local tracking, secure account sync and Hard Mode behavior.", "Review Windows default and minimum sizes and Android system insets.", "Use synthetic data for screenshots."],
+    "donts": ["Do not restore Windows 7 captions, glossy buttons, bevels or Frutiger Aero gradients in native apps.", "Do not fabricate wellness scores, focus achievements or time saved.", "Do not apply the native redesign to Chrome without a separate request."]
+  }
+}

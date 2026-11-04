@@ -23,8 +23,8 @@ if($LASTEXITCODE){throw 'apk add failed'}
 if($LASTEXITCODE){throw 'zipalign failed'}
 $key=Join-Path $out 'debug.keystore'
 if(!(Test-Path $key)){& "$jbr\keytool.exe" -genkeypair -keystore $key -storepass android -keypass android -alias amythest-debug -keyalg RSA -keysize 2048 -validity 3650 -dname 'CN=Amythest Development,O=Amythest,C=US' | Out-Null; if($LASTEXITCODE){throw 'keytool failed'}}
-& "$tools\apksigner.bat" sign --ks $key --ks-pass pass:android --key-pass pass:android --out "$out\amythest-0.7.6-android.apk" "$out\aligned.apk"
+& "$tools\apksigner.bat" sign --ks $key --ks-pass pass:android --key-pass pass:android --out "$out\amythest-0.7.7-android.apk" "$out\aligned.apk"
 if($LASTEXITCODE){throw 'sign failed'}
-& "$tools\apksigner.bat" verify --verbose "$out\amythest-0.7.6-android.apk"
+& "$tools\apksigner.bat" verify --verbose "$out\amythest-0.7.7-android.apk"
 if($LASTEXITCODE){throw 'verify failed'}
-Write-Output "$out\amythest-0.7.6-android.apk"
+Write-Output "$out\amythest-0.7.7-android.apk"

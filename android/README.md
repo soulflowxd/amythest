@@ -9,7 +9,7 @@ To check timer accounting without a phone, run `powershell -ExecutionPolicy Bypa
 ## Install
 
 1. Build with `powershell -ExecutionPolicy Bypass -File android/build.ps1`.
-2. Copy `android/dist/amythest-0.7.6-android.apk` to your phone and open it, or download it from the [v0.7.6 release](https://github.com/soulflowxd/amythest/releases/tag/v0.7.6).
+2. Copy `android/dist/amythest-0.7.7-android.apk` to your phone and open it, or download it from the [v0.7.7 release](https://github.com/soulflowxd/amythest/releases/tag/v0.7.7).
 3. If Android asks, allow installation from the app used to open the APK.
 4. Follow the four introduction screens. On the last screen, tap **Allow Usage Access**, then enable Amythest in Android settings. Return to Amythest to continue.
 5. Optionally tap **Enable app reminders** on the last screen or in Settings, then enable Amythest under Accessibility. This lets it observe foreground app package names locally; it does not read screen text.
@@ -33,3 +33,5 @@ Private Space is a separate Android profile. The Amythest installation in your m
 Accessibility access in the main profile does not guarantee Private Space visibility.
 
 Requires Android 8.0 or newer. App totals come from Android's Usage Access API and may differ from Digital Wellbeing. The focus timer is a reminder, not an app lock.
+
+The native interface follows the Opal-inspired screen hierarchy with a black canvas, borderless charcoal sections, white primary actions, and restrained lavender selection states. Home centers the animated geode; Apps contains reminders and limits; Timer uses a flat LCD display; Settings includes a back action and grouped account and permission controls. It respects system-bar insets.

@@ -3,9 +3,7 @@ package com.amythest.app;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.Shader;
 import android.view.View;
 
 /** A local LCD-style clock; the time is still supplied by the focus session state. */
@@ -28,18 +26,11 @@ final class SevenSegmentClock extends View {
     float width = getWidth(), height = getHeight();
     float radius = Math.min(width, height) * .12f;
     paint.setShader(null);
-    paint.setColor(Color.rgb(17, 20, 29));
+    paint.setColor(Color.rgb(22, 22, 25));
     canvas.drawRoundRect(0, 0, width, height, radius, radius, paint);
-    paint.setShader(new LinearGradient(0, 0, 0, height,
-      new int[]{Color.rgb(156, 177, 195), Color.rgb(110, 139, 164), Color.rgb(77, 107, 133)}, null,
-      Shader.TileMode.CLAMP));
-    canvas.drawRoundRect(7, 7, width - 7, height - 7, radius - 5, radius - 5, paint);
+    paint.setColor(Color.rgb(173, 187, 192));
+    canvas.drawRoundRect(12, 12, width - 12, height - 12, radius - 5, radius - 5, paint);
     paint.setShader(null);
-    paint.setStyle(Paint.Style.STROKE);
-    paint.setStrokeWidth(2);
-    paint.setColor(Color.argb(200, 213, 225, 236));
-    canvas.drawRoundRect(8, 8, width - 8, height - 8, radius - 5, radius - 5, paint);
-    paint.setStyle(Paint.Style.FILL);
 
     float innerWidth = 192f, innerHeight = 88f;
     float scale = Math.min((width - 36f) / innerWidth, (height - 26f) / innerHeight);

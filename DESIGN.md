@@ -1,46 +1,106 @@
+---
+name: Amythest native apps
+description: Opal-inspired focus and screen time with an original amethyst geode
+colors:
+  canvas: "#050506"
+  surface: "#141416"
+  control: "#222225"
+  ink: "#F9F9FA"
+  secondary: "#AAAAB1"
+  accent: "#C3AAFF"
+  action: "#FFFFFF"
+  windows-surface: "#141417"
+  windows-ink: "#F6F3FC"
+  windows-secondary: "#AEA8BA"
+  windows-accent: "#CCB1FA"
+  windows-action: "#F2F0F7"
+  windows-control: "#232328"
+typography:
+  windows-body:
+    fontFamily: "Segoe UI"
+    fontSize: "10pt"
+    fontWeight: 400
+  windows-app-row:
+    fontFamily: "Segoe UI"
+    fontSize: "11pt"
+    fontWeight: 400
+  android-body:
+    fontFamily: "sans-serif"
+    fontSize: "13sp"
+    fontWeight: 400
+  android-control:
+    fontFamily: "sans-serif-medium"
+    fontSize: "15sp"
+    fontWeight: 500
+  windows-home-title:
+    fontFamily: "Segoe UI"
+    fontSize: "25pt"
+    fontWeight: 700
+  android-page-title:
+    fontFamily: "sans-serif"
+    fontSize: "31sp"
+    fontWeight: 700
+rounded:
+  windows-section: "22px"
+  windows-control: "20px"
+  android-section: "24dp"
+  android-control: "18dp"
+  android-primary: "26dp"
+spacing:
+  small: "8px"
+  group: "16px"
+  section: "24px"
+components:
+  button-primary:
+    backgroundColor: "{colors.action}"
+    textColor: "{colors.canvas}"
+    rounded: "{rounded.android-primary}"
+    height: "48dp"
+---
 # Amythest design
 
-## Purpose
+## Overview
 
-Amythest makes screen time visible and gives people a calm pause before distractions. The Windows companion tracks desktop apps; the Chrome extension tracks sites and videos. Both should feel like one product.
+Windows and Android follow the supplied Opal app hierarchy with Amythest branding. The original animated amethyst geode leads Home. The native apps use black space, flat charcoal groups, white type and white primary actions. This replaces the former Windows Aero / Frutiger Aero direction completely for native apps.
 
-## Visual language — geode and Aero controls
+Chrome remains a separate existing surface with its current purple Aero design and bundled Inter font. Do not propagate this native redesign into the extension without a new request.
 
-- **Character:** Chrome, Android, and Windows share an original four-stage amethyst geode. Its stage changes fade through adjacent artwork; reduced motion shows the final stage immediately. Android and Windows use a near-black canvas and large original amethyst geode image, with restrained purple surfaces. The Windows caption keeps joined Windows 7 style minimize, maximize, and red close controls. Pale glossy buttons retain a little Aero character.
-- **Palette:** near-black `#08070C`, graphite card `#16141D`, lavender ink `#F6F3FC`, amethyst label `#CCB1FA`, muted gray `#AEA8BA`, and dark violet edges `#403652`.
-- **Mark:** one small opal-shaped amethyst mark beside the wordmark. Do not put a second framed copy of the logo in the same view. The companion avatar is distinct from the logo.
-- **Windows icon:** use the transparent version of the mark for the title bar and packaged EXE. The in-app mark has no dark square behind it.
-- **Type:** Segoe UI on Windows for native familiarity; Inter in the extension where bundled. Use a clear hierarchy: 22–28 px page title, 18–22 px metric, 13–15 px body, 11–12 px supporting labels. Use sentence case for most UI labels.
-- **Shape:** dark cards have restrained 16 px curves. Buttons have a pale lavender face, cool blue edge, top shine, and a subtle lower shadow.
-- **Spacing:** 8 px base rhythm; 24 px outer margins; at least 16 px between sections. No text or lists should touch window edges.
+## Colors
 
-## Windows dashboard layout
+Black is the canvas; charcoal distinguishes a content group. The unprefixed palette records Android values; `windows-*` records the closely related Windows palette. Headings and primary values are white. Secondary descriptions are neutral gray. Reserve lavender for selected navigation, progress and the geode. Never use purple for every heading. Error and disabled states must stay readable and explicit.
 
-The Windows app should feel like the Chrome extension dashboard opened as its own desktop app. At the default 1100 × 800 size, the order is:
+## Typography
 
-1. Thin Windows 7 glass caption with joined minimize, maximize, and red close controls.
-2. Amythest wordmark and a short “Your focus, in view” introduction.
-3. A large activity card within Today, with day total, distraction goal, an hourly activity chart, and the most used apps. Do not place a separate metric banner above the tabs.
-4. A geode card and focus card beside the activity card. The geode opens or closes based on **Windows distracting app time divided by the chosen daily goal**: open below 30%, partly open from 30%, nearly closed from 65%, and closed at 100%. It is an artistic cue, never a claimed health score. The focus card has a duration choice and Hard Mode commitment. Boundaries holds Windows app controls; Account shows cloud Chrome website limits. Windows-only controls must clearly say “apps”; browser controls must clearly say “sites.”
-5. A Websites view with the Chrome extension’s domain totals, including video and distraction time. This is a breakdown of Chrome usage, not additional desktop time.
+Use Segoe UI on Windows and Android's system sans-serif. Use regular or medium body text, semibold headings and bold principal metrics. Avoid tiny all-caps labels, excessive tracking, font effects and fabricated wellness scores. Time values use stable numerals. Android supports native text scaling.
 
-Use the dashboard’s spacious card rhythm, near-black canvas, and restrained purple labels. The desktop title controls remain true to the Windows 7 screenshot. Avoid a compact utility/tray layout as the main experience.
+## Layout
 
-The cards must stay inside the content area when resized. Keep the tab panel visible and never let it cover the header or summary. At narrow widths, reduce column widths before clipping the page. The default screen must show the summary and at least several usage rows without scrolling.
+Windows has four primary top destinations: Home, Apps, Timer, Settings. Home places a large unframed geode beside screen time, the daily distraction budget, activity and readable app rows. Apps holds app boundaries. Timer holds duration, start/end, persistent Hard Mode and its state. Settings groups account sync and secondary Chrome website detail. At 940 × 700, content stays reachable without clipping.
 
-## Interaction
+Android uses Home, Apps and Timer bottom destinations, with Settings reached through the profile action. Home leads with the complete geode cutout, authentic completed focus minutes and progress, then screen time and app breakdown. Apps groups distractions and rules. Timer has a flat digital display and an obvious white action. Settings groups account, preferences and permissions. The first-run geode introduction uses the same flat system.
 
-- All desktop apps are tracked while active; only selected distractions advance the distraction goal.
-- The focus action should show its current state and end time.
-- A blocked app gets an Amythest reminder that explains the reason and offers a temporary break. The reminder is a self-control boundary, not an OS security lock.
-- A mouse or keyboard user can reach every control. Keep focus indicators and legible input text.
+Use proximity and whitespace before adding containers. Keep at least 48dp Android touch targets and preserve keyboard focus on Windows. Scroll content beyond fixed actions and navigation so the final row can be revealed completely.
 
-## Verification
+Android Home places the focus action within the scrolling content, above screen time. Only the compact navigation row remains fixed; its selected icon and label use lavender without a filled capsule. A short scroll-edge fade softens content entering the navigation boundary.
 
-Build the Windows app, run core policy tests, launch the EXE, and inspect the window at its default size. Check the Today and Boundaries views, focus state, and blocked reminder. Update this document when the visual system changes.
+## Elevation & Depth
 
-## Android dashboard
+Native surfaces are flat and separated by tone. No glossy shine, decorative bevels, Aero gradients, chrome-colored caption bars, colored halos or heavy outline around every group. Windows minimize, maximize and close remain familiar flat controls with proper hover and keyboard states.
 
-The Android app takes its screen hierarchy from the supplied Opal screenshots and its restraint from the [monopo saigon DESIGN.md on Refero](https://styles.refero.design/style/3e52dd36-6ab1-48c6-bc40-47ef6d33abc2): a near-black canvas, one spacious title, small quiet labels, and color reserved for a single amethyst accent. It uses the same amethyst mark but does not copy Opal branding. Cards and bottom navigation use translucent purple-gray native gradients, a thin light rim, and rounded lens-like edges inspired by [LiquidGlass](https://github.com/ybouane/liquidglass), [kube.io's glass study](https://kube.io/blog/liquid-glass-css-svg/), and [21st.dev glass components](https://21st.dev/). Those web effects are references, not Android dependencies or a claim of live refraction. Use frosted white only for primary actions and keep text opaque and legible.
+## Shapes
 
-The first launch has four sparse geode screens: closed stone, first opening, wider opening, and open crystal. The last screen gives a clear Usage Access action and optional Accessibility action. It says that Usage Access measures app time and Accessibility observes foreground app package IDs for reminders; Android does not let this build close or block other apps. The main bottom destinations are Home, Apps, and Timer. A profile icon in the header opens Settings. Home uses an original amethyst geode cutout on the near-black canvas, with no rectangular image background. The geode uses the same 30%, 65%, and 100% distraction-budget thresholds as Windows. With no Usage Access, it stays neutral and explains why. Completed focus minutes appear beneath it; three compact chips show actual streak, completed sessions, and points earned from completed minutes. Screen time and its app breakdown follow within the first screen. A focus pill sits above the tab bar. Exclude system launchers and system UI from tracked app totals. Apps presents selected distractions without empty icon placeholders, then weekday rules, app choices, and the daily goal. Timer uses a native-drawn LCD-style clock, adjustable duration, useful 15- and 45-minute presets, and persistent Hard Mode preference. Settings groups profile sync, focus preferences, permissions, and app information; it hides sign-in fields while signed in. Do not show a Pixel Private Space card in Settings. Explain that profile boundary only in documentation. Use Android's native controls and readable tap targets. Never fabricate scores, streaks, or time saved. Sleep and referral rewards are outside the current design.
+Use 22px section curves and 20px action curves on Windows; Android sections use 24dp, secondary actions 18dp, and primary actions 26dp. Pills are reserved for major focus actions or compact navigation selection. Do not put the geode in a framed image tile or crop its silhouette.
+
+## Components
+
+The geode uses distracting time divided by the local platform daily goal: open below 30%, partly open at 30%, nearly closed at 65%, resting at 100%. Stage changes fade through adjacent artwork. Honor reduced motion. Missing Android Usage Access shows a neutral state with an explanation. It is an artistic budget cue.
+
+Primary actions are white with dark labels; secondary actions use flat charcoal. Inputs retain native editing behavior and legible text. Hard Mode stays persistent and disables early stop/break paths while active. Android sends reminders and cannot close other apps. Do not imply stronger enforcement.
+
+## Do's and Don'ts
+
+- Do preserve Amythest's mark, original geode, truthful totals, platform boundaries and existing account behavior.
+- Do review all destinations, narrow Windows sizes, Android scrolling and permission states in built apps with synthetic data.
+- Do keep Pixel Private Space limitations in documentation, not a new in-app card.
+- Don't restore Windows 7 captions, glossy buttons or Frutiger styling in native apps.
+- Don't add sleep tracking, referral rewards, fake scores or invented time saved.
