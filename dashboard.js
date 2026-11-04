@@ -22,6 +22,7 @@ async function render() {
   const videoUsage = chartView === "day" ? (state[`videoUsage:${dateKey()}`] || {}) : days.reduce((sum, d) => { for (const [site, ms] of Object.entries(state[`videoUsage:${keyFor(d)}`] || {})) sum[site] = (sum[site] || 0) + ms; return sum; }, {});
   const distractionTotal = distractionTime(usage, state.blockedSites || [], videoUsage);
   const todayDistractionTime = distractionTime(state[`usage:${dateKey()}`] || {}, state.blockedSites || [], state[`videoUsage:${dateKey()}`] || {});
+  showGeode($("dashboard-geode"), todayDistractionTime, state.dailyGoalMinutes || 120);
   showAvatarMood(document.querySelector(".intro-avatar"), avatarMood(todayDistractionTime, state.dailyGoalMinutes || 120));
   $("daily-total").textContent = fmt(total);
   $("date-label").textContent = chartView === "day" ? new Intl.DateTimeFormat("en", { weekday:"long", month:"long", day:"numeric" }).format(new Date()) : `${new Intl.DateTimeFormat("en", { month:"short", day:"numeric" }).format(days[0])} – ${new Intl.DateTimeFormat("en", { month:"short", day:"numeric" }).format(days[6])}`;

@@ -6,7 +6,7 @@ Amythest makes screen time visible and gives people a calm pause before distract
 
 ## Visual language — geode and Aero controls
 
-- **Character:** Android and Windows use a near-black canvas and large original amethyst geode image, with restrained purple surfaces. The Windows caption keeps joined Windows 7 style minimize, maximize, and red close controls. Pale glossy buttons retain a little Aero character.
+- **Character:** Chrome, Android, and Windows share an original four-stage amethyst geode. Its stage changes fade through adjacent artwork; reduced motion shows the final stage immediately. Android and Windows use a near-black canvas and large original amethyst geode image, with restrained purple surfaces. The Windows caption keeps joined Windows 7 style minimize, maximize, and red close controls. Pale glossy buttons retain a little Aero character.
 - **Palette:** near-black `#08070C`, graphite card `#16141D`, lavender ink `#F6F3FC`, amethyst label `#CCB1FA`, muted gray `#AEA8BA`, and dark violet edges `#403652`.
 - **Mark:** one small opal-shaped amethyst mark beside the wordmark. Do not put a second framed copy of the logo in the same view. The companion avatar is distinct from the logo.
 - **Windows icon:** use the transparent version of the mark for the title bar and packaged EXE. The in-app mark has no dark square behind it.

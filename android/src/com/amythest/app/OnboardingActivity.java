@@ -76,7 +76,8 @@ public final class OnboardingActivity extends Activity {
     body = new LinearLayout(this); body.setOrientation(1); body.setGravity(Gravity.CENTER);
     shell.addView(body, new LinearLayout.LayoutParams(-1, 0, 1));
     ImageView stone = new ImageView(this); stone.setScaleType(ImageView.ScaleType.FIT_CENTER);
-    GeodeArt.show(this, stone, step);
+    GeodeArt.show(this, stone, Math.max(0, step - 1));
+    if (step > 0) stone.post(() -> GeodeArt.show(this, stone, step));
     stone.setContentDescription(new String[]{"A closed amethyst geode", "Amethyst emerging from stone",
         "A widening amethyst geode", "A fully open amethyst geode"}[step]);
     body.addView(stone, new LinearLayout.LayoutParams(-1, dp(320)));

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -322,27 +323,70 @@ namespace Amythest.Windows
     {
         private readonly Bitmap art;
         private int stage = 1;
-        public int Stage { get { return stage; } set { stage = Math.Max(0, Math.Min(3, value)); Invalidate(); } }
+        private int target = 1;
+        private int next = 1;
+        private float blend;
+        private readonly System.Windows.Forms.Timer animation = new System.Windows.Forms.Timer { Interval = 33 };
+        public int Stage { get { return target; } set {
+            target = Math.Max(0, Math.Min(3, value));
+            if (!SystemInformation.IsMenuAnimationEnabled) {
+                animation.Stop(); stage = next = target; blend = 0; Invalidate(); return;
+            }
+            if (target == stage && !animation.Enabled) return;
+            if (!animation.Enabled) { next = stage + Math.Sign(target - stage); blend = 0; animation.Start(); }
+        } }
         public GeodeView()
         {
             DoubleBuffered = true;
             BackColor = Palette.Card;
             AccessibleName = "Amethyst geode showing today's distraction budget";
-            string path = Path.Combine(Application.StartupPath, "amythest-geode-stages.png");
+            string path = Path.Combine(Path.GetDirectoryName(typeof(GeodeView).Assembly.Location), "amythest-geode-stages.png");
             if (File.Exists(path)) { using (Bitmap loaded = new Bitmap(path)) art = new Bitmap(loaded); }
+            animation.Tick += delegate {
+                blend = Math.Min(1f, blend + .15f);
+                if (blend >= 1f) {
+                    stage = next;
+                    blend = 0;
+                    if (stage == target) animation.Stop();
+                    else next = stage + Math.Sign(target - stage);
+                }
+                Invalidate();
+            };
         }
         protected override void OnPaint(PaintEventArgs e)
         {
-            e.Graphics.Clear(Palette.Card);
+            float cardHeight = Parent == null ? Math.Max(1, Height) : Math.Max(1, Parent.ClientSize.Height - 3);
+            float first = Math.Max(0f, Math.Min(1f, Top / cardHeight));
+            float last = Math.Max(0f, Math.Min(1f, (Top + Height) / cardHeight));
+            Func<float, Color> cardColor = fraction => Color.FromArgb(
+                (int)(35 + (Palette.Card.R - 35) * fraction),
+                (int)(30 + (Palette.Card.G - 30) * fraction),
+                (int)(45 + (Palette.Card.B - 45) * fraction));
+            using (LinearGradientBrush surface = new LinearGradientBrush(
+                new Rectangle(0, 0, Math.Max(1, Width), Math.Max(1, Height)),
+                cardColor(first), cardColor(last), LinearGradientMode.Vertical))
+                e.Graphics.FillRectangle(surface, ClientRectangle);
             if (art == null) return;
             e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             int tileWidth = art.Width / 2, tileHeight = art.Height / 2;
-            Rectangle source = new Rectangle((stage % 2) * tileWidth, (stage / 2) * tileHeight, tileWidth, tileHeight);
             float scale = 1.38f * Math.Min((float)Width / tileWidth, (float)Height / tileHeight);
             int width = (int)(tileWidth * scale), height = (int)(tileHeight * scale);
-            e.Graphics.DrawImage(art, new Rectangle((Width - width) / 2, (Height - height) / 2, width, height), source, GraphicsUnit.Pixel);
+            Rectangle destination = new Rectangle((Width - width) / 2, (Height - height) / 2, width, height);
+            DrawStage(e.Graphics, destination, stage, 1f);
+            if (animation.Enabled) DrawStage(e.Graphics, destination, next, blend);
         }
-        protected override void Dispose(bool disposing) { if (disposing && art != null) art.Dispose(); base.Dispose(disposing); }
+        private void DrawStage(Graphics graphics, Rectangle destination, int tile, float alpha)
+        {
+            int tileWidth = art.Width / 2, tileHeight = art.Height / 2;
+            Rectangle source = new Rectangle((tile % 2) * tileWidth, (tile / 2) * tileHeight, tileWidth, tileHeight);
+            using (ImageAttributes attributes = new ImageAttributes()) {
+                ColorMatrix color = new ColorMatrix();
+                color.Matrix33 = alpha;
+                attributes.SetColorMatrix(color);
+                graphics.DrawImage(art, destination, source.X, source.Y, source.Width, source.Height, GraphicsUnit.Pixel, attributes);
+            }
+        }
+        protected override void Dispose(bool disposing) { if (disposing) { animation.Dispose(); if (art != null) art.Dispose(); } base.Dispose(disposing); }
     }
 
     internal sealed class BlockForm : Form
@@ -553,13 +597,13 @@ namespace Amythest.Windows
             caption.MinimizeButton.Click += delegate { WindowState = FormWindowState.Minimized; };
             caption.MaximizeButton.Click += toggleMaximize;
             caption.CloseButton.Click += delegate { Close(); };
-            GlassStrip header = new GlassStrip();
+            Panel header = new Panel { BackColor = Palette.Background };
             Controls.Add(header);
             header.Controls.Add(new LogoMark { Left = 26, Top = 14, Width = 44, Height = 44 });
             header.Controls.Add(Ui.Label("amythest", 79, 14, 330, 32, 19, true, Color.White));
-            header.Controls.Add(Ui.Label("Your focus, in view.", 26, 59, 650, 38, 25, true, Color.White));
+            header.Controls.Add(Ui.Label("Your focus, in view.", 26, 59, 650, 38, 23, true, Color.White));
             header.Controls.Add(Ui.Label("Windows apps, Chrome websites, and the space between.", 28, 99, 650, 22, 11, false, Color.FromArgb(222, 212, 240)));
-            Label edition = Ui.Label("TODAY  /  DESKTOP", 0, 25, 210, 20, 9, true, Color.FromArgb(218, 198, 244));
+            Label edition = Ui.Label("Windows companion", 0, 25, 210, 20, 10, false, Palette.Muted);
             edition.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             header.Controls.Add(edition);
             header.Resize += delegate { edition.Left = header.ClientSize.Width - 235; };

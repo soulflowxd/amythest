@@ -22,7 +22,7 @@ By default, only soulflowxd should edit the Windows and Android apps. Other cont
 - Keep the Chrome extension's existing purple Aero style and bundled Inter font. Android and Windows now use a near-black geode dashboard with restrained purple labels; Windows retains its Windows 7 style caption buttons and pale glossy actions. Follow `DESIGN.md` for thresholds and spacing.
 - Reuse the same restrained opal-shaped amethyst mark across the icon, popup, dashboard, overlays, and README. Avoid duplicate logos in one view.
 - Use the original full-body Aero companion in normal views and its angry expression on blocked distractions. Keep it interactive and avoid crossed arms.
-- Android follows the supplied screen hierarchy using Amythest branding: first-run onboarding and Home use the original four-state amethyst geode without a rectangular background. The geode follows the selected distraction budget and is never a wellness score. Apps groups distractions and rules, Timer has an LCD-style display, and the profile button opens Settings. Keep the Pixel Private Space explanation in documentation, not an in-app card.
+- Android follows the supplied screen hierarchy using Amythest branding: first-run onboarding and Home use the original four-state amethyst geode without a rectangular background. The geode follows the selected distraction budget and is never a wellness score. Chrome shows the same geode for distracting website and video time. Animate stage changes through adjacent artwork and respect reduced-motion settings. Apps groups distractions and rules, Timer has an LCD-style display, and the profile button opens Settings. Keep the Pixel Private Space explanation in documentation, not an in-app card.
 
 ## Code and verification
 
@@ -37,3 +37,5 @@ By default, only soulflowxd should edit the Windows and Android apps. Other cont
 - The Android APK is built with `android/build.ps1`; run `android/test.ps1` for focus accounting, verify the APK signature, and exercise Home, Apps, Timer, Settings/account, and permissions on an emulator after UI or policy changes. Use only synthetic emulator data in screenshots.
 - The Windows installer and portable ZIP come from `windows/build.ps1 -Package`. Versioned Chrome and Windows downloads belong in one GitHub release. The screenshot in `docs/screenshots/` must be captured from the built app with sample data, never private usage data.
 - Publik lists the GitHub release. After publishing a release, verify its assets and install links; Publik may refresh the listing later. Do not claim the Publik page changed until it is checked.
+
+- Geode changes ship together across Chrome, Windows, and Android. Capture screenshots after stage animations finish, using synthetic data. Keep Chrome geode artwork grouped with activity and preserve readable contrast on its dashboard card.

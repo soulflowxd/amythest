@@ -1,0 +1,26 @@
+.geode-art { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; }
+.geode-frame { position: absolute; inset: 0; display: block; background-image: url("assets/geode-stages.png"); background-size: 200% 200%; background-repeat: no-repeat; }
+.geode-next { opacity: 0; }
+.geode-caption { color: #cbb8ee; font-size: 12px; line-height: 1.35; }
+.popup .geode-panel { display: flex; align-items: center; gap: 9px; min-height: 64px; margin: 1px 0 8px; padding: 0; }
+.popup .geode-art { flex: none; width: 69px; height: 62px; }
+.popup .geode-copy { display: grid; gap: 5px; }
+.popup .geode-copy strong { color: #faf7ff; font-size: 13px; }
+.dashboard .geode-panel { display: grid; grid-column: 2; grid-template-columns: minmax(130px, 190px) 1fr; align-items: center; gap: 14px; min-height: 180px; color: #f6f3fc; background: linear-gradient(145deg, #272133, #17141e); border: 1px solid #594875; box-shadow: inset 0 1px 0 #ffffff24; }
+.dashboard .geode-panel::before { display: none; }
+.dashboard .geode-art { width: 100%; height: 170px; }
+.dashboard .geode-copy { display: grid; gap: 9px; }
+.dashboard .geode-copy h2 { margin: 0; color: #f6f3fc; }
+.dashboard .geode-copy p { margin: 0; line-height: 1.5; }
+.dashboard .geode-copy .muted { color: #c9c2d5; }
+.popup .timer, .popup .metrics strong, .dashboard .screen-total { font-variant-numeric: tabular-nums; }
+.popup .card-heading small, .popup .metrics span, .popup .usage-row, .popup .distraction-caption { font-size: 12px; }
+.popup .timer-caption { font-size: 11px; letter-spacing: .03em; }
+.popup .hard-mode-control small { font-size: 12px; line-height: 1.5; }
+.dashboard .screen-card { border-radius: 16px; }
+.dashboard .chart-wrap { height: 190px; }
+.dashboard .screen-summary span, .dashboard .site-type { font-size: 12px; }
+.dashboard .geode-copy p { max-width: 30ch; }
+.popup button:focus-visible, .dashboard button:focus-visible { outline: 2px solid #aa88e3; outline-offset: 3px; }
+@media (max-width: 730px) { .dashboard .geode-panel { grid-column: 1; } }
+@media (max-width: 430px) { .dashboard .geode-panel { grid-template-columns: 120px 1fr; } .dashboard .geode-art { height: 130px; } }

@@ -23,6 +23,7 @@ async function render() {
   const usage = data[`usage:${dateKey()}`] || {};
   const rows = Object.entries(usage).sort((a,b) => b[1]-a[1]);
   const distractionTotal = distractionTime(usage, data.blockedSites || [], data[`videoUsage:${dateKey()}`] || {});
+  showGeode($("popup-geode"), distractionTotal, data.dailyGoalMinutes || 120);
   showAvatarMood($("avatar"), avatarMood(distractionTotal, data.dailyGoalMinutes || 120));
   $("total-time").textContent = fmt(rows.reduce((sum, row) => sum + row[1], 0));
   $("site-count").textContent = rows.length;

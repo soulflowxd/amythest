@@ -10,7 +10,7 @@ Chrome extension screenshot. The screen time values are from the example shown i
 
 ## Install it in Chrome
 
-1. Download **[amythest-0.7.5-chrome.zip](https://github.com/soulflowxd/amythest/releases/download/v0.7.5/amythest-0.7.5-chrome.zip)** and extract it. Use the extracted folder, not the ZIP itself.
+1. Download **[amythest-0.7.6-chrome.zip](https://github.com/soulflowxd/amythest/releases/download/v0.7.6/amythest-0.7.6-chrome.zip)** and extract it. Use the extracted folder, not the ZIP itself.
 2. Open Chrome and go to `chrome://extensions`.
 3. Turn on **Developer mode** in the top right.
 4. Click **Load unpacked**.
@@ -25,9 +25,9 @@ The ZIP contains the Chrome extension. Download the Windows app separately if yo
 
 ## Android APK (early build)
 
-The Android companion opens with a short geode introduction, then has Home, Apps, and Timer tabs, with Settings in the profile button. Home shows an original amethyst geode that opens or closes according to distracting app time compared with your chosen daily budget. It also shows actual screen time, completed focus minutes, streak, sessions, and points earned from completed minutes. Apps lets you mark distractions, set daily app limits and weekday work hours. Timer includes 15- and 45-minute presets. With Usage Access, Accessibility, and notifications enabled, Amythest can remind you to leave a distracting app during focus, work hours, or after a limit. It does not close apps. Sign in with the same Amythest account to sync Android daily totals and Android app boundaries alongside separate Chrome and Windows activity. Build and install the APK with the steps in [the Android guide](android/README.md).
+The Android companion opens with a short animated geode introduction, then has Home, Apps, and Timer tabs, with Settings in the profile button. Home shows an original amethyst geode that fades through stages according to distracting app time compared with your chosen daily budget. It also shows actual screen time, completed focus minutes, streak, sessions, and points earned from completed minutes. Apps lets you mark distractions, set daily app limits and weekday work hours. Timer includes 15- and 45-minute presets. With Usage Access, Accessibility, and notifications enabled, Amythest can remind you to leave a distracting app during focus, work hours, or after a limit. It does not close apps. Sign in with the same Amythest account to sync Android daily totals and Android app boundaries alongside separate Chrome and Windows activity. Build and install the APK with the steps in [the Android guide](android/README.md).
 
-Download the [Android APK](https://github.com/soulflowxd/amythest/releases/download/v0.7.5/amythest-0.7.5-android.apk) and follow the permission steps in the Android guide.
+Download the [Android APK](https://github.com/soulflowxd/amythest/releases/download/v0.7.6/amythest-0.7.6-android.apk) and follow the permission steps in the Android guide.
 
 ![Actual Android app dashboard running in an emulator with sample usage](docs/screenshots/amythest-android-dashboard.png)
 
@@ -37,9 +37,9 @@ Download the [Android APK](https://github.com/soulflowxd/amythest/releases/downl
 
 ## Windows companion
 
-Amythest also has a separate Windows app for tracking time in desktop programs. Download the [Windows installer](https://github.com/soulflowxd/amythest/releases/download/v0.7.5/amythest-0.7.5-windows-setup.exe) for a Start menu shortcut and uninstall support, or download the [portable ZIP](https://github.com/soulflowxd/amythest/releases/download/v0.7.5/amythest-0.7.5-windows.zip), extract it, and open `Amythest.exe`. See [the Windows guide](windows/README.md) for connection steps. Keep the Chrome extension installed to manage individual websites and videos. The two apps store their totals separately on your device.
+Amythest also has a separate Windows app for tracking time in desktop programs. Download the [Windows installer](https://github.com/soulflowxd/amythest/releases/download/v0.7.6/amythest-0.7.6-windows-setup.exe) for a Start menu shortcut and uninstall support, or download the [portable ZIP](https://github.com/soulflowxd/amythest/releases/download/v0.7.6/amythest-0.7.6-windows.zip), extract it, and open `Amythest.exe`. See [the Windows guide](windows/README.md) for connection steps. Keep the Chrome extension installed to manage individual websites and videos. The two apps store their totals separately on your device.
 
-The Windows app follows [Amythest's design guide](DESIGN.md): a dark desktop dashboard, a geode tied to the Windows distraction budget, and Windows 7 style window controls. Its **Websites** view can show Chrome's per-domain activity after you connect the extension using the steps in [the Windows guide](windows/README.md).
+The Windows app follows [Amythest's design guide](DESIGN.md): a dark desktop dashboard, an animated geode tied to the Windows distraction budget, and Windows 7 style window controls. Its **Websites** view can show Chrome's per-domain activity after you connect the extension using the steps in [the Windows guide](windows/README.md).
 
 ![Actual Windows app showing sample screen time data](docs/screenshots/amythest-windows-dashboard.png)
 
@@ -54,7 +54,7 @@ This is a screenshot of the built Windows app with sample data. It does not show
 
 ## Use it
 
-- **See your time:** Click the amythest icon to see today's time in Chrome. Open the dashboard for an iOS-style Screen Time view. **Day** shows time by hour; **Week** shows the last seven days and your daily average. All websites are tracked, including productive sites such as GitHub.
+- **See your time:** Click the amythest icon to see today's time in Chrome. The popup and dashboard show the same four-stage geode, shaped by distracting website and video time against your daily goal. Open the dashboard for an iOS-style Screen Time view. **Day** shows time by hour; **Week** shows the last seven days and your daily average. All websites are tracked, including productive sites such as GitHub.
 - **Focus session:** Pick 15, 25, 45, or 60 minutes in the dashboard, then start a session. Websites on your distraction list will be blocked until it ends.
 - **Hard Mode:** Turn it on once in Chrome, Windows, or Android; the preference stays on for future focus sessions until you turn it off. During each Hard Mode session, the in-app End control is disabled. Chrome and Windows also disable their break controls; Chrome pauses checked videos without a reason unlock. Android currently sends reminders rather than blocking apps, so its Hard Mode only locks its own timer controls. You can still disable an extension, app, or system permission outside Amythest. Hard Mode is a commitment aid, not tamper protection.
 - **Distraction list:** Add websites such as `youtube.com`. Subdomains such as `music.youtube.com` are included.
