@@ -85,7 +85,7 @@ Android Home places the focus action within the scrolling content, above screen 
 
 ## Elevation & Depth
 
-Native surfaces are flat and separated by tone. No glossy shine, decorative bevels, Aero gradients, chrome-colored caption bars, colored halos or heavy outline around every group. Windows minimize, maximize and close remain familiar flat controls with proper hover and keyboard states.
+Native surfaces are flat and separated by tone. No glossy shine, decorative bevels, Aero gradients, chrome-colored caption bars, colored halos or heavy outline around every group. Windows uses the standard OS title bar, resizable frame, system menu and minimize/maximize/close controls. Request the dark title-bar theme through DWM; do not draw replacement caption buttons or override resize hit testing.
 
 ## Shapes
 

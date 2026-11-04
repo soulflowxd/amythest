@@ -41,3 +41,5 @@ By default, only soulflowxd should edit the Windows and Android apps. Other cont
 - Geode changes ship together across Chrome, Windows, and Android. Capture screenshots after stage animations finish, using synthetic data. Keep Chrome geode artwork grouped with activity and preserve readable contrast on its dashboard card.
 
 - Android Home keeps its focus action within scrolling content. Bottom navigation is a compact icon-and-label row; selected tabs use lavender without a filled capsule.
+
+- Windows uses the standard OS title bar and resizable window frame, with dark title-bar theming requested through DWM. Do not restore custom caption buttons or resize hit testing.

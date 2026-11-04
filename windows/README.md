@@ -1,6 +1,6 @@
 # Amythest for Windows
 
-The window layout and visual rules are documented in the repository's `DESIGN.md`. The bundled title-bar icon uses the transparent Amythest mark. The app uses a black canvas, flat charcoal sections, restrained purple accents, and Home, Apps, Timer, and Settings navigation. Home leads with the animated geode; Timer holds focus controls. Account and Chrome website details are available under Settings.
+The window layout and visual rules are documented in the repository's `DESIGN.md`. The standard Windows title bar provides native window controls, resizing and the system menu, with the dark title-bar theme requested on supported Windows versions. The bundled title-bar icon uses the transparent Amythest mark. The app uses a black canvas, flat charcoal sections, restrained purple accents, and Home, Apps, Timer, and Settings navigation. Home leads with the animated geode; Timer holds focus controls. Account and Chrome website details are available under Settings.
 
 This is a native Windows companion to the Amythest Chrome extension. It tracks time spent in foreground desktop apps while you are using the computer. The Chrome extension continues to handle individual websites and videos.
 
@@ -8,8 +8,8 @@ This is a native Windows companion to the Amythest Chrome extension. It tracks t
 
 Choose one download:
 
-- **Installer:** Run `amythest-0.7.7-windows-setup.exe`. It installs for your Windows account, adds a Start menu shortcut, and can be removed from Installed Apps. No administrator permission is needed.
-- **Portable:** Extract `amythest-0.7.7-windows.zip` into a folder and open `Amythest.exe`. Keep `Amythest.NativeHost.exe`, `icon48.png`, and `amythest-geode-stages.png` beside it.
+- **Installer:** Run `amythest-0.7.8-windows-setup.exe`. It installs for your Windows account, adds a Start menu shortcut, and can be removed from Installed Apps. No administrator permission is needed.
+- **Portable:** Extract `amythest-0.7.8-windows.zip` into a folder and open `Amythest.exe`. Keep `Amythest.NativeHost.exe`, `icon48.png`, and `amythest-geode-stages.png` beside it.
 
 Leave Amythest running to track time. Closing its window sends it to the system tray; right-click the tray icon to reopen it or quit. Uninstalling the app leaves local screen-time data in `%LOCALAPPDATA%\Amythest` so it can be restored later.
 
@@ -45,4 +45,4 @@ Connect Chrome as described above, then create an account or sign in with email 
 
 ## Build from source
 
-On Windows, run `powershell -ExecutionPolicy Bypass -File windows\build.ps1 -Package` from the repository root. The script uses the Windows .NET Framework C# compiler and produces `windows\dist\Amythest.exe`, `windows\dist\Amythest.NativeHost.exe`, and `windows\dist\amythest-0.7.7-windows.zip`. If NSIS 3 is available, it also produces `windows\dist\amythest-0.7.7-windows-setup.exe` from `windows\installer.nsi`. Pass `-OutputDirectory` to build elsewhere when the installed or portable EXE is running. It compiles and runs core and bridge tests before packaging. The repository's MIT license also covers the Windows app.
+On Windows, run `powershell -ExecutionPolicy Bypass -File windows\build.ps1 -Package` from the repository root. The script uses the Windows .NET Framework C# compiler and produces `windows\dist\Amythest.exe`, `windows\dist\Amythest.NativeHost.exe`, and `windows\dist\amythest-0.7.8-windows.zip`. If NSIS 3 is available, it also produces `windows\dist\amythest-0.7.8-windows-setup.exe` from `windows\installer.nsi`. Pass `-OutputDirectory` to build elsewhere when the installed or portable EXE is running. It compiles and runs core and bridge tests before packaging. The repository's MIT license also covers the Windows app.

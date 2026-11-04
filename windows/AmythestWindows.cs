@@ -31,85 +31,6 @@ namespace Amythest.Windows
         }
     }
 
-    internal enum CaptionAction { Minimize, Maximize, Close }
-
-    internal sealed class CaptionButton : Control
-    {
-        private bool hot;
-        public CaptionAction Action { get; private set; }
-        public CaptionButton(CaptionAction action)
-        {
-            Action = action;
-            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint | ControlStyles.Selectable, true);
-            TabStop = true;
-            Size = new Size(action == CaptionAction.Close ? 58 : 34, 23);
-            Cursor = Cursors.Hand;
-            AccessibleRole = AccessibleRole.PushButton;
-            AccessibleName = action == CaptionAction.Maximize ? "Maximize or restore" : action.ToString();
-        }
-        protected override void OnMouseEnter(EventArgs e) { hot = true; Invalidate(); base.OnMouseEnter(e); }
-        protected override void OnMouseLeave(EventArgs e) { hot = false; Invalidate(); base.OnMouseLeave(e); }
-        protected override void OnMouseDown(MouseEventArgs e) { Invalidate(); base.OnMouseDown(e); }
-        protected override void OnMouseUp(MouseEventArgs e) { Invalidate(); base.OnMouseUp(e); }
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Space) { OnClick(EventArgs.Empty); e.Handled = true; }
-            base.OnKeyDown(e);
-        }
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            Rectangle rect = new Rectangle(0, 0, Width - 1, Height - 1);
-            bool close = Action == CaptionAction.Close;
-            Color surface = hot ? (close ? Color.FromArgb(190, 45, 55) : Color.FromArgb(38, 38, 43)) : Palette.Background;
-            using (SolidBrush brush = new SolidBrush(surface)) e.Graphics.FillRectangle(brush, rect);
-            using (Pen glyph = new Pen(Color.White, 1.8f))
-            {
-                glyph.StartCap = LineCap.Square;
-                glyph.EndCap = LineCap.Square;
-                int cx = Width / 2, cy = Height / 2;
-                if (Action == CaptionAction.Minimize) e.Graphics.DrawLine(glyph, cx - 5, cy + 4, cx + 5, cy + 4);
-                else if (Action == CaptionAction.Close)
-                {
-                    e.Graphics.DrawLine(glyph, cx - 5, cy - 5, cx + 5, cy + 5);
-                    e.Graphics.DrawLine(glyph, cx + 5, cy - 5, cx - 5, cy + 5);
-                }
-                else if (FindForm() != null && FindForm().WindowState == FormWindowState.Maximized)
-                {
-                    e.Graphics.DrawRectangle(glyph, cx - 3, cy - 5, 9, 8);
-                    e.Graphics.DrawRectangle(glyph, cx - 6, cy - 2, 9, 8);
-                }
-                else e.Graphics.DrawRectangle(glyph, cx - 5, cy - 4, 10, 9);
-            }
-            if (Focused) ControlPaint.DrawFocusRectangle(e.Graphics, new Rectangle(4, 4, Width - 8, Height - 8));
-        }
-    }
-
-    internal sealed class AeroCaption : Panel
-    {
-        public readonly CaptionButton MinimizeButton = new CaptionButton(CaptionAction.Minimize);
-        public readonly CaptionButton MaximizeButton = new CaptionButton(CaptionAction.Maximize);
-        public readonly CaptionButton CloseButton = new CaptionButton(CaptionAction.Close);
-        public AeroCaption()
-        {
-            DoubleBuffered = true;
-            Height = 35;
-            BackColor = Palette.Background;
-            Controls.Add(MinimizeButton);
-            Controls.Add(MaximizeButton);
-            Controls.Add(CloseButton);
-            Resize += delegate {
-                CloseButton.SetBounds(Width - 62, 4, 58, 23);
-                MaximizeButton.SetBounds(Width - 96, 4, 34, 23);
-                MinimizeButton.SetBounds(Width - 130, 4, 34, 23);
-            };
-        }
-        protected override void OnPaintBackground(PaintEventArgs e)
-        {
-            e.Graphics.Clear(Palette.Background);
-        }
-    }
-
     internal sealed class LogoMark : Control
     {
         public LogoMark()
@@ -395,31 +316,6 @@ namespace Amythest.Windows
             path.CloseFigure();
             return path;
         }
-        public static GraphicsPath CaptionShape(Rectangle rect, CaptionAction action)
-        {
-            GraphicsPath path = new GraphicsPath();
-            if (action == CaptionAction.Maximize) { path.AddRectangle(rect); return path; }
-            int d = 6;
-            if (action == CaptionAction.Minimize)
-            {
-                path.AddArc(rect.Left, rect.Top, d, d, 180, 90);
-                path.AddLine(rect.Left + d / 2, rect.Top, rect.Right, rect.Top);
-                path.AddLine(rect.Right, rect.Top, rect.Right, rect.Bottom);
-                path.AddLine(rect.Right, rect.Bottom, rect.Left + d / 2, rect.Bottom);
-                path.AddArc(rect.Left, rect.Bottom - d, d, d, 90, 90);
-            }
-            else
-            {
-                path.AddLine(rect.Left, rect.Top, rect.Right - d / 2, rect.Top);
-                path.AddArc(rect.Right - d, rect.Top, d, d, 270, 90);
-                path.AddLine(rect.Right, rect.Top + d / 2, rect.Right, rect.Bottom - d / 2);
-                path.AddArc(rect.Right - d, rect.Bottom - d, d, d, 0, 90);
-                path.AddLine(rect.Right - d / 2, rect.Bottom, rect.Left, rect.Bottom);
-                path.AddLine(rect.Left, rect.Bottom, rect.Left, rect.Top);
-            }
-            path.CloseFigure();
-            return path;
-        }
         public static Label Label(string text, int x, int y, int w, int h, float size, bool bold, Color? color = null)
         {
             return new Label { Text = text, Left = x, Top = y, Width = w, Height = h,
@@ -439,12 +335,7 @@ namespace Amythest.Windows
 
     internal sealed class MainForm : Form
     {
-        [DllImport("user32.dll")] private static extern bool ReleaseCapture();
-        [DllImport("user32.dll")] private static extern IntPtr SendMessage(IntPtr handle, int message, IntPtr wParam, IntPtr lParam);
-        private const int WmNcHitTest = 0x84;
-        private const int WmNcLButtonDown = 0xA1;
-        private const int HtCaption = 2;
-        private readonly AeroCaption caption = new AeroCaption();
+        [DllImport("dwmapi.dll")] private static extern int DwmSetWindowAttribute(IntPtr handle, int attribute, ref int value, int size);
         private readonly LocalStore store;
         private readonly Settings settings;
         private Dictionary<string, long> usage;
@@ -498,11 +389,10 @@ namespace Amythest.Windows
             BackColor = Palette.Background;
             ForeColor = Palette.Ink;
             Font = new Font("Segoe UI", 10);
-            FormBorderStyle = FormBorderStyle.None;
+            FormBorderStyle = FormBorderStyle.Sizable;
             Size = new Size(1100, 800);
             MinimumSize = new Size(940, 700);
             StartPosition = FormStartPosition.CenterScreen;
-            Load += delegate { MaximizedBounds = Screen.FromHandle(Handle).WorkingArea; };
             string iconPath = Path.Combine(Application.StartupPath, "icon48.png");
             if (File.Exists(iconPath))
             {
@@ -529,25 +419,6 @@ namespace Amythest.Windows
 
         private void BuildUi()
         {
-            Controls.Add(caption);
-            Label captionTitle = Ui.Label("Amythest — screen time for Windows", 13, 3, 410, 29, 9, false, Palette.Muted);
-            caption.Controls.Add(captionTitle);
-            MouseEventHandler beginDrag = delegate(object sender, MouseEventArgs e) {
-                if (e.Button != MouseButtons.Left || WindowState == FormWindowState.Maximized) return;
-                ReleaseCapture();
-                SendMessage(Handle, WmNcLButtonDown, (IntPtr)HtCaption, IntPtr.Zero);
-            };
-            caption.MouseDown += beginDrag;
-            captionTitle.MouseDown += beginDrag;
-            EventHandler toggleMaximize = delegate {
-                WindowState = WindowState == FormWindowState.Maximized ? FormWindowState.Normal : FormWindowState.Maximized;
-                caption.MaximizeButton.Invalidate();
-            };
-            caption.DoubleClick += toggleMaximize;
-            captionTitle.DoubleClick += toggleMaximize;
-            caption.MinimizeButton.Click += delegate { WindowState = FormWindowState.Minimized; };
-            caption.MaximizeButton.Click += toggleMaximize;
-            caption.CloseButton.Click += delegate { Close(); };
             Panel header = new Panel { BackColor = Palette.Background };
             Controls.Add(header);
             header.Controls.Add(new LogoMark { Left = 26, Top = 14, Width = 44, Height = 44 });
@@ -583,10 +454,9 @@ namespace Amythest.Windows
             Action layout = delegate {
                 int width = ClientSize.Width;
                 int height = ClientSize.Height;
-                caption.SetBounds(0, 0, width, 35);
-                header.SetBounds(0, 35, width, 78);
+                header.SetBounds(0, 0, width, 78);
                 footer.Visible = false;
-                tabs.SetBounds(28, 120, width - 56, Math.Max(150, height - 148));
+                tabs.SetBounds(28, 85, width - 56, Math.Max(150, height - 113));
             };
             Resize += delegate { layout(); };
             layout();
@@ -932,24 +802,11 @@ namespace Amythest.Windows
             layoutSettings();
         }
 
-        protected override void WndProc(ref Message message)
+        protected override void OnHandleCreated(EventArgs e)
         {
-            if (message.Msg == WmNcHitTest && WindowState != FormWindowState.Maximized)
-            {
-                Point point = PointToClient(new Point((short)(message.LParam.ToInt64() & 0xFFFF), (short)((message.LParam.ToInt64() >> 16) & 0xFFFF)));
-                int edge = 7;
-                bool left = point.X < edge, right = point.X >= ClientSize.Width - edge;
-                bool top = point.Y < edge, bottom = point.Y >= ClientSize.Height - edge;
-                if (top && left) { message.Result = (IntPtr)13; return; }
-                if (top && right) { message.Result = (IntPtr)14; return; }
-                if (bottom && left) { message.Result = (IntPtr)16; return; }
-                if (bottom && right) { message.Result = (IntPtr)17; return; }
-                if (left) { message.Result = (IntPtr)10; return; }
-                if (right) { message.Result = (IntPtr)11; return; }
-                if (top) { message.Result = (IntPtr)12; return; }
-                if (bottom) { message.Result = (IntPtr)15; return; }
-            }
-            base.WndProc(ref message);
+            base.OnHandleCreated(e);
+            int dark = 1;
+            DwmSetWindowAttribute(Handle, 20, ref dark, sizeof(int));
         }
 
         private static DateTimePicker TimePicker(int minutes, int x, int y)
