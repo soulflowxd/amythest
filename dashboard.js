@@ -3,6 +3,9 @@ const fmt = ms => { const m = Math.floor(ms/60000); return m >= 60 ? `${Math.flo
 const dateKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
 let state = {};
 let chartView = "day";
+const workExtras = document.createElement("div");
+workExtras.innerHTML = '<div class="setting-row"><label for="daily-break-limit">Five-minute breaks per day</label><input id="daily-break-limit" type="number" min="0" max="20" step="1" value="3"></div><p id="break-usage" class="status" role="status"></p><h3>Strict work-hours sites</h3><p class="muted">These entire websites, including subdomains and videos, stay paused during work hours. Breaks and written reasons cannot unlock them. These Chrome settings stay on this device.</p><form id="strict-work-form" class="strict-work-form"><input id="strict-work-site" type="text" placeholder="example.com" aria-label="Strict work-hours website" required><button type="submit">Add strict site</button></form><p id="strict-work-error" class="form-error" role="alert"></p><div id="strict-work-list" class="blocked-list"></div>';
+document.querySelector(".work-hours").append(workExtras);
 const keyFor = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 function parseDomain(raw) {
   let value = raw.trim().toLowerCase();
@@ -15,7 +18,7 @@ async function render() {
   await chrome.runtime.sendMessage({ type: "flushUsage" });
   const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate() - (6-i)); return d; });
   const keys = days.flatMap(d => [`usage:${keyFor(d)}`, `videoUsage:${keyFor(d)}`, `hours:${keyFor(d)}`, `hoursBySite:${keyFor(d)}`]);
-  state = await chrome.storage.local.get(["blockedSites", "siteLimits", "focusUntil", "sessionMinutes", "hardModeEnabled", "hardModeUntil", "dailyGoalMinutes", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "hideShortsFeed", "checkLongForm", ...keys]);
+  state = await chrome.storage.local.get(["strictWorkSites", "dailyBreakLimit", "breakUsage", "blockedSites", "siteLimits", "focusUntil", "sessionMinutes", "hardModeEnabled", "hardModeUntil", "dailyGoalMinutes", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "hideShortsFeed", "checkLongForm", ...keys]);
   const usage = chartView === "day" ? (state[`usage:${dateKey()}`] || {}) : days.reduce((sum, d) => { for (const [site, ms] of Object.entries(state[`usage:${keyFor(d)}`] || {})) sum[site] = (sum[site] || 0) + ms; return sum; }, {});
   const rows = Object.entries(usage).sort((a,b) => b[1]-a[1]);
   const total = rows.reduce((sum, row) => sum+row[1], 0);
@@ -57,6 +60,20 @@ async function render() {
   $("work-enabled").checked = !!state.workHoursEnabled;
   $("work-start").value = state.workStart || "09:00";
   $("work-end").value = state.workEnd || "17:00";
+  const breakLimit = state.dailyBreakLimit ?? 3;
+  const breaksUsed = state.breakUsage?.date === dateKey() ? state.breakUsage.count : 0;
+  $("daily-break-limit").value = breakLimit;
+  $("break-usage").textContent = `${breaksUsed || 0} used · ${Math.max(0, breakLimit - (breaksUsed || 0))} remaining today. Shared across all tabs; resets at local midnight. Set 0 to turn breaks off.`;
+  $("strict-work-list").replaceChildren();
+  for (const domain of state.strictWorkSites || []) {
+    const row = document.createElement("div"); row.className = "blocked-row";
+    const name = document.createElement("span"); name.textContent = domain;
+    const remove = document.createElement("button"); remove.textContent = "Remove";
+    remove.setAttribute("aria-label", `Remove strict work-hours block for ${domain}`);
+    remove.addEventListener("click", async () => { await chrome.storage.local.set({ strictWorkSites: state.strictWorkSites.filter(site => site !== domain) }); render(); });
+    row.append(name, remove); $("strict-work-list").append(row);
+  }
+  if (!state.strictWorkSites?.length) $("strict-work-list").textContent = "No strict sites selected.";
   $("work-status").textContent = state.workHoursEnabled ? "Your distraction list is blocked Monday through Friday during these hours." : "Work hours are off.";
   $("block-shorts").checked = state.blockShorts !== false;
   $("hide-shorts-feed").checked = state.hideShortsFeed !== false;
@@ -121,6 +138,22 @@ $("add-limit").addEventListener("submit", async e => {
 $("work-enabled").addEventListener("change", e => chrome.storage.local.set({ workHoursEnabled: e.target.checked }));
 $("work-start").addEventListener("change", e => chrome.storage.local.set({ workStart: e.target.value }));
 $("work-end").addEventListener("change", e => chrome.storage.local.set({ workEnd: e.target.value }));
+$("daily-break-limit").addEventListener("change", async event => {
+  const value = Number(event.target.value);
+  if (event.target.value === "" || !Number.isInteger(value) || value < 0 || value > 20) { event.target.setCustomValidity("Enter a whole number from 0 to 20."); event.target.reportValidity(); return; }
+  event.target.setCustomValidity("");
+  await chrome.storage.local.set({ dailyBreakLimit: value }); render();
+});
+$("daily-break-limit").addEventListener("input", event => event.target.setCustomValidity(""));
+$("strict-work-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const domain = parseDomain($("strict-work-site").value);
+  if (!domain) { $("strict-work-error").textContent = "Enter a website domain, such as youtube.com."; return; }
+  const sites = [...new Set([...(state.strictWorkSites || []), domain])];
+  if (sites.length > 200) { $("strict-work-error").textContent = "You can add up to 200 strict sites."; return; }
+  await chrome.storage.local.set({ strictWorkSites: sites, blockedSites: [...new Set([...(state.blockedSites || []), domain])] });
+  $("strict-work-site").value = ""; $("strict-work-error").textContent = ""; render();
+});
 $("block-shorts").addEventListener("change", e => chrome.storage.local.set({ blockShorts: e.target.checked }));
 $("hide-shorts-feed").addEventListener("change", e => chrome.storage.local.set({ hideShortsFeed: e.target.checked }));
 $("check-long-form").addEventListener("change", e => chrome.storage.local.set({ checkLongForm: e.target.checked }));

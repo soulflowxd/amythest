@@ -4,11 +4,13 @@ const DEFAULTS = {
   blockedSites: ["instagram.com", "tiktok.com", "x.com", "youtube.com"],
   siteLimits: {}, focusUntil: 0, pausedUntil: 0, sessionMinutes: 25, hardModeEnabled: false, hardModeUntil: 0,
   dailyGoalMinutes: 120, workHoursEnabled: false, workStart: "09:00", workEnd: "17:00",
+  strictWorkSites: [], dailyBreakLimit: 3, breakUsage: { date: "", count: 0 },
   blockShorts: true, hideShortsFeed: true, checkLongForm: true, videoAccess: {}, shortAccess: {}
 };
 let active = null;
 let recording = Promise.resolve();
 let syncing = Promise.resolve();
+let breaking = Promise.resolve();
 let nativeSyncing = null;
 let cloudSyncing = null;
 let applyingCloudSettings = false;
@@ -80,19 +82,31 @@ function isWorkTime({ workHoursEnabled, workStart, workEnd }, now = new Date()) 
   return (day >= 1 && day <= 5 && minutes >= start) || (day >= 2 && day <= 6 && minutes < end);
 }
 function blockedDomains(settings, usage, now = Date.now()) {
-  if (settings.pausedUntil > now && !(settings.hardModeUntil > now && settings.focusUntil > now)) return [];
+  const strict = isWorkTime(settings, new Date(now)) ? (settings.strictWorkSites || []) : [];
+  if (settings.pausedUntil > now && !(settings.hardModeUntil > now && settings.focusUntil > now)) return [...strict];
   const scheduled = settings.focusUntil > now || isWorkTime(settings, new Date(now));
   const domains = new Set(scheduled ? settings.blockedSites.filter(site => !(settings.checkLongForm && site === "youtube.com") && !(settings.blockShorts && ["instagram.com", "tiktok.com"].includes(site))) : []);
+  for (const site of strict) domains.add(site);
   for (const [site, limit] of Object.entries(settings.siteLimits)) {
     const spent = Object.entries(usage).filter(([domain]) => matches(domain, site)).reduce((sum, [, ms]) => sum + ms, 0);
     if (spent >= limit * 60000) domains.add(site);
   }
   return [...domains].slice(0, 200);
 }
+function breakAllowance(settings, now = Date.now()) {
+  const limit = Number.isInteger(settings.dailyBreakLimit) ? Math.max(0, Math.min(20, settings.dailyBreakLimit)) : 3;
+  const used = settings.breakUsage?.date === dateKey(now) ? Math.max(0, Number(settings.breakUsage.count) || 0) : 0;
+  return { dailyBreakLimit: limit, breaksRemaining: Math.max(0, limit - used), used };
+}
+function strictWorkBlock(url, settings, now = Date.now()) {
+  const domain = hostname(url);
+  return !!domain && isWorkTime(settings, new Date(now)) && (settings.strictWorkSites || []).some(site => matches(domain, site));
+}
 function sitePolicy(url, settings, usage, now = Date.now()) {
   const domain = hostname(url);
   if (!domain) return { mode: "allow" };
   const hard = settings.hardModeUntil > now && settings.focusUntil > now;
+  if (strictWorkBlock(url, settings, now)) return { mode: "block", strictWork: true, workHours: true, hard, ...breakAllowance(settings, now) };
   if (settings.pausedUntil > now && !hard) return { mode: "allow" };
   const short = settings.blockShorts ? shortContent(url) : null;
   if (short) {
@@ -100,7 +114,7 @@ function sitePolicy(url, settings, usage, now = Date.now()) {
     return { mode: "allow" };
   }
   if (blockedDomains(settings, usage, now).some(site => matches(domain, site))) {
-    return { mode: "block", focusUntil: settings.focusUntil, workHours: isWorkTime(settings, new Date(now)), hard };
+    return { mode: "block", focusUntil: settings.focusUntil, workHours: isWorkTime(settings, new Date(now)), hard, ...breakAllowance(settings, now) };
   }
   const video = youtubeVideo(url);
   if (settings.checkLongForm && video && (hard || !(settings.videoAccess?.[video.id]?.until > now))) {
@@ -164,16 +178,27 @@ async function policyForUrl(url) {
   const data = await chrome.storage.local.get(`usage:${dateKey()}`);
   return sitePolicy(url, settings, data[`usage:${dateKey()}`] || {});
 }
-async function grantBreak(url) {
-  const { focusUntil, hardModeUntil } = await chrome.storage.local.get(DEFAULTS);
+function grantBreak(url) {
+  const request = breaking.catch(() => {}).then(() => performBreak(url));
+  breaking = request;
+  return request;
+}
+async function performBreak(url) {
+  const settings = await chrome.storage.local.get(DEFAULTS);
+  const { focusUntil, hardModeUntil } = settings;
   if (focusUntil > Date.now() && hardModeUntil > Date.now()) return { ok: false, error: "Hard Mode is on until this focus session ends." };
+  if (strictWorkBlock(url, settings)) return { ok: false, error: "This site is strictly blocked during work hours. Breaks cannot unlock it." };
+  if (settings.pausedUntil > Date.now()) return { ok: true, until: settings.pausedUntil };
+  const allowance = breakAllowance(settings);
+  if (!allowance.breaksRemaining) return { ok: false, error: "You've used all of today's five-minute breaks." };
   const policy = await policyForUrl(url);
   if (policy.mode !== "block") return { ok: false, error: "This site is no longer blocked." };
   const until = Date.now() + 5 * 60000;
-  await chrome.storage.local.set({ pausedUntil: until });
-  return { ok: true, until };
+  await chrome.storage.local.set({ pausedUntil: until, breakUsage: { date: dateKey(), count: allowance.used + 1 } });
+  return { ok: true, until, breaksRemaining: allowance.breaksRemaining - 1 };
 }
 async function grantVideoAccess(message) {
+  if (strictWorkBlock(message.url, await chrome.storage.local.get(DEFAULTS))) return { ok: false, error: "This site is strictly blocked during work hours. Video reasons cannot unlock it." };
   const { focusUntil, hardModeUntil } = await chrome.storage.local.get(DEFAULTS);
   if (focusUntil > Date.now() && hardModeUntil > Date.now()) return { ok: false, error: "Hard Mode does not allow video unlocks during this session." };
   const video = youtubeVideo(message.url);
@@ -186,6 +211,7 @@ async function grantVideoAccess(message) {
   return { ok: true, url: video.url };
 }
 async function grantShortAccess(message) {
+  if (strictWorkBlock(message.url, await chrome.storage.local.get(DEFAULTS))) return { ok: false, error: "This site is strictly blocked during work hours. Video reasons cannot unlock it." };
   const { focusUntil, hardModeUntil } = await chrome.storage.local.get(DEFAULTS);
   if (focusUntil > Date.now() && hardModeUntil > Date.now()) return { ok: false, error: "Hard Mode does not allow short video unlocks during this session." };
   const shortId = shortContent(message.url)?.key;
@@ -396,7 +422,7 @@ chrome.tabs.onRemoved.addListener(refreshActive);
 chrome.windows.onFocusChanged.addListener(refreshActive);
 chrome.alarms.onAlarm.addListener(async () => { await recordElapsed(); await syncNativeUsage(); await syncCloud(); await syncRules(); });
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && Object.keys(changes).some(key => ["blockedSites", "siteLimits", "focusUntil", "hardModeUntil", "pausedUntil", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm"].includes(key) || key.startsWith("usage:"))) syncRules();
+  if (area === "local" && Object.keys(changes).some(key => ["strictWorkSites", "dailyBreakLimit", "breakUsage", "blockedSites", "siteLimits", "focusUntil", "hardModeUntil", "pausedUntil", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm"].includes(key) || key.startsWith("usage:"))) syncRules();
   if (area === "local" && !applyingCloudSettings && Object.keys(changes).some(key => CLOUD_SETTING_KEYS.includes(key))) {
     chrome.storage.local.set({ cloudSettingsDirty: true }).then(() => void syncCloud());
   }

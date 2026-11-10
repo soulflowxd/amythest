@@ -236,4 +236,10 @@ html { scrollbar-color: #8d86bd #dfe3f3; }
 .cloud-device-summary { margin-top: 18px; padding: 14px 16px; border: 1px solid rgba(104, 117, 171, .32); border-radius: 12px; background: rgba(242, 245, 255, .72); color: #283556; }
 .cloud-device-row { padding-top: 8px; font-size: .9rem; }
 .account-panel [hidden] { display: none !important; }
+.dashboard .work-hours h3 { font-size: 16px; margin: 24px 0 8px; color: var(--aero-ink); }
+.dashboard .strict-work-form { display: flex; flex-wrap: wrap; gap: 8px; }
+.dashboard .strict-work-form input { flex: 1 1 160px; min-width: 0; padding: 10px 12px; background: #fff; color: var(--aero-ink); border: 1px solid #9eabc8; border-radius: 6px; }
+.dashboard .strict-work-form button { min-height: 40px; padding: 8px 12px; color: var(--aero-ink); background: #e3e9f7; border: 1px solid #819edb; border-radius: 7px; font-weight: 600; }
+.dashboard #daily-break-limit { width: 72px; min-height: 38px; padding: 8px; border: 1px solid #9eabc8; border-radius: 6px; background: #fff; color: var(--aero-ink); }
+.dashboard #strict-work-list { margin-top: 12px; font-size: 12px; }
 .hard-mode-control{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:16px 0;color:var(--aero-ink);font-size:13px;font-weight:650}.hard-mode-control input{accent-color:#7953bc;width:18px;height:18px}.hard-mode-control small{display:block;flex-basis:100%;padding-left:26px;color:var(--aero-muted);font-size:11px;font-weight:400;line-height:1.45}.hard-mode-control input:focus-visible{outline:2px solid #7652b2;outline-offset:3px}.primary-button:disabled{opacity:.65;cursor:not-allowed}
