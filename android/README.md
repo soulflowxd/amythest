@@ -9,7 +9,7 @@ To check timer accounting without a phone, run `powershell -ExecutionPolicy Bypa
 ## Install
 
 1. Build with `powershell -ExecutionPolicy Bypass -File android/build.ps1`.
-2. Copy `android/dist/amythest-0.7.8-android.apk` to your phone and open it, or download it from the [v0.7.8 release](https://github.com/soulflowxd/amythest/releases/tag/v0.7.8).
+2. Copy `android/dist/amythest-0.7.9-android.apk` to your phone and open it, or download it from the [v0.7.9 release](https://github.com/soulflowxd/amythest/releases/tag/v0.7.9).
 3. If Android asks, allow installation from the app used to open the APK.
 4. Follow the four introduction screens. On the last screen, tap **Allow Usage Access**, then enable Amythest in Android settings. Return to Amythest to continue.
 5. Optionally tap **Enable app reminders** on the last screen or in Settings, then enable Amythest under Accessibility. This lets it observe foreground app package names locally; it does not read screen text.
