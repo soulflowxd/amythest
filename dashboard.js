@@ -6,6 +6,11 @@ let chartView = "day";
 const workExtras = document.createElement("div");
 workExtras.innerHTML = '<div class="setting-row"><label for="daily-break-limit">Five-minute breaks per day</label><input id="daily-break-limit" type="number" min="0" max="20" step="1" value="3"></div><p id="break-usage" class="status" role="status"></p><h3>Strict work-hours sites</h3><p class="muted">These entire websites, including subdomains and videos, stay paused during work hours. Breaks and written reasons cannot unlock them. These Chrome settings stay on this device.</p><form id="strict-work-form" class="strict-work-form"><input id="strict-work-site" type="text" placeholder="example.com" aria-label="Strict work-hours website" required><button type="submit">Add strict site</button></form><p id="strict-work-error" class="form-error" role="alert"></p><div id="strict-work-list" class="blocked-list"></div>';
 document.querySelector(".work-hours").append(workExtras);
+const limitScope = document.createElement("label");
+limitScope.className = "limit-work-scope";
+limitScope.innerHTML = '<input id="limit-work-only" type="checkbox"> Apply this limit only during work hours';
+document.querySelector("#add-limit").append(limitScope);
+document.querySelector(".limits .muted").textContent = "Set a time limit for any website, whether or not it is a distraction. Choose all day or work hours only. Once reached, the site stays blocked until tomorrow or your work hours end. Subdomains count together; breaks and video reasons cannot override a limit.";
 const keyFor = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 function parseDomain(raw) {
   let value = raw.trim().toLowerCase();
@@ -17,8 +22,8 @@ function parseDomain(raw) {
 async function render() {
   await chrome.runtime.sendMessage({ type: "flushUsage" });
   const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate() - (6-i)); return d; });
-  const keys = days.flatMap(d => [`usage:${keyFor(d)}`, `videoUsage:${keyFor(d)}`, `hours:${keyFor(d)}`, `hoursBySite:${keyFor(d)}`]);
-  state = await chrome.storage.local.get(["strictWorkSites", "dailyBreakLimit", "breakUsage", "blockedSites", "siteLimits", "focusUntil", "sessionMinutes", "hardModeEnabled", "hardModeUntil", "dailyGoalMinutes", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "hideShortsFeed", "checkLongForm", ...keys]);
+  const keys = days.flatMap(d => [`usage:${keyFor(d)}`, `workUsage:${keyFor(d)}`, `videoUsage:${keyFor(d)}`, `hours:${keyFor(d)}`, `hoursBySite:${keyFor(d)}`]);
+  state = await chrome.storage.local.get(["strictWorkSites", "dailyBreakLimit", "breakUsage", "blockedSites", "siteLimits", "siteLimitScopes", "focusUntil", "sessionMinutes", "hardModeEnabled", "hardModeUntil", "dailyGoalMinutes", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "hideShortsFeed", "checkLongForm", ...keys]);
   const usage = chartView === "day" ? (state[`usage:${dateKey()}`] || {}) : days.reduce((sum, d) => { for (const [site, ms] of Object.entries(state[`usage:${keyFor(d)}`] || {})) sum[site] = (sum[site] || 0) + ms; return sum; }, {});
   const rows = Object.entries(usage).sort((a,b) => b[1]-a[1]);
   const total = rows.reduce((sum, row) => sum+row[1], 0);
@@ -100,9 +105,13 @@ async function render() {
   $("limits-list").replaceChildren();
   Object.entries(state.siteLimits || {}).sort((a,b) => a[0].localeCompare(b[0])).forEach(([domain, minutes]) => {
     const row = document.createElement("div"); row.className = "blocked-row";
-    const label = document.createElement("span"); label.textContent = `${domain} · ${minutes} min/day`;
+    const label = document.createElement("span");
+    const workOnly = state.siteLimitScopes?.[domain] === "work";
+    const source = state[`${workOnly ? "workUsage" : "usage"}:${dateKey()}`] || {};
+    const spent = Object.entries(source).filter(([host]) => host === domain || host.endsWith(`.${domain}`)).reduce((sum, [, ms]) => sum + ms, 0);
+    label.textContent = `${domain} · ${Math.floor(spent / 60000)} of ${minutes} min ${workOnly ? "during work hours" : "today"}`;
     const button = document.createElement("button"); button.textContent = "Remove"; button.setAttribute("aria-label", `Remove limit for ${domain}`);
-    button.addEventListener("click", async () => { const siteLimits = { ...state.siteLimits }; delete siteLimits[domain]; await chrome.storage.local.set({ siteLimits }); render(); });
+    button.addEventListener("click", async () => { const siteLimits = { ...state.siteLimits }; const siteLimitScopes = { ...state.siteLimitScopes }; delete siteLimits[domain]; delete siteLimitScopes[domain]; await chrome.storage.local.set({ siteLimits, siteLimitScopes }); render(); });
     row.append(label, button); $("limits-list").append(row);
   });
   if (!Object.keys(state.siteLimits || {}).length) $("limits-list").innerHTML = '<div class="empty">No limits set yet.</div>';
@@ -133,7 +142,12 @@ $("add-limit").addEventListener("submit", async e => {
   if (!Number.isInteger(minutes) || minutes < 1 || minutes > 1440) { $("limit-error").textContent = "Choose 1 to 1440 minutes."; return; }
   if (!state.siteLimits?.[domain] && Object.keys(state.siteLimits || {}).length >= 100) { $("limit-error").textContent = "You can set up to 100 site limits."; return; }
   $("limit-error").textContent = ""; $("limit-site").value = ""; $("limit-minutes").value = "";
-  await chrome.storage.local.set({ siteLimits: { ...(state.siteLimits || {}), [domain]: minutes } }); render();
+  const siteLimitScopes = { ...(state.siteLimitScopes || {}) };
+  if ($("limit-work-only").checked) siteLimitScopes[domain] = "work";
+  else delete siteLimitScopes[domain];
+  await chrome.storage.local.set({ siteLimits: { ...(state.siteLimits || {}), [domain]: minutes }, siteLimitScopes });
+  $("limit-work-only").checked = false;
+  render();
 });
 $("work-enabled").addEventListener("change", e => chrome.storage.local.set({ workHoursEnabled: e.target.checked }));
 $("work-start").addEventListener("change", e => chrome.storage.local.set({ workStart: e.target.value }));

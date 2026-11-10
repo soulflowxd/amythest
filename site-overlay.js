@@ -101,8 +101,8 @@
       });
       }
     } else {
-      const reason = policy.strictWork ? "This site is strictly blocked until your work hours end." : policy.focusUntil > Date.now() ? "You're in a focus session." : policy.workHours ? "You're within your work hours." : "You've reached today's limit for this site.";
-      const breakNote = policy.strictWork ? "Breaks and video reasons cannot unlock this site during work hours." : policy.hard ? "Hard Mode is active. Breaks are off until this session ends." : policy.breaksRemaining === 0 ? "No five-minute breaks remain today. Your allowance resets at local midnight." : null;
+      const reason = policy.strictWork ? "This site is strictly blocked until your work hours end." : policy.siteLimit ? `You've reached the time limit for ${policy.siteLimit}${policy.workHours ? " during work hours" : " today"}.` : policy.focusUntil > Date.now() ? "You're in a focus session." : policy.workHours ? "You're within your work hours." : "You've reached today's limit for this site.";
+      const breakNote = policy.strictWork ? "Breaks and video reasons cannot unlock this site during work hours." : policy.siteLimit ? `This limit stays in place until ${policy.workHours ? "work hours end" : "local midnight"}. Breaks and video reasons cannot unlock it.` : policy.hard ? "Hard Mode is active. Breaks are off until this session ends." : policy.breaksRemaining === 0 ? "No five-minute breaks remain today. Your allowance resets at local midnight." : null;
       content.innerHTML = `${guardMarkup}<span class="eyebrow">A GENTLE REMINDER</span><h1 id="amythest-title">Your attention is <em>worth protecting.</em></h1><p id="block-reason"></p>${breakNote ? '<p id="break-note" class="note"></p>' : '<button id="break" class="primary" type="button">Take a 5-minute break <span>→</span></button><p id="break-note" class="note"></p>'}<p class="note">Your website will stay open behind this reminder.</p>`;
       shadow.getElementById("break-note").textContent = breakNote || `${policy.breaksRemaining} of ${policy.dailyBreakLimit} breaks remaining today.`;
       shadow.getElementById("block-reason").textContent = `${reason} Take a breath, then return to what matters to you.`;
@@ -156,7 +156,7 @@
   }
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && Object.keys(changes).some(key => key.startsWith("usage:") || ["strictWorkSites", "dailyBreakLimit", "breakUsage", "blockedSites", "siteLimits", "focusUntil", "hardModeUntil", "pausedUntil", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm", "videoAccess", "shortAccess"].includes(key))) refresh();
+    if (area === "local" && Object.keys(changes).some(key => key.startsWith("usage:") || key.startsWith("workUsage:") || ["strictWorkSites", "dailyBreakLimit", "breakUsage", "blockedSites", "siteLimits", "siteLimitScopes", "focusUntil", "hardModeUntil", "pausedUntil", "workHoursEnabled", "workStart", "workEnd", "blockShorts", "checkLongForm", "videoAccess", "shortAccess"].includes(key))) refresh();
   });
   chrome.runtime.onMessage.addListener(message => { if (message.type === "policyChanged") { onLocationChange(); refresh(); } });
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });

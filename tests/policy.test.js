@@ -15,5 +15,5 @@ assert.equal(policy.isWorkTime(base, new Date(mondayMorning)), true);
 assert.equal(policy.isWorkTime(base, new Date(sundayMorning)), false);
 assert.deepEqual([...policy.blockedDomains(base, {}, mondayMorning)], ["youtube.com"]);
 assert.deepEqual([...policy.blockedDomains(base, { "www.example.com": 20 * 60000, "mail.example.com": 10 * 60000 }, sundayMorning)], ["example.com"]);
-assert.deepEqual([...policy.blockedDomains({ ...base, pausedUntil: mondayMorning + 300000 }, { "example.com": 31 * 60000 }, mondayMorning)], []);
+assert.deepEqual([...policy.blockedDomains({ ...base, pausedUntil: mondayMorning + 300000 }, { "example.com": 31 * 60000 }, mondayMorning)], ["example.com"]);
 console.log("Policy checks passed");

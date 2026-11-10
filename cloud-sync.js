@@ -26,7 +26,7 @@
   const settingsValue = local => ({
     dailyDistractionGoalMinutes: local.dailyGoalMinutes || 120,
     distractionDomains: local.blockedSites || [],
-    siteLimits: Object.entries(local.siteLimits || {}).map(([domain, minutes]) => ({ domain, minutes })),
+    siteLimits: Object.entries(local.siteLimits || {}).map(([domain, minutes]) => ({ domain, minutes, workHoursOnly: local.siteLimitScopes?.[domain] === "work" })),
     workHours: { enabled: !!local.workHoursEnabled, start: local.workStart || "09:00", end: local.workEnd || "17:00" },
     blockShorts: local.blockShorts !== false,
     checkLongForm: local.checkLongForm !== false
@@ -35,6 +35,7 @@
     dailyGoalMinutes: remote.dailyDistractionGoalMinutes,
     blockedSites: remote.distractionDomains,
     siteLimits: Object.fromEntries(remote.siteLimits.map(({ domain, minutes }) => [domain, minutes])),
+    siteLimitScopes: Object.fromEntries(remote.siteLimits.filter(entry => entry.workHoursOnly).map(({ domain }) => [domain, "work"])),
     workHoursEnabled: remote.workHours.enabled,
     workStart: remote.workHours.start,
     workEnd: remote.workHours.end,

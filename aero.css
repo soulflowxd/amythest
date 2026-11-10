@@ -242,4 +242,7 @@ html { scrollbar-color: #8d86bd #dfe3f3; }
 .dashboard .strict-work-form button { min-height: 40px; padding: 8px 12px; color: var(--aero-ink); background: #e3e9f7; border: 1px solid #819edb; border-radius: 7px; font-weight: 600; }
 .dashboard #daily-break-limit { width: 72px; min-height: 38px; padding: 8px; border: 1px solid #9eabc8; border-radius: 6px; background: #fff; color: var(--aero-ink); }
 .dashboard #strict-work-list { margin-top: 12px; font-size: 12px; }
+.dashboard .limits form { flex-wrap: wrap; }
+.dashboard .limits .limit-work-scope { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; color: var(--aero-ink); font-size: 12px; }
+.dashboard .limits .limit-work-scope input { width: 16px; height: 16px; min-height: 0; padding: 0; accent-color: #7953bc; }
 .hard-mode-control{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:16px 0;color:var(--aero-ink);font-size:13px;font-weight:650}.hard-mode-control input{accent-color:#7953bc;width:18px;height:18px}.hard-mode-control small{display:block;flex-basis:100%;padding-left:26px;color:var(--aero-muted);font-size:11px;font-weight:400;line-height:1.45}.hard-mode-control input:focus-visible{outline:2px solid #7652b2;outline-offset:3px}.primary-button:disabled{opacity:.65;cursor:not-allowed}

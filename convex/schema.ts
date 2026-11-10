@@ -31,7 +31,7 @@ export default defineSchema({
     updatedAt: v.number(),
     dailyDistractionGoalMinutes: v.number(),
     distractionDomains: v.array(v.string()),
-    siteLimits: v.array(v.object({ domain: v.string(), minutes: v.number() })),
+    siteLimits: v.array(v.object({ domain: v.string(), minutes: v.number(), workHoursOnly: v.optional(v.boolean()) })),
     workHours: v.object({ enabled: v.boolean(), start: v.string(), end: v.string() }),
     blockShorts: v.boolean(),
     checkLongForm: v.boolean(),

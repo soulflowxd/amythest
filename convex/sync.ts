@@ -13,7 +13,7 @@ const site = v.object({
 const settings = v.object({
   dailyDistractionGoalMinutes: v.number(),
   distractionDomains: v.array(v.string()),
-  siteLimits: v.array(v.object({ domain: v.string(), minutes: v.number() })),
+  siteLimits: v.array(v.object({ domain: v.string(), minutes: v.number(), workHoursOnly: v.optional(v.boolean()) })),
   workHours: v.object({ enabled: v.boolean(), start: v.string(), end: v.string() }),
   blockShorts: v.boolean(),
   checkLongForm: v.boolean(),
@@ -92,7 +92,7 @@ export const putSettings = mutation({
     if (!Number.isSafeInteger(args.expectedRevision) || args.expectedRevision < 0) throw new ConvexError("Invalid revision");
     if (!Number.isSafeInteger(s.dailyDistractionGoalMinutes) || s.dailyDistractionGoalMinutes < 1 || s.dailyDistractionGoalMinutes > 1440) throw new ConvexError("Invalid goal");
     if (s.distractionDomains.length > 200 || s.distractionDomains.some(d => !validDomain(d)) || new Set(s.distractionDomains).size !== s.distractionDomains.length) throw new ConvexError("Invalid distraction domains");
-    if (s.siteLimits.length > 200 || s.siteLimits.some(x => !validDomain(x.domain) || !Number.isSafeInteger(x.minutes) || x.minutes < 1 || x.minutes > 1440)) throw new ConvexError("Invalid site limits");
+    if (s.siteLimits.length > 200 || s.siteLimits.some(x => !validDomain(x.domain) || !Number.isSafeInteger(x.minutes) || x.minutes < 1 || x.minutes > 1440 || (x.workHoursOnly !== undefined && typeof x.workHoursOnly !== "boolean"))) throw new ConvexError("Invalid site limits");
     if (new Set(s.siteLimits.map(x => x.domain)).size !== s.siteLimits.length) throw new ConvexError("Duplicate site limits");
     if (![s.workHours.start, s.workHours.end].every(x => /^([01]\d|2[0-3]):[0-5]\d$/.test(x))) throw new ConvexError("Invalid work hours");
     const row = await ctx.db.query("accountSettings").withIndex("by_user", q => q.eq("userId", userId)).unique();

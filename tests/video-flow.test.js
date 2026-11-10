@@ -52,9 +52,9 @@ async function main() {
   saved.siteLimits = { "example.com": 1 };
   saved[`usage:${vm.runInContext("dateKey()", context)}`] = { "example.com": 2 * 60000 };
   assert.equal((await vm.runInContext("policyForUrl('https://example.com/')", context)).mode, "block");
-  assert.equal((await vm.runInContext("grantBreak('https://example.com/')", context)).ok, true);
-  assert.equal((await vm.runInContext("policyForUrl('https://example.com/')", context)).mode, "allow");
-  assert.equal((await vm.runInContext("policyForUrl('https://www.youtube.com/shorts/otherid1234')", context)).mode, "allow");
+  assert.equal((await vm.runInContext("grantBreak('https://example.com/')", context)).ok, false);
+  assert.equal((await vm.runInContext("policyForUrl('https://example.com/')", context)).mode, "block");
+  assert.equal((await vm.runInContext("policyForUrl('https://www.youtube.com/shorts/otherid1234')", context)).mode, "shorts");
   saved.pausedUntil = Date.now() - 1;
   assert.equal((await vm.runInContext("policyForUrl('https://example.com/')", context)).mode, "block");
   saved.focusUntil = Date.now() + 60000;
