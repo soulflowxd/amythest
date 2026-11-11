@@ -13,7 +13,7 @@ Amythest is a screen-time and focus extension. It measures time on websites whil
 
 ## Permissions
 
-Amythest requests access to websites so it can measure active-tab time and show an in-page reminder without redirecting the tab. It uses tabs, web navigation, and alarms to notice page changes and update time records. It uses storage for settings and activity, declarative net request for its blocking policy, and native messaging for the optional Windows companion.
+Amythest requests access to websites so it can measure active-tab time and show an in-page reminder without redirecting the tab. It uses tabs, web navigation, and alarms to notice page changes and update time records. It uses storage for settings and activity, declarative net request to clear older dynamic blocking rules from prior versions, and native messaging for the optional Windows companion.
 
 ## Sharing and control
 
